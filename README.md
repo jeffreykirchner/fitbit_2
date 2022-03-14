@@ -1,5 +1,5 @@
-# multi_user_socket_template
-Fitbit 2 research project.
+# Fitbit 2
+Research project.
 
 
 
