@@ -1,0 +1,64 @@
+<div class="card" v-show="first_load_done">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+            Players ([[session.parameter_set.parameter_set_players.length]]) 
+        </span>      
+
+        <span class="float-end">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Parameters Players')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span> 
+                
+    </div>
+    <div class="card-body" >        
+
+        <div class="row justify-content-center">
+            <!-- player settings -->
+            <div class="col-md-auto text-center">                
+                <div class="table-responsive">
+                <table class="table table-condensed"> 
+                    <thead>
+                        <tr>
+                            <th scope="col" class = "m-1 p-1">
+                                #
+                            </th> 
+                            <th scope="col" class = "m-1 p-1">
+                                Label
+                            </th>                           
+                        </tr>
+                    </thead>
+                    <tbody id="player_list">
+                        <tr v-for="(p, index) in session.parameter_set.parameter_set_players" v-bind:key="p.id">
+                            <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell">
+                                [[index+1]]
+                            </td>
+                            <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell">
+                                [[p.id_label]]
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <!-- copy groups forward -->
+                        <tr>
+                            <td>
+                                <button class="btn btn-outline-success btn-sm"
+                                        type="button"
+                                        title="Add player"
+                                        v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_players.length >= 24"
+                                        v-on:click="sendAddParameterSetPlayer()">
+                                       Add <i class="fas fa-plus"></i>
+                                </button>
+                            </td>                            
+                            <td>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </div>
+            </div>
+        </div>  
+        
+    </div>                    
+</div> 
