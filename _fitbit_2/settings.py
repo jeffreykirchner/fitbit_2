@@ -45,7 +45,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = '_multi_user_socket_template.urls'
+ROOT_URLCONF = '_fitbit_2.urls'
 ADMIN_SITE_HEADER = 'Multi User Socket Template Administration'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -60,16 +60,16 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                '_multi_user_socket_template.context_processors.get_debug',
-                '_multi_user_socket_template.context_processors.get_auth_account_url',
-                '_multi_user_socket_template.context_processors.get_auth_password_reset_url',
+                '_fitbit_2.context_processors.get_debug',
+                '_fitbit_2.context_processors.get_auth_account_url',
+                '_fitbit_2.context_processors.get_auth_password_reset_url',
             ],
         },
     },
 ]
 
-#WSGI_APPLICATION = '_multi_user_socket_template.wsgi.application'
-ASGI_APPLICATION = '_multi_user_socket_template.asgi.application'
+#WSGI_APPLICATION = '_fitbit_2.wsgi.application'
+ASGI_APPLICATION = '_fitbit_2.asgi.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

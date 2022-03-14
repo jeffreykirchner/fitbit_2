@@ -10,7 +10,7 @@
 import os
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "_multi_user_socket_template.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "_fitbit_2.settings")
 django_asgi_app = get_asgi_application()
 
 from channels.auth import AuthMiddlewareStack

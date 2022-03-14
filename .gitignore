@@ -1,5 +1,5 @@
 logs/*
-_multi_user_socket_template_env/*
+_fitbit_2_env/*
 .vscode/*
 *.pyc
 setup.sh
