@@ -32,6 +32,7 @@
 {%include "staff/staff_session_parameters/general_settings/edit_parameterset_modal.html"%}
 {%include "staff/staff_session_parameters/players/edit_parameterset_player_modal.html"%}
 {%include "staff/staff_session_parameters/periods/edit_parameterset_periods_modal.html"%}
+{%include "staff/staff_session_parameters/zone_minutes/edit_parameterset_zone_minutes_modal.html"%}
 {%include "staff/staff_session_parameters/control/upload_parameters_modal.html"%}
 {%include "staff/staff_session_parameters/control/import_parameters_modal.html"%}
 {%include "help_modal.html"%}
@@ -51,6 +52,9 @@
 
 <div class="row justify-content-lg-center" v-cloak>
     <div class="col-md">
+        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes_card.html"%}  
+    </div>
+    <div class="col-md-9">
         {%include "staff/staff_session_parameters/periods/periods_card.html"%}  
     </div>
 </div>

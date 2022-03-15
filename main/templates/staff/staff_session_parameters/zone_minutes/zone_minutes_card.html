@@ -1,0 +1,77 @@
+<div class="card" v-show="first_load_done">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+           Zone Minutes
+        </span>  
+        
+        <span class="float-end">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Parameters Periods')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>
+    </div>
+    <div class="card-body">        
+        <div class="row justify-content-center">
+            <!-- active minutes settings -->
+            <div class="col-md-auto text-center">                
+                <div class="table-responsive">
+                <table class="table table-condensed"> 
+                    <thead>
+                        <tr>
+                            <th scope="col" class = "m-1 p-1">
+                                #
+                            </th> 
+                            <th scope="col" class = "m-1 p-1">
+                                Value
+                            </th>
+                            <th scope="col" class = "m-1 p-1">
+                                Label
+                            </th>                            
+                        </tr>
+                    </thead>
+                    <tbody id="zone_minutes_list">
+                        <tr v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id">
+                            <td v-on:click="showEditParametersetZoneMinutes(index)" class="player_table_cell">
+                                [[index+1]]
+                            </td>
+                            <td v-on:click="showEditParametersetZoneMinutes(index)" class="player_table_cell">
+                                [[p.zone_minutes]]
+                            </td>
+                            <td v-on:click="showEditParametersetZoneMinutes(index)" class="player_table_cell">
+                                [[p.label]]                         
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <!-- copy groups forward -->
+                        <tr>
+                            <td>
+                                <button class="btn btn-outline-success btn-sm me-2"
+                                        type="button"
+                                        title="Add player"
+                                        v-bind:disabled="session.started || reconnecting || working"
+                                        v-on:click="sendAddParameterSetZoneMinutes(1)">
+                                       Add <i class="fas fa-plus"></i>
+                                </button>
+
+                                <button class="btn btn-outline-danger btn-sm"
+                                        type="button"
+                                        title="Add player"
+                                        v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_zone_minutes.length <= 1"
+                                        v-on:click="sendAddParameterSetZoneMinutes(-1)">
+                                       Delete <i class="fas fa-minus"></i>
+                                </button>
+                            </td>                            
+                            <td>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </div>
+            </div>
+        </div>  
+        
+        
+    </div>                    
+</div> 

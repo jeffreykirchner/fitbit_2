@@ -32,6 +32,7 @@ hideEditParametersetPeriod:function(){
 sendUpdatePeriods(){
     
     app.working = true;
+    app.cancelModal=false;
     app.sendMessage("update_parameterset_period", {"sessionID" : app.sessionID,
                                                     "formData" : app.current_parameter_set_period,});
 },
@@ -40,7 +41,7 @@ sendUpdatePeriods(){
 */
 takeUpdatePeriods(messageData){
 
-    app.$data.cancelModal=false;
+    app.cancelModal=false;
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -65,12 +66,11 @@ sendAddParameterSetPeriod(value){
 },
 
 takeAddParameterSetPeriod(messageData){
-    app.$data.cancelModal=false;
+    app.cancelModal=false;
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
-    {
-        app.takeGetSession(messageData);       
+    {   
         app.session.parameter_set = messageData.status.parameter_set;      
     } 
 },

@@ -10,7 +10,7 @@ import main
 
 class ParameterSetPlayer(models.Model):
     '''
-    session player parameters 
+    paramterset player parameters 
     '''
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_players")

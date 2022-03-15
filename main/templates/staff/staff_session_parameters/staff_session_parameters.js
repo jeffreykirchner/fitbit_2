@@ -18,11 +18,13 @@ var app = Vue.createApp({
                     valuecost_modal_label:'Edit Value or Cost',
 
                     current_parameter_set_player : {{first_parameter_set_player_json|safe}},  
-                    current_parameter_set_period : {{first_parameter_set_period_json|safe}},                 
+                    current_parameter_set_period : {{first_parameter_set_period_json|safe}},  
+                    current_parameter_set_zone_minutes : {{first_parameter_set_zone_minutes_json|safe}},                 
 
                     parameterset_form_ids: {{parameterset_form_ids|safe}},
                     parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
                     parameterset_period_form_ids: {{parameterset_period_form_ids|safe}},
+                    parameterset_zone_minutes_form_ids: {{parameterset_zone_minutes_form_ids|safe}},
 
                     upload_file: null,
                     upload_file_name:'Choose File',
@@ -75,6 +77,12 @@ var app = Vue.createApp({
                     break;   
                 case "update_parameterset_period":
                     app.takeUpdatePeriods(messageData)  ;
+                    break; 
+                case "add_parameterset_zone_minutes":
+                    app.takeAddParameterSetZoneMinutes(messageData)  ;
+                    break;   
+                case "update_parameterset_zone_minutes":
+                    app.takeUpdateZoneMinutes(messageData)  ;
                     break;     
                 case "import_parameters":
                     app.takeImportParameters(messageData);
@@ -113,9 +121,9 @@ var app = Vue.createApp({
         */
         takeGetSession(messageData){
             
-            app.$data.session = messageData.session;
+            app.session = messageData.session;
 
-            if(app.$data.session.started)
+            if(app.session.started)
             {
                 
             }
@@ -167,6 +175,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session_parameters/control/control.js"%}
         {%include "staff/staff_session_parameters/players/players.js"%}
         {%include "staff/staff_session_parameters/periods/periods.js"%}
+        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages
@@ -237,6 +246,7 @@ var app = Vue.createApp({
         $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
         $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
         $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
+        $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
     },
 
 }).mount('#app');

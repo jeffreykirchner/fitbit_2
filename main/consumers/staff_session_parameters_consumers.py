@@ -18,10 +18,12 @@ from main.forms import SessionForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
+from main.forms import ParameterSetZoneMinutesForm
 
 from main.models import Session
 from main.models import ParameterSetPlayer
 from main.models import ParameterSetPeriod
+from main.models import ParameterSetZoneMinutes
 
 import main
 
@@ -55,7 +57,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         #build response
         message_data = {}
         message_data["status"] = await sync_to_async(take_update_parameterset)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "update_parameterset"
@@ -71,7 +72,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_update_parameterset_player)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "update_parameterset_player"
@@ -87,7 +87,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_remove_parameterset_player)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "remove_parameterset_player"
@@ -103,7 +102,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_add_parameterset_player)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "add_parameterset_player"
@@ -119,10 +117,9 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_add_parameterset_period)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
-        message["messageType"] = "add_parameterset_player"
+        message["messageType"] = "add_parameterset_period"
         message["messageData"] = message_data
 
         # Send message to WebSocket
@@ -135,10 +132,39 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_update_parameterset_period)(event["message_text"])
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "update_parameterset_period"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def add_parameterset_zone_minutes(self, event):
+        '''
+        add a parameterset zone minutes
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_add_parameterset_zone_minutes)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "add_parameterset_zone_minutes"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_parameterset_zone_minutes(self, event):
+        '''
+        update a parameterset zone minutes
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_zone_minutes)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_parameterset_zone_minutes"
         message["messageData"] = message_data
 
         # Send message to WebSocket
@@ -394,7 +420,7 @@ def take_add_parameterset_period(data):
     elif session.parameter_set.parameter_set_periods.count()>1:
         session.parameter_set.parameter_set_periods.last().delete()
 
-    return {"status" : "success", "parameter_set" : session.parameter_set.json()}
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
 def take_update_parameterset_period(data):
     '''
@@ -412,15 +438,62 @@ def take_update_parameterset_period(data):
     except ObjectDoesNotExist:
         logger.warning(f"take_update_parameterset_period paramterset_period, not found ID: {form_data['id']}")
         return
-    
-    # form_data_dict = {}
-
-    # for field in form_data:            
-    #     form_data_dict[field["name"]] = field["value"]
-
-    # logger.info(f'form_data_dict : {form_data_dict}')
 
     form = ParameterSetPeriodForm(form_data, instance=parameter_set_period)
+
+    if form.is_valid():
+        #print("valid form")             
+        form.save()              
+
+        session = Session.objects.get(id=session_id)
+
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
+                                
+    logger.info("Invalid parameterset player form")
+    return {"value" : "fail", "errors" : dict(form.errors.items())}
+
+def take_add_parameterset_zone_minutes(data):
+    '''
+    add a new parameter set zone minutes
+    '''
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Add parameterset zone minutes: {data}")
+
+    session_id = data["sessionID"]
+    value = data["value"]
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
+        return
+
+    if value == 1:
+        if session.parameter_set.parameter_set_zone_minutes.filter(zone_minutes=0).count()==0:
+            session.parameter_set.add_new_zone_minutes()
+    elif session.parameter_set.parameter_set_zone_minutes.count()>1:
+        session.parameter_set.parameter_set_zone_minutes.first().delete()
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
+
+def take_update_parameterset_zone_minutes(data):
+    '''
+    update parameterset zone minutes
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset zone minutes: {data}")
+
+    session_id = data["sessionID"]
+    # paramterset_period_id = data["paramterset_period_id"]
+    form_data = data["formData"]
+
+    try:        
+        parameter_set_zone_minutes = ParameterSetZoneMinutes.objects.get(id=form_data["id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_parameterset_zone_minutes paramterset_period, not found ID: {form_data['id']}")
+        return
+
+    form = ParameterSetZoneMinutesForm(form_data, instance=parameter_set_zone_minutes)
 
     if form.is_valid():
         #print("valid form")             
