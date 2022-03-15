@@ -16,12 +16,13 @@ var app = Vue.createApp({
                     sessionID : {{session.id}},
                     session : {{session_json|safe}},                   
                     valuecost_modal_label:'Edit Value or Cost',
-                    current_parameter_set_player : {
-                        id:0,
-                    },                  
+
+                    current_parameter_set_player : {{first_parameter_set_player_json|safe}},  
+                    current_parameter_set_period : {{first_parameter_set_period_json|safe}},                 
 
                     parameterset_form_ids: {{parameterset_form_ids|safe}},
                     parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
+                    parameterset_period_form_ids: {{parameterset_period_form_ids|safe}},
 
                     upload_file: null,
                     upload_file_name:'Choose File',
@@ -68,7 +69,13 @@ var app = Vue.createApp({
                     break;
                 case "add_parameterset_player":
                     app.takeAddParameterSetPlayer(messageData);
-                    break;                
+                    break;     
+                case "add_parameterset_period":
+                    app.takeAddParameterSetPeriod(messageData)  ;
+                    break;   
+                case "update_parameterset_period":
+                    app.takeUpdatePeriods(messageData)  ;
+                    break;     
                 case "import_parameters":
                     app.takeImportParameters(messageData);
                     break;
@@ -159,6 +166,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session_parameters/general_settings/general_settings.js"%}
         {%include "staff/staff_session_parameters/control/control.js"%}
         {%include "staff/staff_session_parameters/players/players.js"%}
+        {%include "staff/staff_session_parameters/periods/periods.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages
@@ -171,14 +179,28 @@ var app = Vue.createApp({
                 $("#id_errors_" + item).remove();
             }
 
-            s = app.$data.parameterset_form_ids;
+            s = app.parameterset_form_ids;
             for(var i in s)
             {
                 $("#id_" + s[i]).attr("class","form-control");
                 $("#id_errors_" + s[i]).remove();
             }
 
-            s = app.$data.parameterset_player_form_ids;
+            s = app.parameterset_player_form_ids;
+            for(var i in s)
+            {
+                $("#id_" + s[i]).attr("class","form-control");
+                $("#id_errors_" + s[i]).remove();
+            }
+
+            s = app.parameterset_player_form_ids;
+            for(var i in s)
+            {
+                $("#id_" + s[i]).attr("class","form-control");
+                $("#id_errors_" + s[i]).remove();
+            }
+
+            s = app.parameterset_period_form_ids;
             for(var i in s)
             {
                 $("#id_" + s[i]).attr("class","form-control");
@@ -214,6 +236,7 @@ var app = Vue.createApp({
         $('#importParametersModal').on("hidden.bs.modal", this.hideImportParameters); 
         $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
         $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
+        $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
     },
 
 }).mount('#app');

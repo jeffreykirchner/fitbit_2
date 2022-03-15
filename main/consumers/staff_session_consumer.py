@@ -167,100 +167,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
                      "sender_channel_name": self.channel_name},
                 )
 
-    async def start_timer(self, event):
-        '''
-        start or stop timer 
-        '''
-        logger = logging.getLogger(__name__)
-
-        logger.info(f"start_timer {event}")
-
-        result = await sync_to_async(take_start_timer)(self.session_id, event["message_text"])
-
-        message_data = {}
-        message_data["status"] = result
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        if event["message_text"]["action"] == "start":
-            self.timer_running = True
-        else:
-            self.timer_running = False
-
-        #Send reply to sending channel
-        if self.timer_running == True:
-            await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
-        #update all that timer has started
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "update_time",
-                "data": result,
-                "sender_channel_name": self.channel_name,},
-        )
-
-        if result["value"] == "success" and event["message_text"]["action"] == "start":
-            #start continue timer
-            await self.channel_layer.send(
-                self.channel_name,
-                {
-                    'type': "continue_timer",
-                    'message_text': {},
-                }
-            )
-        else:
-            logger.warning(f"start_timer: {message}")
-        
-        logger.info(f"start_timer complete {event}")
-
-    async def continue_timer(self, event):
-        '''
-        continue to next second of the experiment
-        '''
-        logger = logging.getLogger(__name__)
-        logger.info(f"continue_timer start")
-
-        if not self.timer_running:
-            logger.info(f"continue_timer timer off")
-            return
-
-        # await asyncio.sleep(1)
-
-        if not self.timer_running:
-            logger.info(f"continue_timer timer off")
-            return
-
-        timer_result = await sync_to_async(take_do_period_timer)(self.session_id)
-
-        # timer_result = await do_period_timer(self.session_id)
-
-        if timer_result["value"] == "success":
-
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {"type": "update_time",
-                "data": timer_result,
-                "sender_channel_name": self.channel_name,},
-            )
-
-            #if session is not over continue
-            if not timer_result["end_game"]:
-
-                loop = asyncio.get_event_loop()
-
-                loop.call_later(1, asyncio.create_task, 
-                                self.channel_layer.send(
-                                    self.channel_name,
-                                    {
-                                        'type': "continue_timer",
-                                        'message_text': {},
-                                    }
-                                ))
-        
-        logger.info(f"continue_timer end")
-
     async def download_summary_data(self, event):
         '''
         download summary data
@@ -439,52 +345,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
-    async def update_move_goods(self, event):
-        '''
-        update good count staff
-        '''
-        # logger = logging.getLogger(__name__) 
-        # logger.info(f'update_goods{self.channel_name}')
-
-        message_data = {}
-        message_data["status"] = event["data"]
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
-    async def update_time(self, event):
-        '''
-        update running, phase and time status
-        '''
-
-        message_data = {}
-        message_data["status"] = event["data"]
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
-    async def update_groups(self, event)  :
-        '''
-        update groups on client
-        '''
-
-        result = await sync_to_async(take_update_groups)(self.session_id)
-
-        message_data = {}
-        message_data["status"] = result
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
     async def update_connection_status(self, event):
         '''
         handle connection status update from group member
@@ -508,23 +368,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     async def update_name(self, event):
         '''
         send update name notice to staff screens
-        '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
-
-        message_data = {}
-        message_data["status"] = event["data"]
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-    
-    async def update_avatar(self, event):
-        '''
-        send update avatar notice to staff screens
         '''
 
         # logger = logging.getLogger(__name__) 
@@ -587,22 +430,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def update_production_time(self, event):
-        '''
-        send production settings update
-        '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
-
-        message_data = {}
-        message_data["status"] = event["data"]
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 #local async function
 
 #local sync functions    
@@ -708,92 +535,6 @@ def take_reset_connections(session_id, data):
     value = "success"
     
     return {"value" : value, "started" : session.started}
-
-def take_next_phase(session_id, data):
-    '''
-    advance to next phase in the experiment
-    '''   
-
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Advance to Next Phase: {data}")
-
-    #session_id = data["sessionID"]
-    session = Session.objects.get(id=session_id)
-
-    if session.current_experiment_phase == ExperimentPhase.SELECTION:
-        if session.parameter_set.show_instructions:
-            session.current_experiment_phase = ExperimentPhase.INSTRUCTIONS
-        else:
-            session.current_experiment_phase = ExperimentPhase.RUN
-
-    elif session.current_experiment_phase == ExperimentPhase.INSTRUCTIONS:
-        session.current_experiment_phase = ExperimentPhase.RUN
-
-    elif session.current_experiment_phase == ExperimentPhase.RUN:
-        session.current_experiment_phase = ExperimentPhase.DONE
-
-    session.save()
-
-    status = "success"
-    
-    return {"value" : status,
-            "current_experiment_phase" : session.current_experiment_phase,
-            }
-
-def take_start_timer(session_id, data):
-    '''
-    start timer
-    '''   
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Start timer {data}")
-
-    action = data["action"]
-
-    with transaction.atomic():
-        session = Session.objects.get(id=session_id)
-
-        if session.timer_running and action=="start":
-            
-            logger.warning(f"Start timer: already started")
-            return {"value" : "fail", "result" : {"message":"timer already running"}}
-
-        if action == "start":
-            session.timer_running = True
-        else:
-            session.timer_running = False
-
-        session.save()
-
-    return {"value" : "success", "result" : session.json_for_timmer()}
-
-def take_do_period_timer(session_id):
-    '''
-    do period timer actions
-    '''
-    logger = logging.getLogger(__name__)
-
-    session = Session.objects.get(id=session_id)
-
-    if session.timer_running == False or session.finished:
-        return_json = {"value" : "fail", "result" : {"message" : "session no longer running"}}
-    else:
-        return_json = session.do_period_timer()
-
-    logger.info(f"take_do_period_timer: {return_json}")
-
-    return return_json
-
-def take_update_groups(session_id):
-    '''
-    take update groups
-    '''
-
-    session = Session.objects.get(id=session_id)
-
-    status = "success"
-    
-    return {"status" : status,
-            "group_list" : session.json_for_group_update()}
 
 def take_download_summary_data(session_id):
     '''

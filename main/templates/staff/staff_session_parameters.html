@@ -11,12 +11,6 @@
 </script>
 <style>
 
-    canvas {
-        background-color: white; 
-        width: 100%;
-        height: 600px;
-    }
-
     .player_table_row {
         cursor: pointer;
     }
@@ -37,12 +31,13 @@
 <!-- modals -->
 {%include "staff/staff_session_parameters/general_settings/edit_parameterset_modal.html"%}
 {%include "staff/staff_session_parameters/players/edit_parameterset_player_modal.html"%}
+{%include "staff/staff_session_parameters/periods/edit_parameterset_periods_modal.html"%}
 {%include "staff/staff_session_parameters/control/upload_parameters_modal.html"%}
 {%include "staff/staff_session_parameters/control/import_parameters_modal.html"%}
 {%include "help_modal.html"%}
 
 <!-- cards -->
-<div class="row justify-content-lg-center" v-cloak>
+<div class="row justify-content-lg-center mb-4" v-cloak>
     <div class="col-md">
         {%include "staff/staff_session_parameters/general_settings/general_settings_card.html"%}  
     </div>
@@ -52,6 +47,12 @@
     <div class="col-md">
         {%include "staff/staff_session_parameters/control/control_card.html"%}  
     </div>              
+</div>
+
+<div class="row justify-content-lg-center" v-cloak>
+    <div class="col-md">
+        {%include "staff/staff_session_parameters/periods/periods_card.html"%}  
+    </div>
 </div>
                         
 {% endblock %}

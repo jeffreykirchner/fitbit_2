@@ -20,6 +20,7 @@ from main.models import Session
 from main.forms import ImportParametersForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
+from main.forms import ParameterSetPeriodForm
 
 class StaffSessionParametersView(SingleObjectMixin, View):
     '''
@@ -38,6 +39,7 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         session = self.get_object()
 
         parameterset_player_form = ParameterSetPlayerForm()
+        parameterset_period_form = ParameterSetPeriodForm()
 
         parameterset_form_ids=[]
         for i in ParameterSetForm():
@@ -46,6 +48,10 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         parameterset_player_form_ids=[]
         for i in parameterset_player_form:
             parameterset_player_form_ids.append(i.html_name)
+
+        parameterset_period_form_ids=[]
+        for i in parameterset_period_form:
+            parameterset_period_form_ids.append(i.html_name)
 
         return render(request=request,
                       template_name=self.template_name,
@@ -56,12 +62,15 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "parameter_set_player_form" : parameterset_player_form,
                                "parameterset_form_ids" : parameterset_form_ids,
                                "parameterset_player_form_ids" : parameterset_player_form_ids,
+                               "parameterset_period_form" : parameterset_period_form,
+                               "parameterset_period_form_ids" : parameterset_period_form_ids,
                                "import_parameters_form" : ImportParametersForm(user=request.user),     
                                "websocket_path" : self.websocket_path,
                                "page_key" : f'{self.websocket_path}-{session.id}',
-                               "number_of_player_types" : range(4),
                                "session" : session,
-                               "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder)
+                               "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder),
+                               "first_parameter_set_player_json":json.dumps(session.parameter_set.parameter_set_players.first().json(), cls=DjangoJSONEncoder),
+                               "first_parameter_set_period_json":json.dumps(session.parameter_set.parameter_set_periods.first().json(), cls=DjangoJSONEncoder),
                                })
     
     @method_decorator(login_required)

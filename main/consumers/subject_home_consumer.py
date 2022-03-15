@@ -402,7 +402,7 @@ def take_chat(session_id, session_player_id, data):
     if recipients == "all":
         session_player_chat.chat_type = ChatTypes.ALL
     else:
-        if not session.parameter_set.private_chat:
+        if not session.parameter_set.enable_chat:
             logger.warning(f"take chat: private chat not enabled :{session_id} {session_player_id} {data}")
             return {"value" : "fail",
                     "result" : {"message" : "Private chat not allowed."}}

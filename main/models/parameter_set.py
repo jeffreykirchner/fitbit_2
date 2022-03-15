@@ -22,9 +22,8 @@ class ParameterSet(models.Model):
     instruction_set = models.ForeignKey(InstructionSet, on_delete=models.CASCADE, related_name="parameter_sets")
 
     period_count = models.IntegerField(verbose_name='Number of periods', default=20)                          #number of periods in the experiment
-    period_length = models.IntegerField(verbose_name='Period Length, Production', default=60           )      #period length in seconds
     
-    private_chat = models.BooleanField(default=True, verbose_name = 'Private Chat')                          #if true subjects can privately chat one on one
+    enable_chat = models.BooleanField(default=True, verbose_name = 'Private Chat')                          #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=True, verbose_name = 'Show Instructions')                #if true show instructions
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
@@ -50,9 +49,8 @@ class ParameterSet(models.Model):
 
         try:
             self.period_count = new_ps.get("period_count")
-            self.period_length = new_ps.get("period_length")
 
-            self.private_chat = new_ps.get("private_chat")
+            self.enable_chat = new_ps.get("enable_chat")
 
             self.show_instructions = new_ps.get("show_instructions")
 
@@ -92,6 +90,17 @@ class ParameterSet(models.Model):
         '''
         default setup
         '''    
+
+        if self.parameter_set_periods.count() == 0:
+            parameter_set_period = main.models.ParameterSetPeriod()
+            parameter_set_period.parameter_set = self
+            parameter_set_period.save()
+        
+        if self.parameter_set_players.count() == 0:
+            parameter_set_player = main.models.ParameterSetPlayer()
+            parameter_set_player.parameter_set = self
+            parameter_set_player.save()
+
         pass
 
     def add_new_player(self):
@@ -107,6 +116,18 @@ class ParameterSet(models.Model):
         player.parameter_set = self
 
         player.save()
+    
+    def add_new_period(self):
+        '''
+        add new parameter set period
+        '''
+
+        parameter_set_period = main.models.ParameterSetPeriod()
+
+        parameter_set_period.parameter_set = self
+        parameter_set_period.period_number = self.parameter_set_periods.last().period_number+1
+
+        parameter_set_period.save()
 
     def json(self):
         '''
@@ -116,13 +137,12 @@ class ParameterSet(models.Model):
             "id" : self.id,
             "period_count" : self.period_count,
 
-            "period_length" : self.period_length,
-
-            "private_chat" : "True" if self.private_chat else "False",
+            "enable_chat" : "True" if self.enable_chat else "False",
             "show_instructions" : "True" if self.show_instructions else "False",
             "instruction_set" : self.instruction_set.json_min(),
 
             "parameter_set_players" : [p.json() for p in self.parameter_set_players.all()],
+            "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
 
             "test_mode" : "True" if self.test_mode else "False",
         }
@@ -134,7 +154,6 @@ class ParameterSet(models.Model):
         return{
             "id" : self.id,
             
-            "period_length" : self.period_length,
             "show_instructions" : "True" if self.show_instructions else "False",
 
             "test_mode" : self.test_mode,

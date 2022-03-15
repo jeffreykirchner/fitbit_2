@@ -10,6 +10,7 @@ from .instruction import Instruction
 
 from .parameter_set import ParameterSet
 from .parameter_set_player import ParameterSetPlayer
+from .parameter_set_period import ParameterSetPeriod
 
 from .session import Session
 from .session_period import SessionPeriod

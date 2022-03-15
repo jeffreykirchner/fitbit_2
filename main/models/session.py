@@ -85,7 +85,6 @@ class Session(models.Model):
         self.finished = False
         self.current_period = 1
         self.start_date = datetime.now()
-        self.time_remaining = self.parameter_set.period_length
 
         session_periods = []
 
@@ -106,7 +105,6 @@ class Session(models.Model):
         self.started = False
         self.finished = False
         self.current_period = 1
-        self.time_remaining = self.parameter_set.period_length
         self.timer_running = False
 
         for p in self.session_players.all():
@@ -166,9 +164,7 @@ class Session(models.Model):
 
             if self.time_remaining == 0:
                
-                self.current_period += 1
-                self.time_remaining = self.parameter_set.period_length
-        
+                self.current_period += 1        
             else:                                     
 
                 self.time_remaining -= 1
