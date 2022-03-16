@@ -57,7 +57,7 @@ takeUpdateParametersetPlayer(messageData){
 
     if(messageData.status.value == "success")
     {
-        app.takeGetSession(messageData);       
+        app.session.parameter_set = messageData.status.parameter_set;       
         $('#editParametersetPlayerModal').modal('hide');        
     } 
     else
@@ -65,37 +65,6 @@ takeUpdateParametersetPlayer(messageData){
         app.$data.cancelModal=true;                           
         app.displayErrors(messageData.status.errors);
     } 
-},
-
-/**show edit parameter set player group
- */
- showEditParametersetPlayerGroup:function(player_id, period_id){
-     
-    if(app.$data.session.started) return;
-
-    app.clearMainFormErrors();
-    app.$data.cancelModal=true;
-    app.$data.parametersetPlayerGroupBeforeEdit = Object.assign({}, app.$data.session.parameter_set.parameter_set_players[player_id].period_groups[period_id]);
-    app.$data.parametersetPlayerBeforeEditIndex = player_id;
-    app.$data.parametersetPlayerGroupBeforeEditIndex = period_id;
-    app.$data.current_parameter_set_player_group = app.$data.session.parameter_set.parameter_set_players[player_id].period_groups[period_id];
-
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetPlayerGroupModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
-},
-
-/** hide edit parmeter set player group
-*/
-hideEditParametersetPlayerGroup:function(){
-    if(app.$data.cancelModal)
-    {
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].period_groups[app.$data.parametersetPlayerGroupBeforeEditIndex],
-                      app.$data.parametersetPlayerGroupBeforeEdit);
-        app.$data.parametersetPlayerBeforeEdit=null;
-    }
 },
 
 /** update parameterset player group settings
@@ -106,45 +75,6 @@ sendUpdateParametersetPlayerGroup(){
     app.sendMessage("update_parameterset_player_group", {"sessionID" : app.$data.sessionID,
                                                    "paramterset_player_group_id" : app.$data.current_parameter_set_player_group.id,
                                                    "formData" : $("#parametersetPlayerGroupForm").serializeArray(),});
-},
-
-/** handle result of updating parameter set player group
-*/
-takeUpdateParametersetPlayerGroup(messageData){
-    //app.$data.cancelModal=false;
-    //app.clearMainFormErrors();
-
-    app.$data.cancelModal=false;
-    app.clearMainFormErrors();
-
-    if(messageData.status.value == "success")
-    {
-        app.takeGetSession(messageData);       
-        $('#editParametersetPlayerGroupModal').modal('hide');            
-    } 
-    else
-    {
-        app.$data.cancelModal=true;                           
-        app.displayErrors(messageData.status.errors);
-    } 
-},
-
-/** copy specified period's groups forward to future groups
-*/
-sendCopyGroupForward(period_number){
-    app.$data.working = true;
-    app.sendMessage("copy_group_forward", {"sessionID" : app.$data.sessionID,
-                                           "period_number" : period_number,});
-                                                   
-},
-
-/** handle result of copying groups forward
-*/
-takeCopyGroupForward(messageData){
-    //app.$data.cancelModal=false;
-    //app.clearMainFormErrors();
-
-    app.takeGetSession(messageData);   
 },
 
 /** copy specified period's groups forward to future groups
@@ -160,9 +90,8 @@ sendRemoveParameterSetPlayer(){
 /** handle result of copying groups forward
 */
 takeRemoveParameterSetPlayer(messageData){
-    app.$data.cancelModal=false;
-    //app.clearMainFormErrors();
-    app.takeGetSession(messageData);   
+
+    app.session.parameter_set = messageData.status.parameter_set;   
     $('#editParametersetPlayerModal').modal('hide');
 },
 
@@ -170,14 +99,12 @@ takeRemoveParameterSetPlayer(messageData){
 */
 sendAddParameterSetPlayer(player_id){
     app.$data.working = true;
-    app.sendMessage("add_parameterset_player", {"sessionID" : app.$data.sessionID});
-                                                   
+    app.sendMessage("add_parameterset_player", {"sessionID" : app.$data.sessionID});                                                 
 },
 
 /** handle result of copying groups forward
 */
 takeAddParameterSetPlayer(messageData){
-    //app.$data.cancelModal=false;
-    //app.clearMainFormErrors();
-    app.takeGetSession(messageData); 
+
+    app.session.parameter_set = messageData.status.parameter_set;
 },

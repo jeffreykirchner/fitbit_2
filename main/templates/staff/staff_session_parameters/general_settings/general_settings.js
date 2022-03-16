@@ -44,7 +44,7 @@ takeUpdateParameterset(messageData){
 
     if(messageData.status.value == "success")
     {
-        app.takeGetSession(messageData);       
+        app.session.parameter_set = messageData.status.parameter_set;       
         $('#editParametersetModal').modal('hide');            
     } 
     else

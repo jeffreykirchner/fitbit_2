@@ -43,7 +43,7 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         #build response
         message_data = {}
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
+        message_data["session"] = await sync_to_async(get_session)(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -239,8 +239,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # logger = logging.getLogger(__name__) 
         # logger.info("Connection update")
 
-#local sync functions
-@sync_to_async
 def get_session(id_):
     '''
     return session with specified id
@@ -284,77 +282,9 @@ def take_update_parameterset(data):
         #print("valid form")                
         form.save()    
 
-        return {"value" : "success"}                      
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
     logger.info("Invalid paramterset form")
-    return {"value" : "fail", "errors" : dict(form.errors.items())}
-
-def take_update_parameterset_type(data):
-    '''
-    update parameterset type
-    '''   
-
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset type: {data}")
-
-    session_id = data["sessionID"]
-    paramterset_type_id = data["parameterset_type_id"]
-    form_data = data["formData"]
-
-    try:        
-        parameter_set_type = ParameterSetType.objects.get(id=paramterset_type_id)
-    except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_type paramterset_type, not found ID: {paramterset_type_id}")
-        return
-    
-    form_data_dict = {}
-
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
-
-    form = ParameterSetTypeForm(form_data_dict, instance=parameter_set_type)
-
-    if form.is_valid():
-        #print("valid form")             
-        form.save()              
-
-        return {"value" : "success"}                      
-                                
-    logger.info("Invalid parameterset type form")
-    return {"value" : "fail", "errors" : dict(form.errors.items())}
-
-def take_update_parameterset_good(data):
-    '''
-    update parameterset good
-    '''   
-
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset good: {data}")
-
-    session_id = data["sessionID"]
-    parameterset_good_id = data["parameterset_good_id"]
-    form_data = data["formData"]
-
-    try:        
-        parameter_set_good = ParameterSetGood.objects.get(id=parameterset_good_id)
-    except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_good paramterset_good, not found ID: {parameterset_good_id}")
-        return
-    
-    form_data_dict = {}
-
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
-
-    form = ParameterSetGoodForm(form_data_dict, instance=parameter_set_good)
-
-    if form.is_valid():
-        #print("valid form")             
-        form.save()              
-
-        return {"value" : "success"}                      
-                                
-    logger.info("Invalid parameterset good form")
     return {"value" : "fail", "errors" : dict(form.errors.items())}
 
 def take_update_parameterset_player(data):
@@ -367,6 +297,8 @@ def take_update_parameterset_player(data):
     session_id = data["sessionID"]
     paramterset_player_id = data["paramterset_player_id"]
     form_data = data["formData"]
+
+    session = Session.objects.get(id=session_id)
 
     try:        
         parameter_set_player = ParameterSetPlayer.objects.get(id=paramterset_player_id)
@@ -387,7 +319,7 @@ def take_update_parameterset_player(data):
         #print("valid form")             
         form.save()              
 
-        return {"value" : "success"}                      
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
     logger.info("Invalid parameterset player form")
     return {"value" : "fail", "errors" : dict(form.errors.items())}
@@ -410,7 +342,7 @@ def take_remove_parameterset_player(data):
         logger.warning(f"take_remove_parameterset_player paramterset_player, not found ID: {paramterset_player_id}")
         return
     
-    return {"value" : "success"}
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
 def take_add_parameterset_player(data):
     '''
@@ -430,6 +362,8 @@ def take_add_parameterset_player(data):
     session.parameter_set.add_new_player()
 
     session.update_player_count()
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
 def take_add_parameterset_period(data):
     '''
