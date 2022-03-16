@@ -33,6 +33,8 @@ var app = Vue.createApp({
                     uploadParametersetMessaage:'',
                     import_parameters_message : "",
 
+                    increment_period : "1",
+
                 }},
     methods: {
 

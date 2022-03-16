@@ -72,21 +72,29 @@
                         
                     </table>
 
-                    <button class="btn btn-outline-success btn-sm me-2"
-                            type="button"
-                            title="Add period"
-                            v-bind:disabled="session.started || reconnecting || working"
-                            v-on:click="sendAddParameterSetPeriod(1)">
+                    <div class="input-group mb-3 w-25">
+                        <button class="btn btn-outline-success btn-sm"
+                                type="button"
+                                title="Add period"
+                                v-bind:disabled="session.started || reconnecting || working"
+                                v-on:click="sendAddParameterSetPeriod(1)">
                             Add <i class="fas fa-plus"></i>
-                    </button>
+                        </button>
 
-                    <button class="btn btn-outline-danger btn-sm"
-                            type="button"
-                            title="Remove period"
-                            v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
-                            v-on:click="sendAddParameterSetPeriod(-1)">
+                        <input v-model="increment_period" type="number" min="1" max="100" class="form-control text-center" v-bind:disabled="session.started || reconnecting || working">
+
+                        <button class="btn btn-outline-danger btn-sm"
+                                type="button"
+                                title="Remove period"
+                                v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
+                                v-on:click="sendAddParameterSetPeriod(-1)">
                             Delete <i class="fas fa-minus"></i>
-                    </button>
+                        </button>
+                      </div>
+
+                    
+
+                    
 
                 </div>
             </div>

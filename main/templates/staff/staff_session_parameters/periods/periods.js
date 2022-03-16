@@ -60,9 +60,10 @@ takeUpdatePeriods(messageData){
  * add or remove value from number of periods
  */
 sendAddParameterSetPeriod(value){
-    app.$data.working = true;
+    app.working = true;
     app.sendMessage("add_parameterset_period", {"sessionID" : app.sessionID,
-                                                 "value" : value,});
+                                                "value" : value,
+                                                "increment_period" : app.increment_period});
 },
 
 takeAddParameterSetPeriod(messageData){
@@ -85,7 +86,7 @@ takeAddParameterSetPeriod(messageData){
     app.parametersetPeriodBeforeEditIndex = index;
     app.parametersetPeriodPaymentBeforeEditIndex = index2;
 
-    app.current_parameter_set_period_payment = app.$data.session.parameter_set.parameter_set_periods[index].parameter_set_period_payments[index2];
+    app.current_parameter_set_period_payment = app.session.parameter_set.parameter_set_periods[index].parameter_set_period_payments[index2];
 
     var myModal = new bootstrap.Modal(document.getElementById('editParametersetPeriodPaymentModal'), {
         keyboard: false

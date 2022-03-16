@@ -374,6 +374,7 @@ def take_add_parameterset_period(data):
 
     session_id = data["sessionID"]
     value = data["value"]
+    increment_period = data["increment_period"]
 
     try:        
         session = Session.objects.get(id=session_id)
@@ -381,10 +382,11 @@ def take_add_parameterset_period(data):
         logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
         return
 
-    if value == 1:
-        session.parameter_set.add_new_period()
-    elif session.parameter_set.parameter_set_periods.count()>1:
-        session.parameter_set.parameter_set_periods.last().delete()
+    for i in range(increment_period):
+        if value == 1:
+            session.parameter_set.add_new_period()
+        elif session.parameter_set.parameter_set_periods.count()>1:
+            session.parameter_set.parameter_set_periods.last().delete()
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
