@@ -43,31 +43,24 @@
                             
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <!-- copy groups forward -->
-                        <tr>
-                            <td>
-                                <button class="btn btn-outline-success btn-sm me-2"
-                                        type="button"
-                                        title="Add player"
-                                        v-bind:disabled="session.started || reconnecting || working"
-                                        v-on:click="sendAddParameterSetZoneMinutes(1)">
-                                       Add <i class="fas fa-plus"></i>
-                                </button>
-
-                                <button class="btn btn-outline-danger btn-sm"
-                                        type="button"
-                                        title="Add player"
-                                        v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_zone_minutes.length <= 1"
-                                        v-on:click="sendAddParameterSetZoneMinutes(-1)">
-                                       Delete <i class="fas fa-minus"></i>
-                                </button>
-                            </td>                            
-                            <td>
-                            </td>
-                        </tr>
-                    </tfoot>
+                    
                 </table>
+
+                <button class="btn btn-outline-success btn-sm me-2"
+                        type="button"
+                        title="Add player"
+                        v-bind:disabled="session.started || reconnecting || working"
+                        v-on:click="sendAddParameterSetZoneMinutes(1)">
+                        Add <i class="fas fa-plus"></i>
+                </button>
+
+                <button class="btn btn-outline-danger btn-sm"
+                        type="button"
+                        title="Add player"
+                        v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_zone_minutes.length <= 1"
+                        v-on:click="sendAddParameterSetZoneMinutes(-1)">
+                        Delete <i class="fas fa-minus"></i>
+                </button>
                 </div>
             </div>
         </div>  

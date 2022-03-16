@@ -2,14 +2,14 @@
  */
  showEditParametersetPlayer:function(index){
     
-    if(app.$data.session.started) return;
+    if(app.session.started) return;
     
     app.clearMainFormErrors();
-    app.$data.cancelModal=true;
-    app.$data.parametersetPlayerBeforeEdit = Object.assign({}, app.$data.session.parameter_set.parameter_set_players[index]);
+    app.cancelModal=true;
+    app.parametersetPlayerBeforeEdit = Object.assign({}, app.session.parameter_set.parameter_set_players[index]);
 
-    app.$data.parametersetPlayerBeforeEditIndex = index;
-    app.$data.current_parameter_set_player = app.$data.session.parameter_set.parameter_set_players[index];
+    app.parametersetPlayerBeforeEditIndex = index;
+    app.current_parameter_set_player = app.session.parameter_set.parameter_set_players[index];
     
 
     var myModal = new bootstrap.Modal(document.getElementById('editParametersetPlayerModal'), {
@@ -22,17 +22,11 @@
 /** hide edit parmeter set player
 */
 hideEditParametersetPlayer:function(){
-    if(app.$data.cancelModal)
+    if(app.cancelModal)
     {
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex], app.$data.parametersetPlayerBeforeEdit);
+        Object.assign(app.session.parameter_set.parameter_set_players[app.parametersetPlayerBeforeEditIndex], app.parametersetPlayerBeforeEdit);
 
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].good_one, app.$data.parametersetPlayerBeforeEdit.good_one);
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].good_two, app.$data.parametersetPlayerBeforeEdit.good_two);
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].good_three, app.$data.parametersetPlayerBeforeEdit.good_three);
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].parameter_set_type, app.$data.parametersetPlayerBeforeEdit.parameter_set_type);
-        Object.assign(app.$data.session.parameter_set.parameter_set_players[app.$data.parametersetPlayerBeforeEditIndex].avatar, app.$data.parametersetPlayerBeforeEdit.avatar);
-
-        app.$data.parametersetPlayerBeforeEdit=null;
+        app.parametersetPlayerBeforeEdit=null;
     }
 },
 
@@ -40,19 +34,19 @@ hideEditParametersetPlayer:function(){
 */
 sendUpdateParametersetPlayer(){
     
-    app.$data.working = true;
-    app.sendMessage("update_parameterset_player", {"sessionID" : app.$data.sessionID,
-                                                   "paramterset_player_id" : app.$data.current_parameter_set_player.id,
+    app.working = true;
+    app.sendMessage("update_parameterset_player", {"sessionID" : app.sessionID,
+                                                   "paramterset_player_id" : app.current_parameter_set_player.id,
                                                    "formData" : $("#parametersetPlayerForm").serializeArray(),});
 },
 
 /** handle result of updating parameter set player
 */
 takeUpdateParametersetPlayer(messageData){
-    //app.$data.cancelModal=false;
+    //app.cancelModal=false;
     //app.clearMainFormErrors();
 
-    app.$data.cancelModal=false;
+    app.cancelModal=false;
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -62,7 +56,7 @@ takeUpdateParametersetPlayer(messageData){
     } 
     else
     {
-        app.$data.cancelModal=true;                           
+        app.cancelModal=true;                           
         app.displayErrors(messageData.status.errors);
     } 
 },
@@ -71,9 +65,9 @@ takeUpdateParametersetPlayer(messageData){
 */
 sendUpdateParametersetPlayerGroup(){
     
-    app.$data.working = true;
-    app.sendMessage("update_parameterset_player_group", {"sessionID" : app.$data.sessionID,
-                                                   "paramterset_player_group_id" : app.$data.current_parameter_set_player_group.id,
+    app.working = true;
+    app.sendMessage("update_parameterset_player_group", {"sessionID" : app.sessionID,
+                                                   "paramterset_player_group_id" : app.current_parameter_set_player_group.id,
                                                    "formData" : $("#parametersetPlayerGroupForm").serializeArray(),});
 },
 
@@ -81,9 +75,9 @@ sendUpdateParametersetPlayerGroup(){
 */
 sendRemoveParameterSetPlayer(){
 
-    app.$data.working = true;
-    app.sendMessage("remove_parameterset_player", {"sessionID" : app.$data.sessionID,
-                                                   "paramterset_player_id" : app.$data.current_parameter_set_player.id,});
+    app.working = true;
+    app.sendMessage("remove_parameterset_player", {"sessionID" : app.sessionID,
+                                                   "paramterset_player_id" : app.current_parameter_set_player.id,});
                                                    
 },
 
@@ -95,14 +89,15 @@ takeRemoveParameterSetPlayer(messageData){
     $('#editParametersetPlayerModal').modal('hide');
 },
 
-/** copy specified period's groups forward to future groups
+/** add player to parameter set
 */
 sendAddParameterSetPlayer(player_id){
-    app.$data.working = true;
-    app.sendMessage("add_parameterset_player", {"sessionID" : app.$data.sessionID});                                                 
+    app.working = true;
+    app.sendMessage("add_parameterset_player", {"sessionID" : app.sessionID,
+                                                "increment_player" : app.increment_player});                                                 
 },
 
-/** handle result of copying groups forward
+/**take result of add player
 */
 takeAddParameterSetPlayer(messageData){
 

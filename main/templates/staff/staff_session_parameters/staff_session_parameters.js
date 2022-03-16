@@ -34,6 +34,7 @@ var app = Vue.createApp({
                     import_parameters_message : "",
 
                     increment_period : "1",
+                    increment_player : "1",
 
                 }},
     methods: {
@@ -170,6 +171,24 @@ var app = Vue.createApp({
                 app.$data.cancelModal=true;                           
                 app.displayErrors(messageData.errors);
             } 
+        },
+
+        /**trucate text to 10 charcters with elipsis
+         * @param text : string to be truncated
+         */
+        truncateText(text){
+
+            var new_text = "";
+
+            new_text = text.substring(0, 10);
+
+            if(text.length>10)
+            {
+                new_text += "...";
+            }
+
+            return new_text;
+
         },
 
         //do nothing on when enter pressed for post

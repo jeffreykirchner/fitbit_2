@@ -48,8 +48,8 @@
                                     <span v-if="p.survey_required==1">Yes</span>
                                     <span v-else>No</span>
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.survey_link!=''">[[p.survey_link]]</span>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap" v-bind:title="p.survey_link">
+                                    <span v-if="p.survey_link!=''">[[truncateText(p.survey_link)]]</span>
                                     <span v-else>---</span>                                
                                 </td>
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">

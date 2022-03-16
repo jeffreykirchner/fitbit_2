@@ -352,6 +352,7 @@ def take_add_parameterset_player(data):
     logger.info(f"Add parameterset player: {data}")
 
     session_id = data["sessionID"]
+    increment_player = data["increment_player"]
 
     try:        
         session = Session.objects.get(id=session_id)
@@ -359,7 +360,8 @@ def take_add_parameterset_player(data):
         logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
         return
 
-    session.parameter_set.add_new_player()
+    for i in range(increment_player):
+        session.parameter_set.add_new_player()
 
     session.update_player_count()
 
