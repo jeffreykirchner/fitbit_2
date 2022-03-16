@@ -144,7 +144,7 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
     
     async def update_parameterset_period_payment(self, event):
         '''
-        update a parameterset period
+        update a parameterset period payment
         '''
 
         message_data = {}
@@ -152,6 +152,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message = {}
         message["messageType"] = "update_parameterset_period_payment"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_parameterset_period_copy_forward(self, event):
+        '''
+        update a parameterset period copy forward
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_period_copy_forward)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_parameterset_period_copy_forward"
         message["messageData"] = message_data
 
         # Send message to WebSocket
@@ -469,6 +484,31 @@ def take_update_parameterset_period(data):
     logger.info("Invalid parameterset period form")
     return {"value" : "fail", "errors" : dict(form.errors.items())}
 
+def take_update_parameterset_period_copy_forward(data):
+    '''
+    update parameterset period copy forward
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset period copy forward: {data}")
+
+    session_id = data["sessionID"]
+    session = Session.objects.get(id=session_id)
+
+    try:        
+        parameter_set_period = ParameterSetPeriod.objects.get(id=data["id"])
+        
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_parameterset_period paramterset_period, not found ID: {data['id']}")
+        return
+
+    parameter_set_period_list = parameter_set_period.parameter_set.parameter_set_periods.filter(period_number__gt=parameter_set_period.period_number)    
+
+    for p in parameter_set_period_list:
+        p.copy_forward(parameter_set_period)
+   
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
+                                
 def take_update_parameterset_period_payment(data):
     '''
     update parameterset period payment

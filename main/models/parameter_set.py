@@ -23,8 +23,8 @@ class ParameterSet(models.Model):
 
     period_count = models.IntegerField(verbose_name='Number of periods', default=20)                          #number of periods in the experiment
     
-    enable_chat = models.BooleanField(default=True, verbose_name = 'Private Chat')                          #if true subjects can privately chat one on one
-    show_instructions = models.BooleanField(default=True, verbose_name = 'Show Instructions')                #if true show instructions
+    enable_chat = models.BooleanField(default=False, verbose_name = 'Private Chat')                           #if true subjects can privately chat one on one
+    show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 

@@ -87,7 +87,7 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_player_json":json.dumps(session.parameter_set.parameter_set_players.first().json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_period_json":json.dumps(session.parameter_set.parameter_set_periods.first().json(), cls=DjangoJSONEncoder),
-                               "first_parameter_set_period_payment_json":json.dumps(session.parameter_set.parameter_set_periods.first().parameter_set_period_individual_pays_a.first().json(), cls=DjangoJSONEncoder),
+                               "first_parameter_set_period_payment_json":json.dumps(session.parameter_set.parameter_set_periods.first().parameter_set_period_pays_a.first().json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_zone_minutes_json":json.dumps(session.parameter_set.parameter_set_zone_minutes.first().json(), cls=DjangoJSONEncoder),
                                })
     

@@ -79,6 +79,9 @@ var app = Vue.createApp({
                 case "update_parameterset_period":
                     app.takeUpdatePeriods(messageData);
                     break; 
+                case "update_parameterset_period_copy_forward":
+                    app.takeCopyForward(messageData);
+                    break;
                 case "update_parameterset_period_payment":
                     app.takeUpdatePayment(messageData);
                     break;

@@ -15,8 +15,8 @@ class ParameterSetPeriodPayment(models.Model):
     session period payment parameters 
     '''
 
-    parameter_set_period = models.ForeignKey(ParameterSetPeriod, on_delete=models.CASCADE, related_name="parameter_set_period_individual_pays_a")
-    parameter_set_zone_minutes = models.ForeignKey('main.ParameterSetZoneMinutes', on_delete=models.CASCADE, related_name="parameter_set_period_individual_pays_b")
+    parameter_set_period = models.ForeignKey(ParameterSetPeriod, on_delete=models.CASCADE, related_name="parameter_set_period_pays_a")
+    parameter_set_zone_minutes = models.ForeignKey('main.ParameterSetZoneMinutes', on_delete=models.CASCADE, related_name="parameter_set_period_pays_b")
 
     payment = models.DecimalField(decimal_places=2, default=0, max_digits=5)            #amount individual earns reaching this activity level
     group_bonus = models.DecimalField(decimal_places=2, default=0, max_digits=5)        #amount group earns if reaching this acttvity level

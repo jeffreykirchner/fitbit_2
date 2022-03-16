@@ -132,3 +132,23 @@ takeUpdatePayment(messageData){
         app.displayErrors(messageData.status.errors);
     } 
 },
+
+/** update parameterset period settings
+*/
+sendCopyForward(id){
+    
+    app.working = true;
+    app.cancelModal=false;
+    app.sendMessage("update_parameterset_period_copy_forward", {"sessionID" : app.sessionID,
+                                                                "id" : id,});
+},
+
+/** handle result of updating parameter set period payment
+*/
+takeCopyForward(messageData){
+
+    if(messageData.status.value == "success")
+    {
+        app.session.parameter_set = messageData.status.parameter_set;       
+    } 
+},

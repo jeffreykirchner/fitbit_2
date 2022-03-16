@@ -63,6 +63,20 @@ class ParameterSetPeriod(models.Model):
         for z in self.parameter_set.parameter_set_zone_minutes.all():
             obj, created = main.models.ParameterSetPeriodPayment.objects.get_or_create(parameter_set_period=self, parameter_set_zone_minutes=z)
 
+    def copy_forward(self, source):
+        '''
+        copy another period into this one using copy forward function
+        source : ParameterSetPeriod
+        '''
+
+        self.period_type = source.period_type
+
+        for p_source in source.parameter_set_period_pays_a.all():
+            p_target = self.parameter_set_period_pays_a.get(parameter_set_zone_minutes=p_source.parameter_set_zone_minutes)
+            p_target.from_dict(p_source.json())
+
+        self.save()
+
     def json(self):
         '''
         return json object of model
@@ -75,7 +89,7 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : 1 if self.survey_required else 0,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
-            "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_individual_pays_a.all()],
+            "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }
     
     def json_for_subject(self):

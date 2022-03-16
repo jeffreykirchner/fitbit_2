@@ -33,7 +33,10 @@
                                 <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
                                     [[p.label]] <br>
                                     Individual / Group Bonus
-                                </th>                        
+                                </th> 
+                                <th scope="col" class = "text-nowrap">
+                                    Copy Down
+                                </th>                       
                             </tr>
                         </thead>
                         <tbody id="period_list">
@@ -55,6 +58,15 @@
                                 <td v-for="(p, index2) in p.parameter_set_period_payments" v-bind:key="p.id" v-on:click="showEditParametersetPeriodPayment(index, index2)" class="player_table_cell text-nowrap">
                                     $[[p.payment]] / $[[p.group_bonus]]
                                 </td>
+                                <td class="text-nowrap">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            type="button"
+                                            title="Copy period down"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyForward(p.id)">
+                                            <i class="fas fa-angle-double-down"></i>
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                         
@@ -62,7 +74,7 @@
 
                     <button class="btn btn-outline-success btn-sm me-2"
                             type="button"
-                            title="Add player"
+                            title="Add period"
                             v-bind:disabled="session.started || reconnecting || working"
                             v-on:click="sendAddParameterSetPeriod(1)">
                             Add <i class="fas fa-plus"></i>
@@ -70,7 +82,7 @@
 
                     <button class="btn btn-outline-danger btn-sm"
                             type="button"
-                            title="Add player"
+                            title="Remove period"
                             v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
                             v-on:click="sendAddParameterSetPeriod(-1)">
                             Delete <i class="fas fa-minus"></i>
