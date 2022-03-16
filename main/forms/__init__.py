@@ -11,6 +11,7 @@ from .import_parameters_form import ImportParametersForm
 from .parameter_set_form import ParameterSetForm
 from .parameter_set_player_form import ParameterSetPlayerForm
 from .parameter_set_period_form import ParameterSetPeriodForm
+from .parameter_set_period_payment_form import ParameterSetPeriodPaymentForm
 from .parameter_set_zone_minutes_form import ParameterSetZoneMinutesForm
 
 from .session_player_name_etc_form import StaffEditNameEtcForm

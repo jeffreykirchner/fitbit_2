@@ -18,11 +18,13 @@ from main.forms import SessionForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
+from main.forms import ParameterSetPeriodPaymentForm
 from main.forms import ParameterSetZoneMinutesForm
 
 from main.models import Session
 from main.models import ParameterSetPlayer
 from main.models import ParameterSetPeriod
+from main.models import ParameterSetPeriodPayment
 from main.models import ParameterSetZoneMinutes
 
 import main
@@ -140,6 +142,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
+    async def update_parameterset_period_payment(self, event):
+        '''
+        update a parameterset period
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_period_payment)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_parameterset_period_payment"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     async def add_parameterset_zone_minutes(self, event):
         '''
         add a parameterset zone minutes
@@ -427,7 +444,7 @@ def take_update_parameterset_period(data):
     update parameterset period
     '''   
     logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset player: {data}")
+    logger.info(f"Update parameterset period: {data}")
 
     session_id = data["sessionID"]
     # paramterset_period_id = data["paramterset_period_id"]
@@ -449,7 +466,37 @@ def take_update_parameterset_period(data):
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
-    logger.info("Invalid parameterset player form")
+    logger.info("Invalid parameterset period form")
+    return {"value" : "fail", "errors" : dict(form.errors.items())}
+
+def take_update_parameterset_period_payment(data):
+    '''
+    update parameterset period payment
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset period payment: {data}")
+
+    session_id = data["sessionID"]
+    # paramterset_period_id = data["paramterset_period_id"]
+    form_data = data["formData"]
+
+    try:        
+        parameter_set_period_payment = ParameterSetPeriodPayment.objects.get(id=form_data["id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_parameterset_period_payment paramterset_period_payment, not found ID: {form_data['id']}")
+        return
+
+    form = ParameterSetPeriodPaymentForm(form_data, instance=parameter_set_period_payment)
+
+    if form.is_valid():
+        #print("valid form")             
+        form.save()              
+
+        session = Session.objects.get(id=session_id)
+
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
+                                
+    logger.info("Invalid parameterset period payment form")
     return {"value" : "fail", "errors" : dict(form.errors.items())}
 
 def take_add_parameterset_zone_minutes(data):

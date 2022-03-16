@@ -90,22 +90,22 @@ class ParameterSet(models.Model):
         '''
         default setup
         '''    
+        if self.parameter_set_zone_minutes.count() == 0:
+            parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes()
+            parameter_set_zone_minutes.parameter_set = self
+            parameter_set_zone_minutes.save()
 
         if self.parameter_set_periods.count() == 0:
             parameter_set_period = main.models.ParameterSetPeriod()
             parameter_set_period.parameter_set = self
             parameter_set_period.save()
+            parameter_set_period.setup()
         
         if self.parameter_set_players.count() == 0:
             parameter_set_player = main.models.ParameterSetPlayer()
             parameter_set_player.parameter_set = self
             parameter_set_player.save()
         
-        if self.parameter_set_zone_minutes.count() == 0:
-            parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes()
-            parameter_set_zone_minutes.parameter_set = self
-            parameter_set_zone_minutes.save()
-
         pass
 
     def add_new_player(self):
@@ -133,6 +133,7 @@ class ParameterSet(models.Model):
         parameter_set_period.period_number = self.parameter_set_periods.last().period_number+1
 
         parameter_set_period.save()
+        parameter_set_period.setup()
     
     def add_new_zone_minutes(self):
         '''
@@ -145,6 +146,9 @@ class ParameterSet(models.Model):
         parameter_set_zone_minutes.zone_minutes = 0
 
         parameter_set_zone_minutes.save()
+
+        for p in self.parameter_set_periods.all():
+            p.setup()
 
     def json(self):
         '''

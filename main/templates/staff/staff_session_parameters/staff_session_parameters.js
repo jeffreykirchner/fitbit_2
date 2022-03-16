@@ -18,7 +18,8 @@ var app = Vue.createApp({
                     valuecost_modal_label:'Edit Value or Cost',
 
                     current_parameter_set_player : {{first_parameter_set_player_json|safe}},  
-                    current_parameter_set_period : {{first_parameter_set_period_json|safe}},  
+                    current_parameter_set_period : {{first_parameter_set_period_json|safe}}, 
+                    current_parameter_set_period_payment : {{first_parameter_set_period_payment_json|safe}}, 
                     current_parameter_set_zone_minutes : {{first_parameter_set_zone_minutes_json|safe}},                 
 
                     parameterset_form_ids: {{parameterset_form_ids|safe}},
@@ -73,25 +74,25 @@ var app = Vue.createApp({
                     app.takeAddParameterSetPlayer(messageData);
                     break;     
                 case "add_parameterset_period":
-                    app.takeAddParameterSetPeriod(messageData)  ;
+                    app.takeAddParameterSetPeriod(messageData);
                     break;   
                 case "update_parameterset_period":
-                    app.takeUpdatePeriods(messageData)  ;
+                    app.takeUpdatePeriods(messageData);
                     break; 
+                case "update_parameterset_period_payment":
+                    app.takeUpdatePayment(messageData);
+                    break;
                 case "add_parameterset_zone_minutes":
-                    app.takeAddParameterSetZoneMinutes(messageData)  ;
+                    app.takeAddParameterSetZoneMinutes(messageData);
                     break;   
                 case "update_parameterset_zone_minutes":
-                    app.takeUpdateZoneMinutes(messageData)  ;
+                    app.takeUpdateZoneMinutes(messageData);
                     break;     
                 case "import_parameters":
                     app.takeImportParameters(messageData);
                     break;
                 case "download_parameters":
                     app.takeDownloadParameters(messageData);
-                    break;
-                case "update_parameterset_avatar":
-                    app.takeUpdateParametersetAvatar(messageData);
                     break;
                 case "help_doc":
                     app.takeLoadHelpDoc(messageData);
@@ -247,6 +248,7 @@ var app = Vue.createApp({
         $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
         $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
         $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
+        $('#editParametersetPeriodPaymentModal').on("hidden.bs.modal", this.hideEditParametersetPeriodPayment);
     },
 
 }).mount('#app');

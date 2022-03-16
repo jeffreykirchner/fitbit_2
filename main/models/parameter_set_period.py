@@ -30,8 +30,8 @@ class ParameterSetPeriod(models.Model):
         return str(self.id)
 
     class Meta:
-        verbose_name = 'Parameter Set Player'
-        verbose_name_plural = 'Parameter Set Players'
+        verbose_name = 'Parameter Set Period'
+        verbose_name_plural = 'Parameter Set Periods'
         ordering=['period_number']
         constraints = [            
             models.UniqueConstraint(fields=['period_number', 'parameter_set'], name='unique_parameter_set_period'),
@@ -40,7 +40,7 @@ class ParameterSetPeriod(models.Model):
     def from_dict(self, source):
         '''
         copy source values into this period
-        source : dict object of parameterset player
+        source : dict object of parameterset period
         '''
 
         self.id_label = source.get("period_number")
@@ -53,6 +53,15 @@ class ParameterSetPeriod(models.Model):
         message = "Parameters loaded successfully."
 
         return message
+    
+    def setup(self):
+        '''
+        setup period
+        '''
+
+        #add missing period payments
+        for z in self.parameter_set.parameter_set_zone_minutes.all():
+            obj, created = main.models.ParameterSetPeriodPayment.objects.get_or_create(parameter_set_period=self, parameter_set_zone_minutes=z)
 
     def json(self):
         '''
@@ -66,6 +75,7 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : 1 if self.survey_required else 0,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
+            "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_individual_pays_a.all()],
         }
     
     def json_for_subject(self):

@@ -15,66 +15,67 @@
             <!-- player settings -->
             <div class="col-md-auto text-center">                
                 <div class="table-responsive">
-                <table class="table table-condensed"> 
-                    <thead>
-                        <tr>
-                            <th scope="col" class = "m-1 p-1">
-                                #
-                            </th> 
-                            <th scope="col" class = "m-1 p-1">
-                                Show Survey
-                            </th>
-                            <th scope="col" class = "m-1 p-1">
-                                Link
-                            </th>    
-                            <th scope="col" class = "m-1 p-1">
-                                Type
-                            </th>                        
-                        </tr>
-                    </thead>
-                    <tbody id="period_list">
-                        <tr v-for="(p, index) in session.parameter_set.parameter_set_periods" v-bind:key="p.id">
-                            <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell">
-                                [[index+1]]
-                            </td>
-                            <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell">
-                                <span v-if="p.survey_required==1">Yes</span>
-                                <span v-else>No</span>
-                            </td>
-                            <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell">
-                                <span v-if="p.survey_link!=''">[[p.survey_link]]</span>
-                                <span v-else>---</span>                                
-                            </td>
-                            <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell">
-                                [[p.period_type]]
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <!-- copy groups forward -->
-                        <tr>
-                            <td>
-                                <button class="btn btn-outline-success btn-sm me-2"
-                                        type="button"
-                                        title="Add player"
-                                        v-bind:disabled="session.started || reconnecting || working"
-                                        v-on:click="sendAddParameterSetPeriod(1)">
-                                       Add <i class="fas fa-plus"></i>
-                                </button>
+                    <table class="table table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th scope="col" class = "text-nowrap">
+                                    #
+                                </th> 
+                                <th scope="col" class = "text-nowrap">
+                                    Show Survey
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Link
+                                </th>    
+                                <th scope="col" class = "text-nowrap">
+                                    Type
+                                </th>
+                                <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
+                                    [[p.label]] <br>
+                                    Individual / Group Bonus
+                                </th>                        
+                            </tr>
+                        </thead>
+                        <tbody id="period_list">
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_periods" v-bind:key="p.id">
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[index+1]]
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    <span v-if="p.survey_required==1">Yes</span>
+                                    <span v-else>No</span>
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    <span v-if="p.survey_link!=''">[[p.survey_link]]</span>
+                                    <span v-else>---</span>                                
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[p.period_type]]
+                                </td>
+                                <td v-for="(p, index2) in p.parameter_set_period_payments" v-bind:key="p.id" v-on:click="showEditParametersetPeriodPayment(index, index2)" class="player_table_cell text-nowrap">
+                                    $[[p.payment]] / $[[p.group_bonus]]
+                                </td>
+                            </tr>
+                        </tbody>
+                        
+                    </table>
 
-                                <button class="btn btn-outline-danger btn-sm"
-                                        type="button"
-                                        title="Add player"
-                                        v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
-                                        v-on:click="sendAddParameterSetPeriod(-1)">
-                                       Delete <i class="fas fa-minus"></i>
-                                </button>
-                            </td>                            
-                            <td>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                    <button class="btn btn-outline-success btn-sm me-2"
+                            type="button"
+                            title="Add player"
+                            v-bind:disabled="session.started || reconnecting || working"
+                            v-on:click="sendAddParameterSetPeriod(1)">
+                            Add <i class="fas fa-plus"></i>
+                    </button>
+
+                    <button class="btn btn-outline-danger btn-sm"
+                            type="button"
+                            title="Add player"
+                            v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
+                            v-on:click="sendAddParameterSetPeriod(-1)">
+                            Delete <i class="fas fa-minus"></i>
+                    </button>
+
                 </div>
             </div>
         </div>  

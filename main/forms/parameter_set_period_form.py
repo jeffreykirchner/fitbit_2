@@ -10,7 +10,7 @@ from main.globals import PeriodType
 
 class ParameterSetPeriodForm(forms.ModelForm):
     '''
-    parameterset player edit form
+    parameterset period edit form
     '''
 
     survey_link = forms.CharField(label='Link',

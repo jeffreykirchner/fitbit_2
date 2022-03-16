@@ -22,6 +22,7 @@ from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
 from main.forms import ParameterSetZoneMinutesForm
+from main.forms import  ParameterSetPeriodPaymentForm
 
 class StaffSessionParametersView(SingleObjectMixin, View):
     '''
@@ -42,6 +43,7 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         parameterset_player_form = ParameterSetPlayerForm()
         parameterset_period_form = ParameterSetPeriodForm()
         parameterset_zone_minutes_form = ParameterSetZoneMinutesForm()
+        parameterset_period_payment_form = ParameterSetPeriodPaymentForm()
 
         parameterset_form_ids=[]
         for i in ParameterSetForm():
@@ -58,6 +60,10 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         parameterset_zone_minutes_form_ids=[]
         for i in parameterset_zone_minutes_form:
             parameterset_zone_minutes_form_ids.append(i.html_name)
+        
+        parameterset_period_payment_form_ids=[]
+        for i in parameterset_period_payment_form:
+            parameterset_period_payment_form_ids.append(i.html_name)
 
         return render(request=request,
                       template_name=self.template_name,
@@ -70,6 +76,8 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "parameterset_player_form_ids" : parameterset_player_form_ids,
                                "parameterset_period_form" : parameterset_period_form,
                                "parameterset_period_form_ids" : parameterset_period_form_ids,
+                               "parameterset_period_payment_form" : parameterset_period_payment_form,
+                               "parameterset_period_payment_form_ids" : parameterset_period_payment_form_ids,
                                "parameterset_zone_minutes_form" : parameterset_zone_minutes_form,
                                "parameterset_zone_minutes_form_ids" : parameterset_zone_minutes_form_ids,
                                "import_parameters_form" : ImportParametersForm(user=request.user),     
@@ -79,6 +87,7 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_player_json":json.dumps(session.parameter_set.parameter_set_players.first().json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_period_json":json.dumps(session.parameter_set.parameter_set_periods.first().json(), cls=DjangoJSONEncoder),
+                               "first_parameter_set_period_payment_json":json.dumps(session.parameter_set.parameter_set_periods.first().parameter_set_period_individual_pays_a.first().json(), cls=DjangoJSONEncoder),
                                "first_parameter_set_zone_minutes_json":json.dumps(session.parameter_set.parameter_set_zone_minutes.first().json(), cls=DjangoJSONEncoder),
                                })
     
