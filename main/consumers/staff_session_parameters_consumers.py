@@ -352,7 +352,7 @@ def take_add_parameterset_player(data):
     logger.info(f"Add parameterset player: {data}")
 
     session_id = data["sessionID"]
-    increment_player = data["increment_player"]
+    increment_player = int(data["increment_player"])
 
     try:        
         session = Session.objects.get(id=session_id)
@@ -494,8 +494,7 @@ def take_add_parameterset_zone_minutes(data):
         return
 
     if value == 1:
-        if session.parameter_set.parameter_set_zone_minutes.filter(zone_minutes=0).count()==0:
-            session.parameter_set.add_new_zone_minutes()
+        session.parameter_set.add_new_zone_minutes()
     elif session.parameter_set.parameter_set_zone_minutes.count()>1:
         session.parameter_set.parameter_set_zone_minutes.first().delete()
 

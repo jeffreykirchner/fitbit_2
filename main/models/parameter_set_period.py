@@ -18,14 +18,16 @@ class ParameterSetPeriod(models.Model):
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_periods")
 
-    period_number = models.IntegerField(verbose_name='Period Number', default=1)      #period number 1 to N
-    period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY) 
+    period_number = models.IntegerField(verbose_name='Period Number', default=1)                                       #period number 1 to N
+    period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY)              #type of payment system used
 
-    survey_required = models.BooleanField(default=False, verbose_name="Survey Complete")
+    survey_required = models.BooleanField(default=False, verbose_name="Survey Complete")                               #if true show the survey below
     survey_link = models.CharField(max_length = 1000, default = '', verbose_name = 'Survey Link')
 
-    show_notice = models.BooleanField(default=False, verbose_name="Show Notice")
+    show_notice = models.BooleanField(default=False, verbose_name="Show Notice")                                       #if true show notice below
     notice_text = HTMLField(default="Notice Text Here", verbose_name="Notice Text", blank=True)
+
+    minimum_wrist_minutes = models.IntegerField(default = 1080)                                                        #minimum wrist time to get paid today
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
@@ -53,8 +55,14 @@ class ParameterSetPeriod(models.Model):
         self.period_type = source.get("period_type")
         self.show_notice = source.get("show_notice")
         self.notice_text = source.get("notice_text")
+        self.minimum_wrist_minutes = source.get("minimum_wrist_minutes")
 
         self.save()
+
+        new_parameter_set_period_payments = source.get("parameter_set_period_payments")
+        for index, p in enumerate(self.parameter_set_period_pays_a.all()):                
+                p.from_dict(new_parameter_set_period_payments[index])
+
         
         message = "Parameters loaded successfully."
 
@@ -95,6 +103,7 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : 1 if self.survey_required else 0,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
+            "minimum_wrist_minutes" : self.minimum_wrist_minutes,
             "show_notice" : 1 if self.show_notice else 0,
             "notice_text" : self.notice_text,
             "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
@@ -112,6 +121,7 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : self.survey_required,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
+            "minimum_wrist_minutes" : self.minimum_wrist_minutes,
             "show_notice" : self.show_notice,
             "notice_text" : self.notice_text,
         }

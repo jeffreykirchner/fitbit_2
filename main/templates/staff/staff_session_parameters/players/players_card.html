@@ -25,6 +25,9 @@
                                 </th> 
                                 <th scope="col" class = "m-1 p-1">
                                     Label
+                                </th>
+                                <th scope="col" class = "m-1 p-1">
+                                    Color
                                 </th>                           
                             </tr>
                         </thead>
@@ -36,7 +39,9 @@
                                 <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell">
                                     [[p.id_label]]
                                 </td>
-                                
+                                <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell" v-bind:style="{color : p.display_color}">
+                                    [[p.display_color]]
+                                </td>
                             </tr>
                         </tbody>
                         

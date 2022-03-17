@@ -65,6 +65,13 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         for i in parameterset_period_payment_form:
             parameterset_period_payment_form_ids.append(i.html_name)
 
+        
+        if session.parameter_set.parameter_set_players.count() == 0:
+            session.parameter_set.add_new_player()
+        
+        if session.parameter_set.parameter_set_periods.count() == 0:
+            session.parameter_set.add_new_period()
+
         return render(request=request,
                       template_name=self.template_name,
                       context={"channel_key" : uuid.uuid4(),

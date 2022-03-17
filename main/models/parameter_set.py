@@ -49,35 +49,46 @@ class ParameterSet(models.Model):
 
         try:
             self.period_count = new_ps.get("period_count")
-
             self.enable_chat = new_ps.get("enable_chat")
-
             self.show_instructions = new_ps.get("show_instructions")
 
             self.save()
 
             
-            #parameter set players
+            #players
             new_parameter_set_players = new_ps.get("parameter_set_players")
+            
+            self.parameter_set_players.all().delete()
 
-            if len(new_parameter_set_players) > self.parameter_set_players.count():
-                #add more players
-                new_player_count = len(new_parameter_set_players) - self.parameter_set_players.count()
-
-                for i in range(new_player_count):
-                    self.add_new_player(self.parameter_set_types.first())
-
-            elif len(new_parameter_set_players) < self.parameter_set_players.count():
-                #remove excess players
-
-                extra_player_count = self.parameter_set_players.count() - len(new_parameter_set_players)
-
-                for i in range(extra_player_count):
-                    self.parameter_set_players.last().delete()
+            for i in range(len(new_parameter_set_players)):
+                self.add_new_player()
 
             new_parameter_set_players = new_ps.get("parameter_set_players")
             for index, p in enumerate(self.parameter_set_players.all()):                
                 p.from_dict(new_parameter_set_players[index])
+            
+
+            #zone minutes
+            new_parameter_set_zone_minutes = new_ps.get("parameter_set_zone_minutes")
+
+            self.parameter_set_zone_minutes.all().delete()
+
+            for i in range(len(new_parameter_set_zone_minutes)):
+                    self.add_new_zone_minutes()
+
+            for index, p in enumerate(self.parameter_set_zone_minutes.all()):                
+                p.from_dict(new_parameter_set_zone_minutes[index])
+
+            #periods
+            new_parameter_set_periods = new_ps.get("parameter_set_periods")
+            self.parameter_set_periods.all().delete()
+
+            for i in range(len(new_parameter_set_periods)):
+                    self.add_new_period()
+
+            for index, p in enumerate(self.parameter_set_periods.all()):                
+                p.from_dict(new_parameter_set_periods[index])
+
 
         except IntegrityError as exp:
             message = f"Failed to load parameter set: {exp}"
@@ -130,7 +141,11 @@ class ParameterSet(models.Model):
         parameter_set_period = main.models.ParameterSetPeriod()
 
         parameter_set_period.parameter_set = self
-        parameter_set_period.period_number = self.parameter_set_periods.last().period_number+1
+
+        if self.parameter_set_periods.count() == 0:
+            parameter_set_period.period_number = 1
+        else:
+            parameter_set_period.period_number = self.parameter_set_periods.last().period_number+1
 
         parameter_set_period.save()
         parameter_set_period.setup()
@@ -139,11 +154,24 @@ class ParameterSet(models.Model):
         '''
         add new parameter set zone minutes
         '''
+        logger = logging.getLogger(__name__) 
 
         parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes()
 
+        new_zone_minutes = -1
+
+        for i in range(1441):
+            if self.parameter_set_zone_minutes.filter(zone_minutes=i).count() == 0:
+                new_zone_minutes = i
+                #logger.info(f'add_new_zone_minutes: new_zone_minutes {new_zone_minutes}')
+                break
+
+        if new_zone_minutes == -1:
+            logger.warning(f'add_new_zone_minutes: no slot found for parameter set {self.id}')
+            return
+
         parameter_set_zone_minutes.parameter_set = self
-        parameter_set_zone_minutes.zone_minutes = 0
+        parameter_set_zone_minutes.zone_minutes = new_zone_minutes
 
         parameter_set_zone_minutes.save()
 

@@ -14,8 +14,11 @@ class ParameterSetPlayerForm(forms.ModelForm):
 
     id_label = forms.CharField(label='Label Used in Chat',
                                widget=forms.TextInput(attrs={"v-model":"current_parameter_set_player.id_label",}))
+    
+    display_color = forms.CharField(label='Graph Color',
+                               widget=forms.TextInput(attrs={"v-model":"current_parameter_set_player.display_color",}))
 
     class Meta:
         model=ParameterSetPlayer
-        fields =['id_label']
+        fields =['id_label', 'display_color']
     

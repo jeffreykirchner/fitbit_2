@@ -35,6 +35,7 @@ class Session(models.Model):
 
     title = models.CharField(max_length = 300, default="*** New Session ***")    #title of session
     start_date = models.DateField(default=now)                                   #date of session start
+    end_date = models.DateField(default=now)                                    #date of session end
 
     current_experiment_phase = models.CharField(max_length=100, choices=ExperimentPhase.choices, default=ExperimentPhase.RUN)         #current phase of expeirment
 
@@ -49,6 +50,10 @@ class Session(models.Model):
 
     shared = models.BooleanField(default=False)                                  #shared session parameter sets can be imported by other users
     locked = models.BooleanField(default=False)                                  #locked models cannot be deleted
+
+    canceled = models.BooleanField(default=False)                                #true if session needs to be canceled
+    cancelation_text =  models.CharField(max_length=10000, default="")           #text sent to subjects if experiment is canceled
+    cancelation_text_subject = models.CharField(max_length=1000, default="")     #email subject text for experiment cancelation
 
     invitation_text = HTMLField(default="", verbose_name="Invitation Text")       #inviataion email subject and text
     invitation_subject = HTMLField(default="", verbose_name="Invitation Subject")

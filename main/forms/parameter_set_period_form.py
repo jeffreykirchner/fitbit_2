@@ -26,6 +26,14 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                        choices=PeriodType.choices,
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set_period.period_type",}))
     
+    minimum_wrist_minutes = forms.IntegerField(label='Minimum Wrist Minutes',
+                                      min_value=0,
+                                      max_value=1440,
+                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.minimum_wrist_minutes",
+                                                                      "step":"1",
+                                                                      "min":"0",
+                                                                      "max":"1440"}))
+    
     show_notice = forms.ChoiceField(label='Show Notice',
                                         choices=((1, 'Yes'), (0,'No')),
                                         widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_notice"}))
@@ -37,7 +45,7 @@ class ParameterSetPeriodForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSetPeriod
-        fields =['survey_link', 'survey_required', 'period_type', 'show_notice', 'notice_text']
+        fields =['survey_link', 'survey_required', 'period_type', 'minimum_wrist_minutes', 'show_notice', 'notice_text']
     
 
     def clean_survey_link(self):

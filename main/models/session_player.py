@@ -36,11 +36,14 @@ class SessionPlayer(models.Model):
     name = models.CharField(verbose_name='Full Name', max_length = 100, default="")                     #subject's full name
     student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="")              #subject's student ID number
     email =  models.EmailField(verbose_name='Email Address', max_length = 100, blank=True, null=True)              #subject's email address
-    earnings = models.IntegerField(verbose_name='Earnings in cents', default=0)                         #earnings in cents
+                                         
+    group_number = models.IntegerField(default = 1, verbose_name="Group Number")
 
     current_instruction = models.IntegerField(verbose_name='Current Instruction', default=0)                     #current instruction page subject is on
     current_instruction_complete = models.IntegerField(verbose_name='Current Instruction Complete', default=0)   #furthest complete page subject has done
     instructions_finished = models.BooleanField(verbose_name='Instructions Finished', default=False)             #true once subject has completed instructions
+
+    disabled =  models.BooleanField(default=False)                                                   #if true disable subject's screen
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -62,7 +65,6 @@ class SessionPlayer(models.Model):
         reset player to starting state
         '''
 
-        self.earnings = 0
         self.name = ""
         self.student_id = ""
         self.email = None
@@ -106,8 +108,6 @@ class SessionPlayer(models.Model):
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
-
-            "earnings" : self.earnings,
 
             "player_number" : self.player_number,
             "player_key" : self.player_key,
@@ -159,22 +159,6 @@ class SessionPlayer(models.Model):
         return{
             "id" : self.id,    
         }
-    
-    def json_earning(self):
-        '''
-        return json object of earnings only
-        '''
-        return{
-            "id" : self.id, 
-            "earnings" : self.earnings,
-        }
-    
-    def get_earnings_in_dollars(self):
-        '''
-        return earnings in dollar format
-        '''
-
-        return f'${(self.earnings/100):.2f}'
 
 
         

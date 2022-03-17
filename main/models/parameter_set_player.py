@@ -16,6 +16,7 @@ class ParameterSetPlayer(models.Model):
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_players")
 
     id_label = models.CharField(verbose_name='ID Label', max_length = 2, default="1")      #id label shown on screen to subjects
+    display_color = models.CharField(max_length = 300, default = '#000000', verbose_name = 'Graph Color')  
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
@@ -35,6 +36,7 @@ class ParameterSetPlayer(models.Model):
         '''
 
         self.id_label = source.get("id_label")
+        self.display_color = source.get("display_color")
 
         self.save()
         
@@ -51,6 +53,7 @@ class ParameterSetPlayer(models.Model):
 
             "id" : self.id,
             "id_label" : self.id_label,
+            "display_color" : self.display_color,
         }
     
     def json_for_subject(self):
@@ -62,6 +65,7 @@ class ParameterSetPlayer(models.Model):
 
             "id" : self.id,
             "id_label" : self.id_label,
+            "display_color" : self.display_color,
 
         }
 
