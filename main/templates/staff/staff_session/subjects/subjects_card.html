@@ -47,8 +47,8 @@
                                 Student ID
                             </th>
                             <th scope="col" class = "text-center m-1 p-1">
-                                Earnings
-                            </th>                       
+                                Color
+                            </th>                                                  
                             <th scope="col" class = "text-center m-1 p-1">
                                 Shareable<br>Login Link
                             </th> 
@@ -77,9 +77,9 @@
                             <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
                                 [[p.student_id=="" ? "---" : p.student_id]]
                             </td>
-                            <td class="player_table_cell text-nowrap">
-                                $[[(p.earnings/100).toFixed(2)]]
-                            </td>                            
+                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)" v-bind:style="{color:p.parameter_set_player.display_color}">
+                                [[p.parameter_set_player.display_color]]
+                            </td>                                                        
                             <td class="player_table_cell text-nowrap">
                                 <a v-bind:href="p.login_link">Login Link</a>
                             </td>

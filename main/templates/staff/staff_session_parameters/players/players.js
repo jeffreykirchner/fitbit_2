@@ -67,8 +67,8 @@ sendUpdateParametersetPlayerGroup(){
     
     app.working = true;
     app.sendMessage("update_parameterset_player_group", {"sessionID" : app.sessionID,
-                                                   "paramterset_player_group_id" : app.current_parameter_set_player_group.id,
-                                                   "formData" : $("#parametersetPlayerGroupForm").serializeArray(),});
+                                                         "paramterset_player_group_id" : app.current_parameter_set_player_group.id,
+                                                         "formData" : $("#parametersetPlayerGroupForm").serializeArray(),});
 },
 
 /** copy specified period's groups forward to future groups
@@ -77,7 +77,7 @@ sendRemoveParameterSetPlayer(){
 
     app.working = true;
     app.sendMessage("remove_parameterset_player", {"sessionID" : app.sessionID,
-                                                   "paramterset_player_id" : app.current_parameter_set_player.id,});
+                                                   "increment_player" : app.increment_player});
                                                    
 },
 

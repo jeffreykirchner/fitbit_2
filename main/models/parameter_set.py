@@ -8,7 +8,7 @@ from decimal import Decimal
 from django.db import models
 from django.db.utils import IntegrityError
 
-from main import globals
+from main.globals import get_random_hex_color
 
 from main.models import InstructionSet
 
@@ -124,12 +124,10 @@ class ParameterSet(models.Model):
         add a new player of type subject_type
         '''
 
-        #24 players max
-        if self.parameter_set_players.all().count() >= 24:
-            return
-
         player = main.models.ParameterSetPlayer()
         player.parameter_set = self
+        player.id_label = self.parameter_set_players.count() + 1
+        player.display_color = get_random_hex_color()
 
         player.save()
     

@@ -332,14 +332,18 @@ def take_remove_parameterset_player(data):
     logger.info(f"Remove parameterset player: {data}")
 
     session_id = data["sessionID"]
-    paramterset_player_id = data["paramterset_player_id"]
+    increment_player = int(data["increment_player"])
 
     try:        
         session = Session.objects.get(id=session_id)
-        session.parameter_set.parameter_set_players.get(id=paramterset_player_id).delete()
+
+        for i in range(increment_player):
+            if session.parameter_set.parameter_set_players.count()>1:
+                session.parameter_set.parameter_set_players.last().delete()
+
         session.update_player_count()
     except ObjectDoesNotExist:
-        logger.warning(f"take_remove_parameterset_player paramterset_player, not found ID: {paramterset_player_id}")
+        logger.warning(f"take_remove_parameterset_player paramterset_player, not found")
         return
     
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
