@@ -26,7 +26,10 @@
                                 </th>
                                 <th scope="col" class = "text-nowrap">
                                     Link
-                                </th>    
+                                </th>  
+                                <th scope="col" class = "text-nowrap">
+                                    Show Notice
+                                </th>  
                                 <th scope="col" class = "text-nowrap">
                                     Type
                                 </th>
@@ -51,6 +54,10 @@
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap" v-bind:title="p.survey_link">
                                     <span v-if="p.survey_link!=''">[[truncateText(p.survey_link)]]</span>
                                     <span v-else>---</span>                                
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    <span v-if="p.show_notice==1">Yes</span>
+                                    <span v-else>No</span>
                                 </td>
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
                                     [[p.period_type]]

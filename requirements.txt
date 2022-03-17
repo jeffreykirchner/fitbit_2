@@ -8,7 +8,7 @@ channels-redis==3.4.*
 constantly==15.1.0
 cryptography==36.0.1
 daphne==3.0.*
-Django==4.0.*
+Django==3.2.*
 django-crispy-forms==1.14.0
 django-tinymce==3.4.*
 hyperlink==21.0.0

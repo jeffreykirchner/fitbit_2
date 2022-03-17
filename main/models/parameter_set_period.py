@@ -1,6 +1,7 @@
 '''
 parameterset period 
 '''
+from tinymce.models import HTMLField
 
 from django.db import models
 
@@ -22,6 +23,9 @@ class ParameterSetPeriod(models.Model):
 
     survey_required = models.BooleanField(default=False, verbose_name="Survey Complete")
     survey_link = models.CharField(max_length = 1000, default = '', verbose_name = 'Survey Link')
+
+    show_notice = models.BooleanField(default=False, verbose_name="Show Notice")
+    notice_text = HTMLField(default="Notice Text Here", verbose_name="Notice Text", blank=True)
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
@@ -47,6 +51,8 @@ class ParameterSetPeriod(models.Model):
         self.survey_required = source.get("survey_required")
         self.survey_link = source.get("survey_link")
         self.period_type = source.get("period_type")
+        self.show_notice = source.get("show_notice")
+        self.notice_text = source.get("notice_text")
 
         self.save()
         
@@ -89,6 +95,8 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : 1 if self.survey_required else 0,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
+            "show_notice" : 1 if self.show_notice else 0,
+            "notice_text" : self.notice_text,
             "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }
     
@@ -104,6 +112,8 @@ class ParameterSetPeriod(models.Model):
             "survey_required" : self.survey_required,
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
+            "show_notice" : self.show_notice,
+            "notice_text" : self.notice_text,
         }
 
 

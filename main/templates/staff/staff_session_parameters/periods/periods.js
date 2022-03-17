@@ -10,6 +10,8 @@
 
     app.current_parameter_set_period = app.$data.session.parameter_set.parameter_set_periods[index];
 
+    tinymce.get("id_notice_text").setContent(app.current_parameter_set_period.notice_text);
+
     var myModal = new bootstrap.Modal(document.getElementById('editParametersetPeriodModal'), {
         keyboard: false
         })
@@ -30,6 +32,8 @@ hideEditParametersetPeriod(){
 /** update parameterset period settings
 */
 sendUpdatePeriods(){
+
+    app.current_parameter_set_period.notice_text = tinymce.get("id_notice_text").getContent();
     
     app.working = true;
     app.cancelModal=false;
