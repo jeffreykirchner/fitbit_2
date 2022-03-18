@@ -69,9 +69,6 @@ var app = Vue.createApp({
                 case "update_chat":
                     app.takeUpdateChat(messageData);
                     break;
-                case "update_time":
-                    app.takeUpdateTime(messageData);
-                    break;
                 case "update_end_game":
                     app.takeEndGame(messageData);
                     break;
@@ -175,31 +172,6 @@ var app = Vue.createApp({
 
             $('#endGameModal').modal('hide');
             this.closeMoveModal();
-        },
-
-        /**
-        * update time and start status
-        */
-        takeUpdateTime(messageData){
-            let result = messageData.status.result;
-            let status = messageData.status.value;
-            let notice_list = messageData.status.notice_list;
-
-            if(status == "fail") return;
-
-            this.session.started = result.started;
-            this.session.time_remaining = result.time_remaining;
-            this.session.timer_running = result.timer_running;
-            this.session.finished = result.finished;
-
-            //update subject earnings
-            this.session_player.earnings = result.session_player_earnings.earnings;
-
-            //session complete
-            if(app.$data.session.finished)
-            {
-                this.showEndGameModal();
-            }            
         },
 
         /**

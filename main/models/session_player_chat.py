@@ -25,8 +25,6 @@ class SessionPlayerChat(models.Model):
     text = models.CharField(max_length = 1000, default="Chat here", verbose_name="Chat Text")             #chat text
     chat_type = models.CharField(max_length=100, choices=ChatTypes.choices, verbose_name="Chat Type")     #target of chat
 
-    time_remaining = models.IntegerField(verbose_name='Good one amount', default=0)                                              #amount time left in period when move made
-
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -49,7 +47,6 @@ class SessionPlayerChat(models.Model):
        
         writer.writerow([self.session_player.session.id,
                         self.session_period.period_number,
-                        self.time_remaining,
                         self.session_player.player_number,
                         self.session_player.parameter_set_player.id_label,
                         "Chat",

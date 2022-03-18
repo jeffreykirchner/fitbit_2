@@ -45,8 +45,6 @@ class Session(models.Model):
     session_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Session Key')     #unique key for session to auto login subjects by id
 
     started =  models.BooleanField(default=False)                                #starts session and filll in session
-    time_remaining = models.IntegerField(default=0)                              #time remaining in current phase of current period
-    timer_running = models.BooleanField(default=False)                           #true when period timer is running
     finished = models.BooleanField(default=False)                                #true after all session periods are complete
 
     shared = models.BooleanField(default=False)                                  #shared session parameter sets can be imported by other users
@@ -124,7 +122,6 @@ class Session(models.Model):
         '''
         self.started = False
         self.finished = False
-        self.timer_running = False
 
         for p in self.session_players.all():
             p.reset()
@@ -259,8 +256,6 @@ class Session(models.Model):
             "current_experiment_phase":self.current_experiment_phase,
             "current_parameter_set_period": self.get_current_session_period().json() if current_parameter_set_period else None,
             "current_period" : current_parameter_set_period.period_number if current_parameter_set_period else "---",
-            "time_remaining":self.time_remaining,
-            "timer_running":self.timer_running,
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
             "session_periods":[i.json() for i in self.session_periods.all()],
@@ -275,14 +270,14 @@ class Session(models.Model):
         json object for subject screen
         session_player : SessionPlayer() : session player requesting session object
         '''
-        
+
+        current_parameter_set_period = self.get_current_session_period()
+
         return{
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
             "current_parameter_set_period": self.get_current_session_period().json() if self.get_current_session_period() else None,
-            "current_period" : 0,
-            "time_remaining":self.time_remaining,
-            "timer_running":self.timer_running,
+            "current_period"  : current_parameter_set_period.period_number if current_parameter_set_period else "---",
             "finished":self.finished,
             "parameter_set":self.parameter_set.json_for_subject(),
 
