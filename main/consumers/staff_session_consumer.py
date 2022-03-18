@@ -31,9 +31,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     '''
     websocket session list
     '''    
-
-    has_timer_control = False
-    timer_running = False
         
     async def get_session(self, event):
         '''

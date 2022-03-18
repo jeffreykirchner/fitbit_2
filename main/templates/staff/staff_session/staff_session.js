@@ -88,12 +88,6 @@ var app = Vue.createApp({
                 case "update_chat":
                     app.takeUpdateChat(messageData);
                     break;
-                case "update_time":
-                    app.takeUpdateTime(messageData);
-                    break;
-                case "start_timer":
-                    app.takeStartTimer(messageData);
-                    break;   
                 case "update_connection_status":
                     app.takeUpdateConnectionStatus(messageData);
                     break;   
@@ -260,26 +254,6 @@ var app = Vue.createApp({
                 var elmnt = document.getElementById("chat_id_" + app.$data.chat_list_to_display[app.$data.chat_list_to_display.length-1].id.toString());
                 elmnt.scrollIntoView(); 
             }
-        },
-
-        /**
-         * update time and start status
-         */
-        takeUpdateTime(messageData){
-
-            let result = messageData.status.result;
-            let status = messageData.status.value;
-
-            if(status == "fail") return;
-
-            app.$data.session.started = result.started;
-            app.$data.session.time_remaining = result.time_remaining;
-            app.$data.session.timer_running = result.timer_running;
-            app.$data.session.finished = result.finished;
-
-            app.takeUpdateEarnings(messageData);
-
-            app.updatePhaseButtonText();
         },
 
         /**

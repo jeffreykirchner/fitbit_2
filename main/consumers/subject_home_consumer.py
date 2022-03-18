@@ -246,48 +246,6 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         self.session_player_id = result["session_player_id"]
 
-    async def update_time(self, event):
-        '''
-        update running, phase and time status
-        '''
-
-        event_data = deepcopy(event["data"])
-
-        #if new period is starting, update local info
-        if event_data["result"]["do_group_update"]:
-             await self.update_local_info(event)
-
-        #remove other player earnings
-        for session_players_earnings in event_data["result"]["session_player_earnings"]:
-            if session_players_earnings["id"] == self.session_player_id:
-                event_data["result"]["session_player_earnings"] = session_players_earnings
-                break
-        
-        #remove none group memebers
-        session_players = []
-        for session_player in event_data["result"]["session_players"]:
-            session_players.append(session_player)
-        
-        #remove other player notices
-        notice_list = []
-        for session_player_notice in event_data.get("notice_list", []):
-            if session_player_notice["session_player_id"] == self.session_player_id:
-                notice_list.append(session_player_notice)
-                break
-
-        event_data["notice_list"] = notice_list   
-
-        event_data["result"]["session_players"] = session_players
-
-        message_data = {}
-        message_data["status"] = event_data
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
     async def update_connection_status(self, event):
         '''
         handle connection status update from group member
@@ -413,8 +371,6 @@ def take_chat(session_id, session_player_id, data):
     result["recipients"] = []
 
     session_player_chat.text = chat_text
-    session_player_chat.time_remaining = session.time_remaining
-
     session_player_chat.save()
 
     if recipients == "all":

@@ -99,32 +99,6 @@ takeUpdateNextPhase(messageData){
     this.updatePhaseButtonText();
 },
 
-/**
- * start the period timer
-*/
-startTimer(){
-    app.$data.working = true;
-
-    let action = "";
-
-    if(app.$data.session.timer_running)
-    {
-        action = "stop";
-    }
-    else
-    {
-        action = "start";
-    }
-
-    app.sendMessage("start_timer", {action : action});
-},
-
-/** take start experiment response
- * @param messageData {json}
-*/
-takeStartTimer(messageData){
-    app.takeUpdateTime(messageData);
-},
 
 /**reset experiment, remove all bids, asks and trades
 */
