@@ -188,7 +188,6 @@ var app = Vue.createApp({
             if(status == "fail") return;
 
             this.session.started = result.started;
-            this.session.current_period = result.current_period;
             this.session.time_remaining = result.time_remaining;
             this.session.timer_running = result.timer_running;
             this.session.finished = result.finished;
@@ -265,6 +264,7 @@ var app = Vue.createApp({
         {%include "subject/subject_home/summary/summary_card.js"%}
         {%include "subject/subject_home/test_mode/test_mode.js"%}
         {%include "subject/subject_home/instructions/instructions_card.js"%}
+        {%include "subject/subject_home/graph/graph_card.js"%}
     
         /** clear form error messages
         */

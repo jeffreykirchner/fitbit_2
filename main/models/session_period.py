@@ -5,8 +5,10 @@ session period model
 #import logging
 
 from django.db import models
+from django.utils.timezone import now
 
 from main.models import Session
+from main.models import  ParameterSetPeriod
 
 import main
 
@@ -15,8 +17,10 @@ class SessionPeriod(models.Model):
     session period model
     '''
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name="session_periods")
-
-    period_number = models.IntegerField()                       #period number from 1 to N
+    parameter_set_period = models.ForeignKey(ParameterSetPeriod, on_delete=models.CASCADE, related_name="session_periods_b", blank=True, null=True)
+ 
+    period_number = models.IntegerField()                        #period number from 1 to N
+    period_date = models.DateField(default=now)                  #date of period
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
@@ -45,5 +49,6 @@ class SessionPeriod(models.Model):
         return{
             "id" : self.id,
             "period_number" : self.period_number,
+            "period_date" : self.period_date,
         }
         

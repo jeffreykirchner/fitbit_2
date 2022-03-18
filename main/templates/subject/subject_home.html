@@ -29,7 +29,7 @@
 <!-- instructions -->
 <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
     <div class="col-md">
-        {%include "subject/subject_home/instructions_card.html"%}
+        {%include "subject/subject_home/instructions/instructions_card.html"%}
     </div>
 </div>
 
@@ -42,18 +42,17 @@
     </div>
 </div>
 
+<!-- graph -->
 <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
-    {%if session.parameter_set.enable_chat%}
-    <div class="col">
-        {%include "subject/subject_home/graph_card.html"%}                
+    <div class="col-md-6">
+        {%include "subject/subject_home/graph/graph_card.html"%}                
     </div>
-    {%endif%}
-    <div class="col-md-3">
-        <div class="row">
-            <div class="col-md">
-                {%include "subject/subject_home/summary_card.html"%}
-            </div>            
-        </div>     
+</div>
+
+<!-- summary -->
+<div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
+    <div class="col-md-6">
+        {%include "subject/subject_home/summary/summary_card.html"%}     
     </div>
 </div>
 

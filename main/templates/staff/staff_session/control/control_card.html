@@ -37,20 +37,6 @@
             </div>
         </div>
 
-        <!-- start timer -->
-        <div class="row" v-show="session.started  && session.current_experiment_phase=='Run' && !session.finished">
-            <div class="col-md text-center">
-                <button type="button"                        
-                        v-on:click = "startTimer()"
-                        title="Start/Stop period timer"
-                        v-bind:class="[(session.timer_running) ? 'btn-outline-warning' : 'btn-outline-success' , 'btn']"
-                        v-bind:disabled="reconnecting || working || session.started===false || session.finished || session.current_experiment_phase!='Run'">
-                    <span v-if="session.timer_running">Stop Timmer <i class="far fa-clock"></i></span>
-                    <span v-else>Start Timmer <i class="far fa-clock"></i></span>
-                </button>
-            </div>
-        </div>
-
         <!-- next experiment phase -->
         <div class="row mt-2" v-show="(session.started && session.current_experiment_phase!='Run') || (session.finished)">
             <div class="col-md text-center">
@@ -74,10 +60,8 @@
                         v-bind:disabled="reconnecting || 
                                          working || 
                                          session.started===false || 
-                                         session.locked || 
-                                         session.current_period===session.parameter_set.period_count"
-                    >
-                        <span v-if="session.current_period!=session.parameter_set.period_count">End Early <i class="far fa-hand-paper"></i></span>
+                                         session.locked">
+                        <span v-if="session.current_period!=session.parameter_set.parameter_set_periods.length">End Early <i class="far fa-hand-paper"></i></span>
                         <span v-else>***Final Period***</span>
                 </button>
             </div>

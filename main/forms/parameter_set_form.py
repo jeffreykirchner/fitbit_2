@@ -12,9 +12,9 @@ class ParameterSetForm(forms.ModelForm):
     '''
     Parameterset edit form
     '''
-    period_count = forms.IntegerField(label='Number of Periods',
+    display_block = forms.IntegerField(label='Number of Periods in Graph',
                                       min_value=1,
-                                      widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.period_count",
+                                      widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.display_block",
                                                                       "step":"1",
                                                                       "min":"1"}))
                                        
@@ -37,4 +37,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['period_count', 'show_instructions', 'instruction_set', 'test_mode'] #, 'enable_chat'
+        fields =['display_block', 'show_instructions', 'instruction_set', 'test_mode'] #, 'enable_chat'

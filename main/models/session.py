@@ -3,12 +3,14 @@ session model
 '''
 
 from datetime import datetime
+from datetime import timedelta
 from tinymce.models import HTMLField
 
 import logging
 import uuid
 import csv
 import io
+import pytz
 
 from django.conf import settings
 
@@ -35,7 +37,7 @@ class Session(models.Model):
 
     title = models.CharField(max_length = 300, default="*** New Session ***")    #title of session
     start_date = models.DateField(default=now)                                   #date of session start
-    end_date = models.DateField(default=now)                                    #date of session end
+    end_date = models.DateField(default=now)                                     #date of session end
 
     current_experiment_phase = models.CharField(max_length=100, choices=ExperimentPhase.choices, default=ExperimentPhase.RUN)         #current phase of expeirment
 
@@ -43,7 +45,6 @@ class Session(models.Model):
     session_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Session Key')     #unique key for session to auto login subjects by id
 
     started =  models.BooleanField(default=False)                                #starts session and filll in session
-    current_period = models.IntegerField(default=0)                              #current period of the session
     time_remaining = models.IntegerField(default=0)                              #time remaining in current phase of current period
     timer_running = models.BooleanField(default=False)                           #true when period timer is running
     finished = models.BooleanField(default=False)                                #true after all session periods are complete
@@ -80,6 +81,12 @@ class Session(models.Model):
         get a formatted string of start date
         '''
         return  self.start_date.strftime("%#m/%#d/%Y")
+    
+    def get_end_date_string(self):
+        '''
+        get a formatted string of end date
+        '''
+        return  self.end_date.strftime("%#m/%#d/%Y")
 
     def start_experiment(self):
         '''
@@ -87,14 +94,15 @@ class Session(models.Model):
         '''
 
         self.started = True
-        self.finished = False
-        self.current_period = 1
-        self.start_date = datetime.now()
+        self.finished = False     
 
         session_periods = []
 
-        for i in range(self.parameter_set.period_count):
-            session_periods.append(main.models.SessionPeriod(session=self, period_number=i+1))
+        period_date = self.start_date
+
+        for i, p in enumerate(self.parameter_set.parameter_set_periods.all()):
+            session_periods.append(main.models.SessionPeriod(session=self, parameter_set_period=p, period_number=i+1, period_date=period_date))
+            period_date += timedelta(days=1)
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
 
@@ -102,6 +110,13 @@ class Session(models.Model):
 
         for i in self.session_players.all():
             i.start()
+    
+    def update_end_date(self):
+        '''
+        update end date
+        '''
+        self.end_date = self.start_date +  timedelta(days=self.parameter_set.parameter_set_periods.count()-1)
+        self.save()
  
     def reset_experiment(self):
         '''
@@ -109,7 +124,6 @@ class Session(models.Model):
         '''
         self.started = False
         self.finished = False
-        self.current_period = 1
         self.timer_running = False
 
         for p in self.session_players.all():
@@ -130,8 +144,10 @@ class Session(models.Model):
         '''
         if not self.started:
             return None
+        
+        parameter_set_period = self.session_periods.filter(period_date=datetime.now(pytz.UTC))
 
-        return self.session_periods.get(period_number=self.current_period)
+        return parameter_set_period.first()
     
     def update_player_count(self):
         '''
@@ -148,39 +164,6 @@ class Session(models.Model):
             new_session_player.player_number = count + 1
 
             new_session_player.save()
-
-    def do_period_timer(self):
-        '''
-        do period timer actions
-        '''
-
-        status = "success"
-        end_game = False
-
-        #check session over
-        if self.time_remaining == 0 and \
-           self.current_period >= self.parameter_set.period_count:
-
-            self.finished = True
-            end_game = True
-
-
-        if not status == "fail" and not end_game:
-
-            if self.time_remaining == 0:
-               
-                self.current_period += 1        
-            else:                                     
-
-                self.time_remaining -= 1
-
-        self.save()
-
-        result = self.json_for_timmer()
-
-        return {"value" : status,
-                "result" : result,
-                "end_game" : end_game}
 
     def get_download_summary_csv(self):
         '''
@@ -248,26 +231,34 @@ class Session(models.Model):
             writer.writerow([p.name, p.student_id, p.earnings/100, p.avatar.label if p.avatar else 'None'])
 
         return output.getvalue()
+    
 
     def json(self):
         '''
         return json object of model
         '''
-              
-        chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
+
+        chat = []
+        if self.parameter_set.enable_chat: 
+            chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
                                                     .filter(session_player__in=self.session_players.all())\
                                                     .prefetch_related('session_player_recipients')
                                                     .select_related('session_player__parameter_set_player')
                                                     .order_by('-timestamp')[:100:-1]
-               ]                                                           
+               ]
+
+        current_parameter_set_period = self.get_current_session_period()
+
         return{
             "id":self.id,
             "title":self.title,
             "locked":self.locked,
             "start_date":self.get_start_date_string(),
+            "end_date":self.get_end_date_string(),
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
-            "current_period":self.current_period,
+            "current_parameter_set_period": self.get_current_session_period().json() if current_parameter_set_period else None,
+            "current_period" : current_parameter_set_period.period_number if current_parameter_set_period else "---",
             "time_remaining":self.time_remaining,
             "timer_running":self.timer_running,
             "finished":self.finished,
@@ -288,7 +279,8 @@ class Session(models.Model):
         return{
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
-            "current_period":self.current_period,
+            "current_parameter_set_period": self.get_current_session_period().json() if self.get_current_session_period() else None,
+            "current_period" : 0,
             "time_remaining":self.time_remaining,
             "timer_running":self.timer_running,
             "finished":self.finished,
@@ -297,22 +289,6 @@ class Session(models.Model):
             "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.all()]
         }
     
-    def json_for_timmer(self):
-        '''
-        return json object for timer update
-        '''
-
-        session_players = []
-
-        return{
-            "started":self.started,
-            "current_period":self.current_period,
-            "time_remaining":self.time_remaining,
-            "timer_running":self.timer_running,
-            "finished":self.finished,
-            "session_players":session_players,
-            "session_player_earnings": [i.json_earning() for i in self.session_players.all()]
-        }
         
 @receiver(post_delete, sender=Session)
 def post_delete_parameterset(sender, instance, *args, **kwargs):

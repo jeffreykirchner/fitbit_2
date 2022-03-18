@@ -380,7 +380,7 @@ def take_add_parameterset_period(data):
 
     session_id = data["sessionID"]
     value = data["value"]
-    increment_period = data["increment_period"]
+    increment_period = int(data["increment_period"])
 
     try:        
         session = Session.objects.get(id=session_id)
@@ -393,6 +393,8 @@ def take_add_parameterset_period(data):
             session.parameter_set.add_new_period()
         elif session.parameter_set.parameter_set_periods.count()>1:
             session.parameter_set.parameter_set_periods.last().delete()
+    
+    session.update_end_date()
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 

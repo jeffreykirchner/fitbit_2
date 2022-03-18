@@ -20,11 +20,11 @@ class ParameterSet(models.Model):
     parameter set
     '''    
     instruction_set = models.ForeignKey(InstructionSet, on_delete=models.CASCADE, related_name="parameter_sets")
-
-    period_count = models.IntegerField(verbose_name='Number of periods', default=20)                          #number of periods in the experiment
     
     enable_chat = models.BooleanField(default=False, verbose_name = 'Private Chat')                           #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
+
+    display_block = models.IntegerField(verbose_name='Number of Periods to Display', default=28)              #number of periods to display in subject graph
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 
@@ -48,9 +48,9 @@ class ParameterSet(models.Model):
         status = "success"
 
         try:
-            self.period_count = new_ps.get("period_count")
             self.enable_chat = new_ps.get("enable_chat")
             self.show_instructions = new_ps.get("show_instructions")
+            self.display_block = new_ps.get("display_block")
 
             self.save()
 
@@ -181,12 +181,12 @@ class ParameterSet(models.Model):
         return json object of model
         '''
         return{
-            "id" : self.id,
-            "period_count" : self.period_count,
+            "id" : self.id,            
 
             "enable_chat" : "True" if self.enable_chat else "False",
             "show_instructions" : "True" if self.show_instructions else "False",
             "instruction_set" : self.instruction_set.json_min(),
+            "display_block" : self.display_block,
 
             "parameter_set_players" : [p.json() for p in self.parameter_set_players.all()],
             "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
@@ -203,7 +203,7 @@ class ParameterSet(models.Model):
             "id" : self.id,
             
             "show_instructions" : "True" if self.show_instructions else "False",
-
+            "display_block" : self.display_block,
             "test_mode" : self.test_mode,
         }
 

@@ -475,6 +475,7 @@ def take_update_session_form(session_id, data):
     if form.is_valid():
         #print("valid form")                
         form.save()              
+        session.update_end_date()
 
         return {"status":"success", "session" : session.json()}                      
                                 
@@ -578,9 +579,6 @@ def take_end_early(session_id):
     '''
 
     session = Session.objects.get(id=session_id)
-
-    session.parameter_set.period_count = session.current_period
-    session.parameter_set.save()
 
     return {"value" : "success", "result" : session.parameter_set.period_count}
 

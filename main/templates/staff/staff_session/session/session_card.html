@@ -23,17 +23,20 @@
         </div>
         <div class="row">
             <div class="col-md-4" style="text-align: right;">
-                Run Date:
+                Start Date:
             </div>
             <div class="col-md-8">
-                <span v-if="session.started">
-                    [[session.start_date]]
-                </span>
-                <span v-else>
-                    ---
-                </span>
+                [[session.start_date]]
             </div>
-        </div>                    
+        </div>   
+        <div class="row">
+            <div class="col-md-4" style="text-align: right;">
+                End Date:
+            </div>
+            <div class="col-md-8">
+                [[session.end_date]]
+            </div>
+        </div>                  
         
     </div>                    
 </div>
