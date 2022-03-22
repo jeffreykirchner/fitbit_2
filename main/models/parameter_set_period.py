@@ -29,6 +29,12 @@ class ParameterSetPeriod(models.Model):
 
     minimum_wrist_minutes = models.IntegerField(default = 1080)                                                        #minimum wrist time to get paid today
 
+    show_graph = models.BooleanField(default=False, verbose_name="Show Graph")                                         #if true show the graph
+    graph_start_period_number = models.IntegerField(verbose_name='Graph Start Period', default=1)                      #period number to start the graph on
+    graph_end_period_number = models.IntegerField(verbose_name='Graph End Period', default=1)                          #period number to end the graph on
+
+    pay_block = models.IntegerField(verbose_name='Pay Group', default=1)                                               #group period together with the same group to be paid together
+
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
 
@@ -57,6 +63,12 @@ class ParameterSetPeriod(models.Model):
         self.notice_text = source.get("notice_text")
         self.minimum_wrist_minutes = source.get("minimum_wrist_minutes")
 
+        self.show_graph = source.get("show_graph")
+        self.graph_start_period_number = source.get("graph_start_period_number")
+        self.graph_end_period_number = source.get("graph_end_period_number")
+
+        self.pay_block = source.get("pay_block")
+
         self.save()
 
         new_parameter_set_period_payments = source.get("parameter_set_period_payments")
@@ -84,6 +96,11 @@ class ParameterSetPeriod(models.Model):
         '''
 
         self.period_type = source.period_type
+        self.minimum_wrist_minutes = source.minimum_wrist_minutes
+        self.show_graph = source.show_graph
+        self.graph_start_period_number = source.graph_start_period_number
+        self.graph_end_period_number = source.graph_end_period_number
+        self.pay_block = source.pay_block
 
         for p_source in source.parameter_set_period_pays_a.all():
             p_target = self.parameter_set_period_pays_a.get(parameter_set_zone_minutes=p_source.parameter_set_zone_minutes)
@@ -106,6 +123,13 @@ class ParameterSetPeriod(models.Model):
             "minimum_wrist_minutes" : self.minimum_wrist_minutes,
             "show_notice" : 1 if self.show_notice else 0,
             "notice_text" : self.notice_text,
+
+            "show_graph" : 1 if self.show_graph else 0,
+            "graph_start_period_number" : self.graph_start_period_number,
+            "graph_end_period_number" : self.graph_end_period_number,
+
+            "pay_block" : self.pay_block,
+
             "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }
     
@@ -124,6 +148,12 @@ class ParameterSetPeriod(models.Model):
             "minimum_wrist_minutes" : self.minimum_wrist_minutes,
             "show_notice" : self.show_notice,
             "notice_text" : self.notice_text,
+
+            "show_graph" : 1 if self.show_graph else 0,
+            "graph_start_period_number" : self.graph_start_period_number,
+            "graph_end_period_number" : self.graph_end_period_number,
+
+            "pay_block" : self.pay_block,
         }
 
 

@@ -140,6 +140,8 @@ updateChatDisplay(){
 },
 
 updateChatDisplayScroll(){
+    if(!app.session.enable_chat) return;
+    
     var elmnt = document.getElementById("chat_id_" + this.chat_list_to_display[this.chat_list_to_display.length-1].id.toString());
     elmnt.scrollIntoView(); 
 },

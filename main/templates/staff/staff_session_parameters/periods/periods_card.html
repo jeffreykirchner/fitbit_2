@@ -1,7 +1,7 @@
 <div class="card" v-show="first_load_done">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">
-           Periods ([[session.parameter_set.parameter_set_periods.length]])
+           Days ([[session.parameter_set.parameter_set_periods.length]])
         </span>  
         
         <span class="float-end">
@@ -19,30 +19,35 @@
                         <thead>
                             <tr>
                                 <th scope="col" class = "text-nowrap">
-                                    #
+                                    Day
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
                                     Type
                                 </th>
                                 <th scope="col" class = "text-nowrap">
-                                    Wrist Minutes
+                                    Yesterday's Min<br>Wrist Minutes
                                 </th>
                                 <th scope="col" class = "text-nowrap">
-                                    Show Survey
-                                </th>                               
+                                    Show<br>Survey
+                                </th>                             
                                 <th scope="col" class = "text-nowrap">
-                                    Link
-                                </th>  
+                                    Show<br>Notice
+                                </th>
                                 <th scope="col" class = "text-nowrap">
-                                    Show Notice
-                                </th>  
-                                
+                                    Show<br>Graph
+                                </th> 
+                                <th scope="col" class = "text-nowrap">
+                                    Graph<br>Range
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Pay<br>Block
+                                </th>
                                 <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
                                     [[p.label]] <br>
                                     Individual / Group Bonus
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
-                                    Copy Down
+                                    Copy<br>Down
                                 </th>                       
                             </tr>
                         </thead>
@@ -61,14 +66,20 @@
                                     <span v-if="p.survey_required==1">Yes</span>
                                     <span v-else>No</span>
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap" v-bind:title="p.survey_link">
-                                    <span v-if="p.survey_link!=''">[[truncateText(p.survey_link)]]</span>
-                                    <span v-else>---</span>                                
-                                </td>
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
                                     <span v-if="p.show_notice==1">Yes</span>
                                     <span v-else>No</span>
-                                </td>                                
+                                </td> 
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    <span v-if="p.show_graph==1">Yes</span>
+                                    <span v-else>No</span>
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[p.graph_start_period_number]] to [[p.graph_end_period_number]]
+                                </td> 
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[p.pay_block]]
+                                </td>                               
                                 <td v-for="(p, index2) in p.parameter_set_period_payments" v-bind:key="p.id" v-on:click="showEditParametersetPeriodPayment(index, index2)" class="player_table_cell text-nowrap">
                                     $[[p.payment]] / $[[p.group_bonus]]
                                 </td>

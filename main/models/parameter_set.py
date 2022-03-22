@@ -205,5 +205,8 @@ class ParameterSet(models.Model):
             "show_instructions" : "True" if self.show_instructions else "False",
             "display_block" : self.display_block,
             "test_mode" : self.test_mode,
+
+            "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
+            "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
         }
 

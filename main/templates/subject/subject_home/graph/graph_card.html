@@ -1,7 +1,10 @@
 
 <div class="card" id="graph_card">                  
     <div class="card-header fw-bold">                
-        <span class="align-middle">Periods 1 - 28</span>
+        <span class="align-middle">
+            Day [[session.parameter_set.parameter_set_periods[session.current_period-1].graph_start_period_number]] to [[session.parameter_set.parameter_set_periods[session.current_period-1].graph_end_period_number]]
+        </span>
+        
 
         <span class="float-end">
             <span v-show="reconnecting" class="me-1">
@@ -15,8 +18,7 @@
         <!-- graph -->
         <div class="row">
             <div class="col">
-
-                
+                <canvas class="graph" id="graph_id" ></canvas>
             </div>
         </div>       
     </div>                    

@@ -210,7 +210,7 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         message_data = {}
         message_data["status"] = await sync_to_async(take_import_parameters)(event["message_text"])
 
-        message_data["session"] = await get_session(event["message_text"]["sessionID"])
+        message_data["session"] = await sync_to_async(get_session)(event["message_text"]["sessionID"])
 
         message = {}
         message["messageType"] = "import_parameters"

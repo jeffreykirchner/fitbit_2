@@ -229,7 +229,6 @@ class Session(models.Model):
 
         return output.getvalue()
     
-
     def json(self):
         '''
         return json object of model
