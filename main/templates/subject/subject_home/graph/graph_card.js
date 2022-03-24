@@ -92,12 +92,15 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
     ctx.textAlign = "center";
 
     var tempX = marginY;
-    var tempXValue=xMin;                                
+    var tempXValue=xMin;     
+
     for(var i=0;i<=xTickCount;i++)
     {                                       
         ctx.moveTo(tempX, h-marginX);                                   
         ctx.lineTo(tempX,  h-marginX+5);
-        ctx.fillText(Math.round(tempXValue).toString(),tempX,h-marginX+18);
+
+        if(i%7==0)
+           ctx.fillText(Math.round(tempXValue).toString(),tempX,h-marginX+18);
 
         tempX += ((w-marginY-margin2)/ (xTickCount));
         tempXValue += xTickValue;
