@@ -216,6 +216,7 @@ takeUpdateSubject(messageData){
         session_player.name = messageData.status.session_player.name;
         session_player.student_id = messageData.status.session_player.student_id;
         session_player.email = messageData.status.session_player.email;
+        session_player.group_number = messageData.status.session_player.group_number;
     } 
     else
     {
@@ -237,6 +238,7 @@ showEditSubject:function(id){
     this.staffEditNameEtcForm.name = session_player.name;
     this.staffEditNameEtcForm.student_id = session_player.student_id;
     this.staffEditNameEtcForm.email = session_player.email;
+    this.staffEditNameEtcForm.group_number = session_player.group_number;
     
     var myModal = new bootstrap.Modal(document.getElementById('editSubjectModal'), {
         keyboard: false

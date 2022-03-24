@@ -22,7 +22,7 @@ class ParametersForm(forms.ModelForm):
                                              choices=[(tz, tz) for tz in pytz.all_timezones])
 
     invitation_subject = forms.CharField(label='Invitation Subject',
-                               widget=forms.TextInput(attrs={"size":"125"}))
+                                         widget=forms.TextInput(attrs={"size":"125"}))
     
     invitation_text = forms.CharField(label='Invitation Text',
                                       widget=TinyMCE(attrs={"rows":20, "cols":200, "plugins": "link image code"}))

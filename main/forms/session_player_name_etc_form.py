@@ -19,3 +19,7 @@ class StaffEditNameEtcForm(forms.Form):
     email =  forms.EmailField(label='Email',
                               required=False,
                               widget=forms.EmailInput(attrs={"v-model":"staffEditNameEtcForm.email",}))
+    
+    group_number = forms.IntegerField(label='Group Number',
+                                      widget=forms.NumberInput(attrs={"v-model":"staffEditNameEtcForm.group_number",
+                                                                      "step":"1",}))

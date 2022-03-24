@@ -142,9 +142,9 @@ class Session(models.Model):
         if not self.started:
             return None
         
-        parameter_set_period = self.session_periods.filter(period_date=datetime.now(pytz.UTC))
+        session_period = self.session_periods.filter(period_date=datetime.now(pytz.UTC))
 
-        return parameter_set_period.first()
+        return session_period.first()
     
     def update_player_count(self):
         '''
@@ -270,17 +270,18 @@ class Session(models.Model):
         session_player : SessionPlayer() : session player requesting session object
         '''
 
-        current_parameter_set_period = self.get_current_session_period()
+        current_session_period = self.get_current_session_period()
 
         return{
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
-            "current_parameter_set_period": self.get_current_session_period().json() if self.get_current_session_period() else None,
-            "current_period"  : current_parameter_set_period.period_number if current_parameter_set_period else "---",
+            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            "current_period"  : current_session_period.period_number if current_session_period else "---",
             "finished":self.finished,
+
             "parameter_set":self.parameter_set.json_for_subject(),
 
-            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.all()]
+            #"session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.all()]
         }
     
         

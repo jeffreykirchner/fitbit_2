@@ -1,8 +1,8 @@
 
-<div class="card" id="graph_card">                  
+<div class="card" id="id_graph_card">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">
-            Day [[session.parameter_set.parameter_set_periods[session.current_period-1].graph_start_period_number]] to [[session.parameter_set.parameter_set_periods[session.current_period-1].graph_end_period_number]]
+            Day [[session.current_parameter_set_period.graph_start_period_number]] to [[session.current_parameter_set_period.graph_end_period_number]]
         </span>
         
 
@@ -18,7 +18,7 @@
         <!-- graph -->
         <div class="row">
             <div class="col">
-                <canvas class="graph" id="graph_id" ></canvas>
+                <canvas class="graph" id="graph_id"></canvas>
             </div>
         </div>       
     </div>                    

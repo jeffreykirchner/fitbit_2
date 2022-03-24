@@ -17,6 +17,12 @@ class ParameterSetForm(forms.ModelForm):
                                       widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.display_block",
                                                                       "step":"1",
                                                                       "min":"1"}))
+    
+    graph_y_max = forms.IntegerField(label='Graph: Max Y Value',
+                                      min_value=1,
+                                      widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.graph_y_max",
+                                                                      "step":"1",
+                                                                      "min":"1"}))
                                        
     # enable_chat = forms.ChoiceField(label='Enable Chat',
     #                                    choices=((True, 'Yes'), (False,'No' )),
@@ -37,4 +43,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['display_block', 'show_instructions', 'instruction_set', 'test_mode'] #, 'enable_chat'
+        fields =['display_block', 'graph_y_max', 'show_instructions', 'instruction_set', 'test_mode'] #, 'enable_chat'

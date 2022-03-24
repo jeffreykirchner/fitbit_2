@@ -70,8 +70,6 @@ class SessionPlayerPeriod(models.Model):
         '''
         take csv writer and add row
         '''
-
-
         writer.writerow([self.session_period.session.id,
                          self.session_period.period_number,
                          self.session_player.player_number,

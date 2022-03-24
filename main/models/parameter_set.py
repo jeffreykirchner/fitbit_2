@@ -25,6 +25,7 @@ class ParameterSet(models.Model):
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
 
     display_block = models.IntegerField(verbose_name='Number of Periods to Display', default=28)              #number of periods to display in subject graph
+    graph_y_max = models.IntegerField(verbose_name='Graph: Y Max', default=75)                #max height of subject graph
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 
@@ -51,6 +52,7 @@ class ParameterSet(models.Model):
             self.enable_chat = new_ps.get("enable_chat")
             self.show_instructions = new_ps.get("show_instructions")
             self.display_block = new_ps.get("display_block")
+            self.graph_y_max = new_ps.get("graph_y_max")
 
             self.save()
 
@@ -187,6 +189,7 @@ class ParameterSet(models.Model):
             "show_instructions" : "True" if self.show_instructions else "False",
             "instruction_set" : self.instruction_set.json_min(),
             "display_block" : self.display_block,
+            "graph_y_max" : self.graph_y_max,
 
             "parameter_set_players" : [p.json() for p in self.parameter_set_players.all()],
             "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
@@ -205,8 +208,7 @@ class ParameterSet(models.Model):
             "show_instructions" : "True" if self.show_instructions else "False",
             "display_block" : self.display_block,
             "test_mode" : self.test_mode,
-
-            "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
+            "graph_y_max" : self.graph_y_max,
             "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
         }
 

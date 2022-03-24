@@ -99,15 +99,43 @@ class SessionPlayer(models.Model):
 
         return instructions
 
+    def get_session_player_periods_json(self):
+        '''
+        return current session player periods
+        '''
+
+        current_session_period = self.session.get_current_session_period()
+
+        if current_session_period:
+            current_parameter_set_period = current_session_period.parameter_set_period
+
+            session_player_periods = self.session_player_periods_b.filter(session_period__period_number__gte=current_parameter_set_period.graph_start_period_number) \
+                                                                  .filter(session_period__period_number__lte=current_parameter_set_period.graph_end_period_number)
+            return [p.json_for_subject() for p in session_player_periods] 
+        
+        return []
+
     def json(self, get_chat=True):
         '''
         json object of model
         '''
+        chat_all = []
+        if self.session.parameter_set.enable_chat:
+            chat_all = [c.json_for_subject() for c in self.session_player_chats_c.filter(chat_type=main.globals.ChatTypes.ALL)
+                                                                                   .order_by('-timestamp')[:100:-1]
+                       ] if get_chat else [],
+        
+        session_player_periods_group_json = []
+
+        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
+            session_player_periods_group_json.append(p.get_session_player_periods_json())
+
         return{
             "id" : self.id,      
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
+            "group_number" : self.group_number,
 
             "player_number" : self.player_number,
             "player_key" : self.player_key,
@@ -117,14 +145,15 @@ class SessionPlayer(models.Model):
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
-            "chat_all" : [c.json_for_subject() for c in self.session_player_chats_c.filter(chat_type=main.globals.ChatTypes.ALL)
-                                                                                   .order_by('-timestamp')[:100:-1]
-                         ] if get_chat else [],
+            "chat_all" : chat_all,
             "new_chat_message" : False,           #true on client side when a new un read message comes in
 
             "current_instruction" : self.current_instruction,
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
+
+            "session_player_periods" : self.get_session_player_periods_json(),
+            "session_player_periods_group" : session_player_periods_group_json,
 
         }
     
@@ -134,20 +163,22 @@ class SessionPlayer(models.Model):
         session_player_id : int : id number of session player for induvidual chat
         '''
 
-        return{
-            "id" : self.id,  
+        chat_individual = []
 
-            "player_number" : self.player_number,
-
-            "chat_individual" : [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects \
+        if self.session.parameter_set.enable_chat:
+            chat_individual = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects \
                                                                             .filter(chat_type=main.globals.ChatTypes.INDIVIDUAL) \
                                                                             .filter(Q(Q(session_player_recipients=session_player) & Q(session_player=self)) |
                                                                                     Q(Q(session_player_recipients=self) & Q(session_player=session_player)))
                                                                             .order_by('-timestamp')[:100:-1]
                                 ],
 
-            "new_chat_message" : False,           #true on client side when a new un read message comes in
+        return{
+            "id" : self.id,  
 
+            "player_number" : self.player_number,
+            "chat_individual" :chat_individual,
+            "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
         }
 

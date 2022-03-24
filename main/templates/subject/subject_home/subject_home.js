@@ -116,12 +116,12 @@ var app = Vue.createApp({
         takeGetSession(messageData){
             
 
-            app.$data.session = messageData.status.session;
-            app.$data.session_player = messageData.status.session_player;
+            app.session = messageData.status.session;
+            app.session_player = messageData.status.session_player;
 
-            if(app.$data.session.started)
+            if(app.session.started)
             {
-               
+               app.updateGraph();
             }
             else
             {

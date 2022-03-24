@@ -605,6 +605,7 @@ def take_update_subject(session_id, data):
         session_player.name = form.cleaned_data["name"]
         session_player.student_id = form.cleaned_data["student_id"]
         session_player.email = form.cleaned_data["email"]
+        session_player.group_number = form.cleaned_data["group_number"]
         
         try:
             session_player.save()              
