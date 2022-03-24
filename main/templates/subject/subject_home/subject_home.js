@@ -32,6 +32,13 @@ var app = Vue.createApp({
 
                     instruction_pages : {{instruction_pages|safe}},
 
+                    //graph globals
+                    marginY : 45,
+                    marginX : 65,
+                    margin2 : 25,
+                    sizeW : 0,
+                    sizeH : 0,
+
                 }},
     methods: {
 
@@ -335,6 +342,8 @@ var app = Vue.createApp({
         $('#avatarChoiceGridModal').on("hidden.bs.modal", this.hideChoiceGridModal);
         $('#endGameModal').on("hidden.bs.modal", this.hideEndGameModal);
         {%if session.parameter_set.test_mode%} setTimeout(this.doTestMode, this.randomNumber(1000 , 10000)); {%endif%}
+
+        window.addEventListener('resize', this.updateGraph);
 
     },
 

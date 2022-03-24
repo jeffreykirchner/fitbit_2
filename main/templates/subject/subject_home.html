@@ -50,20 +50,20 @@
 </div>
 
 <!-- graph -->
-<div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
+<div class="row justify-content-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
     <div class="col-md-6">
         {%include "subject/subject_home/graph/graph_card.html"%}                
     </div>
 </div>
 
 <!-- summary -->
-<div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
+<div class="row justify-content-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
     <div class="col-md-6">
         {%include "subject/subject_home/summary/summary_card.html"%}     
     </div>
 </div>
 
-<div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Done'">
+<div class="row justify-content-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Done'">
     <div class="col-12 fs-4 fw-bold text-center">
         <br>
         <br>
@@ -73,7 +73,7 @@
     </div>    
 </div>
 
-<div class="row justify-content-lg-center mt-4">
+<div class="row justify-content-center mt-4">
     <div class="col-12 text-end text-muted">
         <span class="align-middle">Client [[session_player.player_number]]</span>
     </div>  
