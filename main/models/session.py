@@ -229,6 +229,19 @@ class Session(models.Model):
 
         return output.getvalue()
     
+    def fill_with_test_data(self):
+        '''
+        fill session players with test data up to this point in the experiment
+        '''
+
+        period = self.get_current_session_period()
+
+        if not period:
+            return
+
+        for p in self.session_players.all():
+            p.fill_with_test_data(period)
+
     def json(self):
         '''
         return json object of model

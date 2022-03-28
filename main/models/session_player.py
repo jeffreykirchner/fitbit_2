@@ -115,6 +115,11 @@ class SessionPlayer(models.Model):
         
         return []
 
+    def fill_with_test_data(self, period):
+        '''
+        fill session player with test data up to, but not including period
+        '''
+
     def json(self, get_chat=True):
         '''
         json object of model

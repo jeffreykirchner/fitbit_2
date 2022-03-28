@@ -92,5 +92,20 @@
                 </button>
             </div>
         </div>
+
+        {%if DEBUG%}
+        <!-- fill with test data -->
+        <div class="row mt-2" v-show="session.started && !session.locked">
+            <div class="col-md text-center">
+                <button type="button"
+                        class="btn btn-outline-warning"
+                        v-on:click = "fillWithTestData()"
+                        title="Fill with test data"
+                        v-bind:disabled="reconnecting || working">
+                    Fill with test data
+                </button>
+            </div>
+        </div>
+        {%endif%}
     </div>                    
 </div> 

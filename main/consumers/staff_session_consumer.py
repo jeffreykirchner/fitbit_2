@@ -276,6 +276,20 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def fill_with_test_data(self, event):
+        '''
+        send invitations to subjects
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_fill_with_test_data)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -702,4 +716,23 @@ def take_email_list(session_id, data):
     
     return {"value" : "success",
             "result" : result}
+
+def take_fill_with_test_data(session_id, data):
+    '''
+    fill subjects with test data up to this point in the experiment
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_take_fill_with_test_data: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_take_fill_with_test_data session, not found: {session_id}")
+        return {"status":"fail", "result":"session not found"}
+    
+    
+    
+    return {"value" : "success",
+            "session_players" : [p.json() for p in session.session_players.all()]}
     

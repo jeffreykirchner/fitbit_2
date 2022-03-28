@@ -189,3 +189,28 @@ fillDefaultInvitation(){
     
     tinymce.get("id_invitation_subject").setContent(this.emailDefaultText);
 },
+
+/**
+ * fill with test data
+ */
+fillWithTestData(){
+    this.cancelModal = false;
+    this.working = true;
+
+    app.sendMessage("fill_with_test_data",
+                   {});
+},
+
+/**
+ * fill with test data
+ */
+ takeFillWithTestData(){
+    if(messageData.status.value == "success")
+    {         
+        this.session.session_players = messageData.status.session_players;
+    } 
+    else
+    {
+       
+    } 
+},
