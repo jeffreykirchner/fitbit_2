@@ -108,6 +108,17 @@ class ParameterSetPeriod(models.Model):
 
         self.save()
 
+    def get_payment(self, minutes):
+        '''
+        return payment given minutes
+        '''
+
+        for p in self.parameter_set_period_pays_a.all():
+            if minutes <= p.parameter_set_zone_minutes.zone_minutes:
+                return p
+
+        return None
+
     def json(self):
         '''
         return json object of model

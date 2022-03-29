@@ -240,7 +240,7 @@ class Session(models.Model):
             return
 
         for p in self.session_players.all():
-            p.fill_with_test_data(period)
+            p.fill_with_test_data(period.period_number)
 
     def json(self):
         '''
@@ -294,7 +294,7 @@ class Session(models.Model):
 
             "parameter_set":self.parameter_set.json_for_subject(),
 
-            #"session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.all()]
+            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number)]
         }
     
         

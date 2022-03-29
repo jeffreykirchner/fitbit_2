@@ -731,7 +731,11 @@ def take_fill_with_test_data(session_id, data):
         logger.warning(f"take_take_fill_with_test_data session, not found: {session_id}")
         return {"status":"fail", "result":"session not found"}
     
-    
+    session.fill_with_test_data()
+
+    for player in session.session_players.all():
+        for session_period_player in player.session_player_periods_b.all():
+            session_period_player.calc_and_store_payment()
     
     return {"value" : "success",
             "session_players" : [p.json() for p in session.session_players.all()]}

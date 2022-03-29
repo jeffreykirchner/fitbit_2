@@ -120,6 +120,9 @@ class SessionPlayer(models.Model):
         fill session player with test data up to, but not including period
         '''
 
+        for p in self.session_player_periods_b.filter(session_period__period_number__lt = period):
+            p.fill_with_test_data()
+
     def json(self, get_chat=True):
         '''
         json object of model
@@ -185,6 +188,7 @@ class SessionPlayer(models.Model):
             "chat_individual" :chat_individual,
             "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
+            "session_player_periods" : self.get_session_player_periods_json(),
         }
 
     def json_min(self, session_player_notice=None):

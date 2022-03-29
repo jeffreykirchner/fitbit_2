@@ -33,9 +33,9 @@ var app = Vue.createApp({
                     instruction_pages : {{instruction_pages|safe}},
 
                     //graph globals
-                    marginY : 45,
-                    marginX : 65,
-                    margin2 : 25,
+                    marginY : 70,
+                    marginX : 75,
+                    margin2 : 35,
                     sizeW : 0,
                     sizeH : 0,
 

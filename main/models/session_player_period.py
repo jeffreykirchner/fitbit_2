@@ -3,6 +3,7 @@ session player period results
 '''
 
 #import logging
+import random
 
 from django.db import models
 
@@ -17,11 +18,13 @@ class SessionPlayerPeriod(models.Model):
     session_period = models.ForeignKey(SessionPeriod, on_delete=models.CASCADE, related_name="session_player_periods_a")
     session_player = models.ForeignKey(SessionPlayer, on_delete=models.CASCADE, related_name="session_player_periods_b")
 
-    earnings_individual = models.IntegerField(verbose_name='Individual Earnings', default=0)        #earnings from individual activity this period
-    earnings_group = models.IntegerField(verbose_name='Individual Earnings', default=0)             #earnings from group bonus this period
+    earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)        #earnings from individual activity this period
+    earnings_group = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)             #earnings from group bonus this period
 
-    zone_minutes = models.IntegerField(default=0)       #todays heart active zone minutes
-    sleep_minutes = models.IntegerField(default=0)      #todays minutes asleep
+    zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
+    sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
+
+    check_in = models.BooleanField(verbose_name='Checked In', default=False)          #true if player was able to check in this period
 
     #fitbit metrics
     #charge 3 metrics depriciated
@@ -66,6 +69,69 @@ class SessionPlayerPeriod(models.Model):
             models.UniqueConstraint(fields=['session_player', 'session_period'], name='unique_session_player_period'),
         ]
     
+    def fill_with_test_data(self):
+        '''
+        fill with test data
+        '''
+
+        self.zone_minutes = random.randrange(0, 90)
+        
+        if random.randrange(1,10) == 1:
+            self.check_in = False
+        else:
+            self.check_in = True
+
+        self.save()
+
+    
+    def calc_and_store_payment(self):
+        '''
+        calculate and store payment
+        '''
+
+        if not self.check_in:
+            return {"status":"fail", "message" : "not checked in"}
+
+        pervious_session_player_period = self.get_pervious_player_period()
+        if not pervious_session_player_period:
+            return {"status":"fail", "message" : "this is the first period"}
+
+        paramter_set_period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.zone_minutes)
+
+        if paramter_set_period_payment:
+            self.earnings_individual = paramter_set_period_payment.payment
+        
+        paramter_set_period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.get_lowest_group_zone_minutes())
+        
+        if paramter_set_period_payment:
+            self.earnings_group = paramter_set_period_payment.group_bonus
+
+        self.save()
+
+        return {"status":"success", "message" : ""}
+    
+    def get_lowest_group_zone_minutes(self):
+        '''
+        return the lowest zone minute total from a group member this period
+        '''
+
+        return self.session_period.session_player_periods_a.filter(session_player__group_number=self.session_player.group_number) \
+                                                           .order_by('zone_minutes').first().zone_minutes
+
+    def get_pervious_player_period(self):
+        '''
+        return the SessionPlayerPeriod that preceeded this one
+        '''
+
+        return self.session_player.session_player_periods_b.filter(session_period__period_number=self.session_period.period_number-1).first()
+
+    def get_earning(self):
+        '''
+        get earnings from period
+        '''
+
+        return self.earnings_individual + self.earnings_group
+
     def write_summary_download_csv(self, writer):
         '''
         take csv writer and add row
@@ -88,7 +154,9 @@ class SessionPlayerPeriod(models.Model):
 
             "earnings_individual" : self.earnings_individual,
             "earnings_group" : self.earnings_group,
+            "earnings_total" : self.get_earning(),
             "zone_minutes" : self.zone_minutes,
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
+            "check_in" : self.check_in,
         }
