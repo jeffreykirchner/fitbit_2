@@ -159,4 +159,6 @@ class SessionPlayerPeriod(models.Model):
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
             "check_in" : self.check_in,
+            "period_type" : self.session_period.parameter_set_period.period_type,
+            "pay_block" : self.session_period.parameter_set_period.pay_block,
         }

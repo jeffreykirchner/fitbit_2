@@ -123,6 +123,50 @@ class SessionPlayer(models.Model):
         for p in self.session_player_periods_b.filter(session_period__period_number__lt = period):
             p.fill_with_test_data()
 
+    def get_pay_block_individual_earnings(self, pay_block):
+        '''
+        return the individual earnings from the specified pay_block
+        '''
+        total = 0
+        
+        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
+
+        for p in pay_group_player_periods:
+            total += p.earnings_individual
+
+        return total
+
+    def get_pay_block_bonus_earnings(self, pay_block):
+        '''
+        return the group bonus earnings from the specified pay_block
+        '''    
+        total = 0
+
+        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
+
+        for p in pay_group_player_periods:
+            total += p.earnings_group
+
+        return total
+    
+    def get_current_block_earnings(self):
+        '''
+        return current payblock earnings
+        '''
+
+        current_session_period = self.session.get_current_session_period()
+
+        earnings = {"individual":"0.00", "group_bonus":"0.00", "total":"0.00"}
+
+        if not current_session_period:
+            return earnings
+        
+        earnings["individual"] = self.get_pay_block_individual_earnings(current_session_period.parameter_set_period.pay_block)
+        earnings["group_bonus"] = self.get_pay_block_bonus_earnings(current_session_period.parameter_set_period.pay_block)
+        earnings["total"] = earnings["individual"] + earnings["group_bonus"]
+
+        return earnings
+    
     def json(self, get_chat=True):
         '''
         json object of model
@@ -163,6 +207,7 @@ class SessionPlayer(models.Model):
             "session_player_periods" : self.get_session_player_periods_json(),
             "session_player_periods_group" : session_player_periods_group_json,
 
+            "current_block_earnings" : self.get_current_block_earnings(),
         }
     
     def json_for_subject(self, session_player):
@@ -189,9 +234,11 @@ class SessionPlayer(models.Model):
             "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
             "session_player_periods" : self.get_session_player_periods_json(),
+            "parameter_set_player" : self.parameter_set_player.json(),
+            "current_block_earnings" : self.get_current_block_earnings(),
         }
 
-    def json_min(self, session_player_notice=None):
+    def json_min(self):
         '''
         minimal json object of model
         '''
