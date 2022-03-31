@@ -42,7 +42,7 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                   required=False,
                                   widget=TinyMCE(attrs={"rows":20, "cols":100,"v-model":"current_parameter_set_period.notice_text"}))
     
-    show_graph_1 = forms.ChoiceField(label='Show Graph 2',
+    show_graph_1 = forms.ChoiceField(label='Show Graph 1',
                                    choices=((1, 'Yes'), (0,'No')),
                                    widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph_1"}))
 

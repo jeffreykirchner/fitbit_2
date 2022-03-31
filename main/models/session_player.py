@@ -99,18 +99,38 @@ class SessionPlayer(models.Model):
 
         return instructions
 
-    def get_session_player_periods_json(self):
+    def get_session_player_periods_1_json(self):
         '''
         return current session player periods
         '''
-
         current_session_period = self.session.get_current_session_period()
 
         if current_session_period:
             current_parameter_set_period = current_session_period.parameter_set_period
 
+            if not current_parameter_set_period.show_graph_1:
+                return []
+
             session_player_periods = self.session_player_periods_b.filter(session_period__period_number__gte=current_parameter_set_period.graph_1_start_period_number) \
                                                                   .filter(session_period__period_number__lte=current_parameter_set_period.graph_1_end_period_number)
+            return [p.json_for_subject() for p in session_player_periods] 
+        
+        return []
+    
+    def get_session_player_periods_2_json(self):
+        '''
+        return current session player periods
+        '''
+        current_session_period = self.session.get_current_session_period()
+
+        if current_session_period:
+            current_parameter_set_period = current_session_period.parameter_set_period
+
+            if not current_parameter_set_period.show_graph_2:
+                return []
+
+            session_player_periods = self.session_player_periods_b.filter(session_period__period_number__gte=current_parameter_set_period.graph_2_start_period_number) \
+                                                                  .filter(session_period__period_number__lte=current_parameter_set_period.graph_2_end_period_number)
             return [p.json_for_subject() for p in session_player_periods] 
         
         return []
@@ -177,10 +197,15 @@ class SessionPlayer(models.Model):
                                                                                    .order_by('-timestamp')[:100:-1]
                        ] if get_chat else [],
         
-        session_player_periods_group_json = []
+        session_player_periods_group_1_json = []
 
         for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
-            session_player_periods_group_json.append(p.get_session_player_periods_json())
+            session_player_periods_group_1_json.append(p.get_session_player_periods_1_json())
+        
+        session_player_periods_group_2_json = []
+
+        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
+            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())
 
         return{
             "id" : self.id,      
@@ -204,8 +229,11 @@ class SessionPlayer(models.Model):
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
 
-            "session_player_periods" : self.get_session_player_periods_json(),
-            "session_player_periods_group" : session_player_periods_group_json,
+            "session_player_periods_1" : self.get_session_player_periods_1_json(),
+            "session_player_periods_2" : self.get_session_player_periods_2_json(),
+
+            "session_player_periods_1_group" : session_player_periods_group_1_json,
+            "session_player_periods_2_group" : session_player_periods_group_2_json,
 
             "current_block_earnings" : self.get_current_block_earnings(),
         }
@@ -233,7 +261,8 @@ class SessionPlayer(models.Model):
             "chat_individual" :chat_individual,
             "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
-            "session_player_periods" : self.get_session_player_periods_json(),
+            "session_player_periods_1" : self.get_session_player_periods_1_json(),
+            "session_player_periods_2" : self.get_session_player_periods_2_json(),
             "parameter_set_player" : self.parameter_set_player.json(),
             "current_block_earnings" : self.get_current_block_earnings(),
         }

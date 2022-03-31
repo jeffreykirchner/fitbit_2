@@ -71,6 +71,10 @@ class ParameterSetPeriod(models.Model):
         self.graph_1_start_period_number = source.get("graph_1_start_period_number")
         self.graph_1_end_period_number = source.get("graph_1_end_period_number")
 
+        self.show_graph_2 = source.get("show_graph_2")
+        self.graph_2_start_period_number = source.get("graph_2_start_period_number")
+        self.graph_2_end_period_number = source.get("graph_2_end_period_number")
+
         self.pay_block = source.get("pay_block")
 
         self.save()
