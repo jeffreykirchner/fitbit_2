@@ -34,7 +34,7 @@
                                     Show<br>Notice
                                 </th>
                                 <th scope="col" class = "text-nowrap">
-                                    Show<br>Graph
+                                    Show<br>Graph 1/2
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
                                     Graph<br>Range
@@ -47,7 +47,7 @@
                                     Individual / Group Bonus
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
-                                    Copy<br>Down
+                                    Copy
                                 </th>                       
                             </tr>
                         </thead>
@@ -71,11 +71,15 @@
                                     <span v-else>No</span>
                                 </td> 
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.show_graph==1">Yes</span>
+                                    <span v-if="p.show_graph_1==1">Yes</span>
+                                    <span v-else>No</span> /
+                                    <span v-if="p.show_graph_2==1">Yes</span>
                                     <span v-else>No</span>
+
                                 </td>
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.graph_start_period_number]] to [[p.graph_end_period_number]]
+                                    [[p.graph_1_start_period_number]] to [[p.graph_1_end_period_number]] and 
+                                    [[p.graph_2_start_period_number]] to [[p.graph_2_end_period_number]]
                                 </td> 
                                 <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
                                     [[p.pay_block]]
@@ -84,12 +88,21 @@
                                     $[[p.payment]] / $[[p.group_bonus]]
                                 </td>
                                 <td class="text-nowrap">
-                                    <button class="btn btn-outline-primary btn-sm"
+                                    <button class="btn btn-outline-primary btn-sm me-2"
                                             type="button"
                                             title="Copy period down"
                                             v-bind:disabled="session.started || reconnecting || working"
                                             v-on:click="sendCopyForward(p.id)">
                                             <i class="fas fa-angle-double-down"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            type="button"
+                                            v-show="index>0"
+                                            title="Copy previous period"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyPrevious(p.id)">
+                                            <i class="fas fa-clone"></i>
                                     </button>
                                 </td>
                             </tr>

@@ -42,22 +42,39 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                   required=False,
                                   widget=TinyMCE(attrs={"rows":20, "cols":100,"v-model":"current_parameter_set_period.notice_text"}))
     
-    show_graph = forms.ChoiceField(label='Show Graph',
+    show_graph_1 = forms.ChoiceField(label='Show Graph 2',
                                    choices=((1, 'Yes'), (0,'No')),
-                                   widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph"}))
+                                   widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph_1"}))
 
                         
-    graph_start_period_number = forms.IntegerField(label="Graph Start Day",
+    graph_1_start_period_number = forms.IntegerField(label="Graph 1 Start Day",
                                                    min_value=1,
-                                                   widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_start_period_number",
-                                                                                    "step":"1",
+                                                   widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_1_start_period_number",
+                                                                                   "step":"1",
                                                                                    "min":"1"}))                                                           
 
-    graph_end_period_number = forms.IntegerField(label="Graph End Day",
+    graph_1_end_period_number = forms.IntegerField(label="Graph 1 End Day",
                                                  min_value=1,
-                                                 widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_end_period_number",
+                                                 widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_1_end_period_number",
                                                                                  "step":"1",
                                                                                  "min":"1"}))
+    
+    show_graph_2 = forms.ChoiceField(label='Show Graph 2',
+                                   choices=((1, 'Yes'), (0,'No')),
+                                   widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph_2"}))
+
+                        
+    graph_2_start_period_number = forms.IntegerField(label="Graph 2 Start Day",
+                                                     min_value=1,
+                                                     widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_2_start_period_number",
+                                                                                     "step":"1",
+                                                                                     "min":"1"}))                                                           
+
+    graph_2_end_period_number = forms.IntegerField(label="Graph 2 End Day",
+                                                   min_value=1,
+                                                   widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_2_end_period_number",
+                                                                                   "step":"1",
+                                                                                   "min":"1"}))
     
     pay_block = forms.IntegerField(label="Payment Group",
                                    min_value=1,
@@ -67,7 +84,10 @@ class ParameterSetPeriodForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSetPeriod
-        fields =['survey_link', 'survey_required', 'period_type', 'minimum_wrist_minutes', 'show_graph', 'graph_start_period_number', 'graph_end_period_number', 'pay_block', 'show_notice', 'notice_text']
+        fields =['survey_link', 'survey_required', 'period_type', 'minimum_wrist_minutes', 
+                 'show_graph_1', 'graph_1_start_period_number', 'graph_1_end_period_number',
+                 'show_graph_2', 'graph_2_start_period_number', 'graph_2_end_period_number', 
+                 'pay_block', 'show_notice', 'notice_text']
     
 
     def clean_survey_link(self):
@@ -84,17 +104,40 @@ class ParameterSetPeriodForm(forms.ModelForm):
 
         return survey_link
     
-    def clean_graph_end_period_number(self):
+    def clean_graph_1_end_period_number(self):
         
         try:
-           graph_start_period_number = self.data.get('graph_start_period_number')
-           graph_end_period_number = self.data.get('graph_end_period_number')
+           graph_1_start_period_number = self.data.get('graph_1_start_period_number')
+           graph_1_end_period_number = self.data.get('graph_1_end_period_number')
           
-           if graph_start_period_number >  graph_end_period_number:
-               raise forms.ValidationError('Must be >= graph start period.')
+           if graph_1_start_period_number >  graph_1_end_period_number:
+               raise forms.ValidationError('Must be >= graph 1 start period.')
             
         except ValueError:
             raise forms.ValidationError('Invalid Entry')
 
-        return graph_end_period_number
+        return graph_1_end_period_number
+    
+    def clean_graph_2_end_period_number(self):
+        try:
+           graph_1_start_period_number = self.data.get('graph_1_start_period_number')
+           graph_1_end_period_number = self.data.get('graph_1_end_period_number')
+
+           graph_2_start_period_number = self.data.get('graph_2_start_period_number')
+           graph_2_end_period_number = self.data.get('graph_2_end_period_number')
+
+           show_graph_2 = self.data.get('show_graph_2')
+          
+           if graph_2_start_period_number >  graph_2_end_period_number:
+               raise forms.ValidationError('Must be >= graph 2 start period.')
+            
+           if show_graph_2 == 1:
+               if graph_1_end_period_number-graph_1_start_period_number != graph_2_end_period_number-graph_2_start_period_number:
+                   raise forms.ValidationError('Graph ranges must match.')
+
+        except ValueError:
+            raise forms.ValidationError('Invalid Entry')
+
+        return graph_2_end_period_number
+
     

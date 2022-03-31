@@ -138,7 +138,7 @@ takeUpdatePayment(messageData){
     } 
 },
 
-/** update parameterset period settings
+/** update copy parameter set period forward
 */
 sendCopyForward(id){
     
@@ -151,6 +151,26 @@ sendCopyForward(id){
 /** handle result of updating parameter set period payment
 */
 takeCopyForward(messageData){
+
+    if(messageData.status.value == "success")
+    {
+        app.session.parameter_set = messageData.status.parameter_set;       
+    } 
+},
+
+/** send copy previous period into this one
+*/
+sendCopyPrevious(id){
+    
+    app.working = true;
+    app.cancelModal=false;
+    app.sendMessage("update_parameterset_period_copy_previous", {"sessionID" : app.sessionID,
+                                                                 "id" : id,});
+},
+
+/** take result of copy previous
+*/
+takeCopyPrevious(messageData){
 
     if(messageData.status.value == "success")
     {

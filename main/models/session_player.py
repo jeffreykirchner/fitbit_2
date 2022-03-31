@@ -109,8 +109,8 @@ class SessionPlayer(models.Model):
         if current_session_period:
             current_parameter_set_period = current_session_period.parameter_set_period
 
-            session_player_periods = self.session_player_periods_b.filter(session_period__period_number__gte=current_parameter_set_period.graph_start_period_number) \
-                                                                  .filter(session_period__period_number__lte=current_parameter_set_period.graph_end_period_number)
+            session_player_periods = self.session_player_periods_b.filter(session_period__period_number__gte=current_parameter_set_period.graph_1_start_period_number) \
+                                                                  .filter(session_period__period_number__lte=current_parameter_set_period.graph_1_end_period_number)
             return [p.json_for_subject() for p in session_player_periods] 
         
         return []

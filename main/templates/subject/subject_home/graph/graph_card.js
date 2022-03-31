@@ -543,20 +543,20 @@ updateGraph(){
 
     app.drawAxis("graph_id", 
                  0, app.session.parameter_set.graph_y_max, 1,
-                 parameter_set_period.graph_start_period_number, parameter_set_period.graph_end_period_number,
-                 (parameter_set_period.graph_end_period_number-parameter_set_period.graph_start_period_number),
+                 parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number,
+                 (parameter_set_period.graph_1_end_period_number-parameter_set_period.graph_1_start_period_number),
                  "Daily Zone Minutes", "Day");
     
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
-                        parameter_set_period.graph_start_period_number, parameter_set_period.graph_end_period_number);
+                        parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number);
 
     app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
-                     parameter_set_period.graph_start_period_number, parameter_set_period.graph_end_period_number);
+                     parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number);
     
     app.drawZoneMinuteLines("graph_id", 0, app.session.parameter_set.graph_y_max,
-                            parameter_set_period.graph_start_period_number, parameter_set_period.graph_end_period_number);
+                            parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number);
     
     app.drawPeriodEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
-                            parameter_set_period.graph_start_period_number, parameter_set_period.graph_end_period_number,
-                            (parameter_set_period.graph_end_period_number-parameter_set_period.graph_start_period_number));
+                            parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number,
+                            (parameter_set_period.graph_1_end_period_number-parameter_set_period.graph_1_start_period_number));
 },

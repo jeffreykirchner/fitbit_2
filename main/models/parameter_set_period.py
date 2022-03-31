@@ -29,9 +29,13 @@ class ParameterSetPeriod(models.Model):
 
     minimum_wrist_minutes = models.IntegerField(default = 1080)                                                        #minimum wrist time to get paid today
 
-    show_graph = models.BooleanField(default=False, verbose_name="Show Graph")                                         #if true show the graph
-    graph_start_period_number = models.IntegerField(verbose_name='Graph Start Period', default=1)                      #period number to start the graph on
-    graph_end_period_number = models.IntegerField(verbose_name='Graph End Period', default=1)                          #period number to end the graph on
+    show_graph_1 = models.BooleanField(default=False, verbose_name="Show Graph 1")                                       #if true show the graph
+    graph_1_start_period_number = models.IntegerField(verbose_name='Graph 1 Start Period', default=1)                    #period number to start the graph on
+    graph_1_end_period_number = models.IntegerField(verbose_name='Graph 1 End Period', default=1)                        #period number to end the graph on
+    
+    show_graph_2 = models.BooleanField(default=False, verbose_name="Show Graph 2")                                       #if true show the graph
+    graph_2_start_period_number = models.IntegerField(verbose_name='Graph 2 Start Period', default=1)                    #period number to start the graph on
+    graph_2_end_period_number = models.IntegerField(verbose_name='Graph 2 End Period', default=1)                        #period number to end the graph on
 
     pay_block = models.IntegerField(verbose_name='Pay Group', default=1)                                               #group period together with the same group to be paid together
 
@@ -63,9 +67,9 @@ class ParameterSetPeriod(models.Model):
         self.notice_text = source.get("notice_text")
         self.minimum_wrist_minutes = source.get("minimum_wrist_minutes")
 
-        self.show_graph = source.get("show_graph")
-        self.graph_start_period_number = source.get("graph_start_period_number")
-        self.graph_end_period_number = source.get("graph_end_period_number")
+        self.show_graph_1 = source.get("show_graph_1")
+        self.graph_1_start_period_number = source.get("graph_1_start_period_number")
+        self.graph_1_end_period_number = source.get("graph_1_end_period_number")
 
         self.pay_block = source.get("pay_block")
 
@@ -97,9 +101,12 @@ class ParameterSetPeriod(models.Model):
 
         self.period_type = source.period_type
         self.minimum_wrist_minutes = source.minimum_wrist_minutes
-        self.show_graph = source.show_graph
-        self.graph_start_period_number = source.graph_start_period_number
-        self.graph_end_period_number = source.graph_end_period_number
+        self.show_graph_1 = source.show_graph_1
+        self.graph_1_start_period_number = source.graph_1_start_period_number
+        self.graph_1_end_period_number = source.graph_1_end_period_number
+        self.show_graph_2 = source.show_graph_2
+        self.graph_2_start_period_number = source.graph_2_start_period_number
+        self.graph_2_end_period_number = source.graph_2_end_period_number
         self.pay_block = source.pay_block
 
         for p_source in source.parameter_set_period_pays_a.all():
@@ -135,9 +142,13 @@ class ParameterSetPeriod(models.Model):
             "show_notice" : 1 if self.show_notice else 0,
             "notice_text" : self.notice_text,
 
-            "show_graph" : 1 if self.show_graph else 0,
-            "graph_start_period_number" : self.graph_start_period_number,
-            "graph_end_period_number" : self.graph_end_period_number,
+            "show_graph_1" : 1 if self.show_graph_1 else 0,
+            "graph_1_start_period_number" : self.graph_1_start_period_number,
+            "graph_1_end_period_number" : self.graph_1_end_period_number,
+
+            "show_graph_2" : 1 if self.show_graph_2 else 0,
+            "graph_2_start_period_number" : self.graph_2_start_period_number,
+            "graph_2_end_period_number" : self.graph_2_end_period_number,
 
             "pay_block" : self.pay_block,
 
@@ -160,9 +171,14 @@ class ParameterSetPeriod(models.Model):
             "show_notice" : self.show_notice,
             "notice_text" : self.notice_text,
 
-            "show_graph" : 1 if self.show_graph else 0,
-            "graph_start_period_number" : self.graph_start_period_number,
-            "graph_end_period_number" : self.graph_end_period_number,
+            "show_graph_1" : 1 if self.show_graph_1 else 0,
+            "graph_1_start_period_number" : self.graph_1_start_period_number,
+            "graph_1_end_period_number" : self.graph_1_end_period_number,
+
+            "show_graph_2" : 1 if self.show_graph_2 else 0,
+            "graph_2_start_period_number" : self.graph_2_start_period_number,
+            "graph_2_end_period_number" : self.graph_2_end_period_number,
+
 
             "pay_block" : self.pay_block,
         }

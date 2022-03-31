@@ -171,6 +171,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_parameterset_period_copy_previous(self, event):
+        '''
+        update a parameterset period copy previous
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_period_copy_previous)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_parameterset_period_copy_previous"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     async def add_parameterset_zone_minutes(self, event):
         '''
@@ -452,7 +467,33 @@ def take_update_parameterset_period_copy_forward(data):
    
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
-                                
+
+def take_update_parameterset_period_copy_previous(data):
+    '''
+    copy previous parameterset period to this one
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset period copy previous: {data}")
+
+    session_id = data["sessionID"]
+    session = Session.objects.get(id=session_id)
+
+    try:        
+        parameter_set_period = ParameterSetPeriod.objects.get(id=data["id"])
+        
+    except ObjectDoesNotExist:
+        logger.warning(f"update_parameterset_period_copy_previous paramterset_period, not found ID: {data['id']}")
+        return
+
+    parameter_set_period_previous = parameter_set_period.parameter_set.parameter_set_periods.filter(period_number=parameter_set_period.period_number-1).first()
+
+    if parameter_set_period:  
+        parameter_set_period.copy_forward(parameter_set_period_previous)
+    else:
+         logger.warning(f"update_parameterset_period_copy_previous paramterset_period, no prevous period ID: {data['id']}")
+   
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
+
 def take_update_parameterset_period_payment(data):
     '''
     update parameterset period payment
