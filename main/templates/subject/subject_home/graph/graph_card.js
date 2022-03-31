@@ -553,36 +553,29 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     //labels
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Partner Pay", marginY-5, 18);
-    //ctx.fillText("Pay", marginY-30, 28);
+    ctx.fillText("Partner", marginY-25, 15);
+    ctx.fillText("Pay", marginY-30, 28);
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-    ctx.fillText("My Pay", marginY-5, h-marginX+40);
+    ctx.fillText("My Pay", marginY-25, h-marginX+40);
 
     ctx.fillStyle = "green";
-    ctx.fillText("Group Pay", marginY-5, h-marginX+64);
-    //ctx.fillText("Pay", marginY-30, h-marginX+70);
+    ctx.fillText("Group", marginY-25, h-marginX+57);
+    ctx.fillText("Pay", marginY-30, h-marginX+70);
 
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "left";
-    ctx.fillText("Σ=$"+session_player_partner.current_block_earnings.total, w - marginY+5, 18);
+    ctx.fillText("Σ=$"+session_player_partner.current_block_earnings.total, w - marginY, 15);
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "left";
-    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.individual, w - marginY+5, h-marginX+40);
+    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.individual, w - marginY, h-marginX+40);
 
     ctx.fillStyle = "green";
     ctx.textAlign = "left";
-    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.group_bonus, w - marginY+5, h-marginX+64);
+    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.group_bonus, w - marginY, h-marginX+57);
 
-
-    //draw player earnings
-    // for(let i=0;i<session.session_players.length;i++)
-    // {
-    //     if(session.session_players[i].id == )
-    //     local_session_player = 
-    // }
 },
 
 /**
