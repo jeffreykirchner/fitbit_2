@@ -150,7 +150,7 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
 /**
  * draw line on graph
  */
-drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha){
+drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha, lineDash){
 
 
     if(document.getElementById(chartID) == null)
@@ -170,6 +170,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
 
     ctx.save();
 
+    ctx.setLineDash(lineDash); //[15, 3, 3, 3]
     ctx.globalAlpha = alpha;
     ctx.translate(marginY, h-marginX);
     ctx.moveTo(0, 0);
@@ -406,7 +407,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
         }
 
         app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                     3, app.session.session_players[i].parameter_set_player.display_color, 0.25);
+                     3, app.session.session_players[i].parameter_set_player.display_color, 0.25,[3, 10]);
     }
 
 },
@@ -432,7 +433,7 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
         }
 
         app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                     3, app.session.session_players[i].parameter_set_player.display_color, 1);
+                     3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
     }
 
 },
