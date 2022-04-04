@@ -567,7 +567,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "left";
-    ctx.fillText("Σ=$"+session_player_partner.current_block_earnings.total, w - marginY, 15);
+    ctx.fillText("Σ=$"+session_player_partner.current_block_earnings.individual, w - marginY, 15);
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "left";
