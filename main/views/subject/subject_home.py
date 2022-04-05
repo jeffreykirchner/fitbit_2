@@ -36,6 +36,10 @@ class SubjectHomeView(View):
         try:
             session_player = SessionPlayer.objects.get(player_key=kwargs['player_key'])
             session = session_player.session
+
+            session_player_period = session_player.get_current_session_player_period()
+
+            session_player_period.pull_fitbit_heart_time_series()
         except ObjectDoesNotExist:
             raise Http404("Subject not found.")
         

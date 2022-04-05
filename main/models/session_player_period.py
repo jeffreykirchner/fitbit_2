@@ -6,9 +6,12 @@ session player period results
 import random
 
 from django.db import models
+from django.core.serializers.json import DjangoJSONEncoder
 
 from main.models import SessionPlayer
 from main.models import SessionPeriod
+
+from main.globals import get_fitbit_metrics
 
 
 class SessionPlayerPeriod(models.Model):
@@ -36,7 +39,7 @@ class SessionPlayerPeriod(models.Model):
     fitbit_steps = models.IntegerField(default=0)                     #todays tracker steps
     fitbit_calories = models.IntegerField(default=0)                  #todays tracker calories
 
-    fitbit_birthday = models.CharField(max_length = 100, default = '')  #todays fitbit listed birthday
+    fitbit_birthday = models.CharField(max_length=100, default='')  #todays fitbit listed birthday
     fitbit_weight = models.DecimalField(decimal_places=2, default=0, max_digits=6)                      #todays fitbit listed weight
     fitbit_height = models.DecimalField(decimal_places=2, default=0, max_digits=6)                      #todays fitbit listed height
 
@@ -46,8 +49,8 @@ class SessionPlayerPeriod(models.Model):
     fitbit_minutes_heart_cardio = models.IntegerField(default=0)               #todays heart rate cardio
     fitbit_minutes_heart_peak = models.IntegerField(default=0)                 #todays heart rate peak
 
-    fitbit_heart_time_series = models.CharField(max_length = 100000, default = '')  #today's heart rate time series
-    fitbit_sleep_time_series = models.CharField(max_length = 100000, default = '')  #today's sleep time series
+    fitbit_heart_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's heart rate time series
+    fitbit_sleep_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's sleep time series
 
     fitbit_on_wrist_minutes = models.IntegerField(default=0)         #minutes fit bit was one wrist (sum of heart time series) 
     fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)  #minimum bmp a subject must have to register active zone minutes
@@ -131,6 +134,28 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         return self.earnings_individual + self.earnings_group
+
+    def pull_fitbit_heart_time_series(self):
+        '''
+        pull heart rate time series from fitbit
+        '''
+
+        if self.session_player.fitbit_user_id == "":
+            return
+
+        temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
+        #temp_s = "today"
+        #temp_s="2020-11-20"
+        # 
+        
+        data = {'fitbit_heart_time_series' : f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'}
+
+        result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+
+        self.fitbit_heart_time_series = result['fitbit_heart_time_series']
+                                                           
+
+        self.save()
 
     def write_summary_download_csv(self, writer):
         '''

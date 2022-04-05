@@ -11,3 +11,5 @@ from .sessions import PeriodType
 from .random_hex_color import get_random_hex_color
 
 from .get_registration_link import get_registration_link
+
+from .get_fitbit_metrics import get_fitbit_metrics

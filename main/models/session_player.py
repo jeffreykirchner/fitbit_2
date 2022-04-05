@@ -121,7 +121,7 @@ class SessionPlayer(models.Model):
     
     def get_session_player_periods_2_json(self):
         '''
-        return current session player periods
+        return current session player periods for graph 2
         '''
         current_session_period = self.session.get_current_session_period()
 
@@ -189,6 +189,12 @@ class SessionPlayer(models.Model):
 
         return earnings
     
+    def get_current_session_player_period(self):
+        '''
+        return the session player period for today
+        '''
+        return self.session_player_periods_b.filter(session_period=self.session.get_current_session_period()).first()
+
     def json(self, get_chat=True):
         '''
         json object of model
