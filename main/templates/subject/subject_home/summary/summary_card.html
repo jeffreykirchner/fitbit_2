@@ -22,5 +22,15 @@
                 [[session_player.earnings]]
             </div>
         </div>
+        {% if session_player.fitbit_user_id == "" %}
+        <div class="row">
+            <div class="col text-end pe-1">
+               Connect FitBit:
+            </div>
+            <div class="col text-start ps-1">
+                <a href="{{fitbit_registration_link}}">Connect</a>
+            </div>
+        </div>
+        {%endif%}
     </div>                    
 </div> 

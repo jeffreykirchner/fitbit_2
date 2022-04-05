@@ -13,11 +13,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
+
 from main.models import SessionPlayer
 from main.models import Parameters
 
 from main.forms import SessionForm
 from main.forms import EndGameForm
+
+from main.globals import get_registration_link
 
 class SubjectHomeView(View):
     '''
@@ -59,6 +62,7 @@ class SubjectHomeView(View):
                                "session_player_json" : json.dumps(session_player.json(), cls=DjangoJSONEncoder),
                                "session" : session,
                                "parameters" : parameters,
+                               "fitbit_registration_link" : get_registration_link(session_player.player_key),
                                "session_json":json.dumps(session.json_for_subject(session_player), cls=DjangoJSONEncoder)})
     
     @method_decorator(login_required)

@@ -9,3 +9,5 @@ from .sessions import ExperimentPhase
 from .sessions import PeriodType
 
 from .random_hex_color import get_random_hex_color
+
+from .get_registration_link import get_registration_link

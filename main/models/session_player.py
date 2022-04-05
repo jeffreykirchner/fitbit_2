@@ -43,6 +43,8 @@ class SessionPlayer(models.Model):
     current_instruction_complete = models.IntegerField(verbose_name='Current Instruction Complete', default=0)   #furthest complete page subject has done
     instructions_finished = models.BooleanField(verbose_name='Instructions Finished', default=False)             #true once subject has completed instructions
 
+    fitbit_user_id = models.CharField(max_length=100, default="",verbose_name = 'FitBit User ID')                #fitbit user id
+
     disabled =  models.BooleanField(default=False)                                                   #if true disable subject's screen
 
     timestamp = models.DateTimeField(auto_now_add=True)
