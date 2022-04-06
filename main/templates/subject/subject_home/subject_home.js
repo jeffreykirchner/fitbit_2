@@ -91,6 +91,9 @@ var app = Vue.createApp({
                 case "finish_instructions":
                     app.takeFinishInstructions(messageData);
                     break;
+                case "check_in":
+                    app.takeCheckIn(messageData);
+                    break;
                 
             }
 

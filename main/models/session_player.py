@@ -171,6 +171,16 @@ class SessionPlayer(models.Model):
 
         return total
     
+    def get_pay_block_range(self, pay_block):
+        '''
+        return the day range of the pay_block
+        '''
+
+        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
+
+        return {"start_day" : pay_group_player_periods.first().session_period.period_number, "end_day" : pay_group_player_periods.last().session_period.period_number}
+
+
     def get_current_block_earnings(self):
         '''
         return current payblock earnings
@@ -178,27 +188,64 @@ class SessionPlayer(models.Model):
 
         current_session_period = self.session.get_current_session_period()
 
-        earnings = {"individual":"0.00", "group_bonus":"0.00", "total":"0.00"}
+        earnings = {"individual":"0.00", 
+                    "group_bonus":"0.00", 
+                    "total":"0.00",
+                    "range": {"start_day":"---", "end_day":"---"}}
 
         if not current_session_period:
             return earnings
+
+        pay_block = current_session_period.parameter_set_period.pay_block
         
-        earnings["individual"] = self.get_pay_block_individual_earnings(current_session_period.parameter_set_period.pay_block)
-        earnings["group_bonus"] = self.get_pay_block_bonus_earnings(current_session_period.parameter_set_period.pay_block)
+        earnings["individual"] = self.get_pay_block_individual_earnings(pay_block)
+        earnings["group_bonus"] = self.get_pay_block_bonus_earnings(pay_block)
         earnings["total"] = earnings["individual"] + earnings["group_bonus"]
+        earnings["range"] = self.get_pay_block_range(pay_block)
 
         return earnings
     
-    def get_current_session_player_period(self):
+    def get_todays_session_player_period(self):
         '''
         return the session player period for today
         '''
         return self.session_player_periods_b.filter(session_period=self.session.get_current_session_period()).first()
+    
+    def get_yesterdays_session_player_period(self):
+        '''
+        return the session player period for yesterday
+        '''
+        return self.session_player_periods_b.filter(session_period__period_number=self.session.get_current_session_period().period_number-1).first()
+    
+    def pull_todays_metrics(self):
+        '''
+        pull needed metrics from yesterday and today
+        '''
 
+        todays_session_player_period = self.get_todays_session_player_period()
+
+        if todays_session_player_period:
+            r = todays_session_player_period.pull_fitbit_heart_time_series()
+
+            if r["status"] == "fail":
+                return r
+        
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
+
+        if yesterdays_session_player_period:
+            r = yesterdays_session_player_period.pull_fitbit_heart_time_series()
+
+            if r["status"] == "fail":
+                return r
+        
+        return {"status" : "success", "message" : ""}
+        
     def json(self, get_chat=True):
         '''
         json object of model
         '''
+        todays_session_player_period = self.get_todays_session_player_period()
+
         chat_all = []
         if self.session.parameter_set.enable_chat:
             chat_all = [c.json_for_subject() for c in self.session_player_chats_c.filter(chat_type=main.globals.ChatTypes.ALL)
@@ -244,6 +291,8 @@ class SessionPlayer(models.Model):
             "session_player_periods_2_group" : session_player_periods_group_2_json,
 
             "current_block_earnings" : self.get_current_block_earnings(),
+
+            "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
         }
     
     def json_for_subject(self, session_player):
@@ -251,6 +300,8 @@ class SessionPlayer(models.Model):
         json model for subject screen
         session_player_id : int : id number of session player for induvidual chat
         '''
+
+        todays_session_player_period = self.get_todays_session_player_period()
 
         chat_individual = []
 
@@ -273,6 +324,7 @@ class SessionPlayer(models.Model):
             "session_player_periods_2" : self.get_session_player_periods_2_json(),
             "parameter_set_player" : self.parameter_set_player.json(),
             "current_block_earnings" : self.get_current_block_earnings(),
+            "checked_in_today" :todays_session_player_period.check_in if todays_session_player_period else None,
         }
 
     def json_min(self):

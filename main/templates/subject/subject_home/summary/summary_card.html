@@ -2,35 +2,26 @@
 
 <div class="card" v-show="first_load_done && session.started && session.current_experiment_phase!='Selection'">                  
     <div class="card-header fw-bold">                
-        <span class="align-middle">Summary</span>            
+        <span class="align-middle">Status</span>            
 
     </div>
     <div class="card-body">      
         <div class="row">
-            <div class="col text-end pe-1">
-                Current Period:
+            <div class="col text-end pe-1 text-nowrap">
+                Current day:
             </div>
             <div class="col text-start ps-1">
                 [[session.current_period]]
             </div>
         </div>  
         <div class="row">
-            <div class="col text-end pe-1">
-                Total Profit (¢):
+            <div class="col text-end pe-1 text-nowrap">
+                Your total earnings for day [[session_player.current_block_earnings.range.start_day]] to day [[session_player.current_block_earnings.range.end_day]]:
             </div>
             <div class="col text-start ps-1">
-                [[session_player.earnings]]
+                $[[session_player.current_block_earnings.total]]
             </div>
         </div>
-        {% if session_player.fitbit_user_id == "" %}
-        <div class="row">
-            <div class="col text-end pe-1">
-               Connect FitBit:
-            </div>
-            <div class="col text-start ps-1">
-                <a href="{{fitbit_registration_link}}">Connect</a>
-            </div>
-        </div>
-        {%endif%}
+        
     </div>                    
 </div> 

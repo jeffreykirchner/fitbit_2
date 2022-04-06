@@ -8,6 +8,7 @@ from django.db import models
 from main.models import ParameterSet
 
 from main.globals import PeriodType
+from main.globals import format_minutes
 
 import main
 
@@ -143,6 +144,7 @@ class ParameterSetPeriod(models.Model):
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
             "minimum_wrist_minutes" : self.minimum_wrist_minutes,
+            "minimum_wrist_minutes_str" : format_minutes(self.minimum_wrist_minutes),
             "show_notice" : 1 if self.show_notice else 0,
             "notice_text" : self.notice_text,
 
@@ -172,6 +174,7 @@ class ParameterSetPeriod(models.Model):
             "survey_link" : self.survey_link,
             "period_type" : self.period_type,
             "minimum_wrist_minutes" : self.minimum_wrist_minutes,
+            "minimum_wrist_minutes_str" : format_minutes(self.minimum_wrist_minutes),
             "show_notice" : self.show_notice,
             "notice_text" : self.notice_text,
 

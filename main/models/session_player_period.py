@@ -12,6 +12,7 @@ from main.models import SessionPlayer
 from main.models import SessionPeriod
 
 from main.globals import get_fitbit_metrics
+from main.globals import format_minutes
 
 
 class SessionPlayerPeriod(models.Model):
@@ -134,6 +135,12 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         return self.earnings_individual + self.earnings_group
+    
+    def get_formated_wrist_minutes(self):
+        '''
+        return wrist minutes string
+        '''
+        return format_minutes(self.fitbit_on_wrist_minutes)
 
     def pull_fitbit_heart_time_series(self):
         '''
@@ -152,10 +159,49 @@ class SessionPlayerPeriod(models.Model):
 
         result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
-        self.fitbit_heart_time_series = result['fitbit_heart_time_series']
-                                                           
+        if  result['fitbit_heart_time_series']['status'] == 'success':
+            self.fitbit_heart_time_series = result['fitbit_heart_time_series']['result']                 
 
-        self.save()
+            heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
+
+            #store heart rate ranges
+            for i in range(4):
+            
+                minutes = heart_summary[i].get("minutes",0)
+                name =  heart_summary[i].get("name","not found")
+
+                #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
+
+                if name == 'Out of Range':
+                    self.fitbit_minutes_heart_out_of_range = minutes
+                elif name == 'Fat Burn':
+                    self.fitbit_minutes_heart_fat_burn = minutes
+                    self.fitbit_min_heart_rate_zone_bpm =  heart_summary[i].get("min",0)
+                elif name == 'Cardio':
+                    self.fitbit_minutes_heart_cardio = minutes
+                elif name == 'Peak':
+                    self.fitbit_minutes_heart_peak = minutes
+            
+            v = self.fitbit_heart_time_series.get("activities-heart-intraday",-1)
+
+            if v == -1:
+                self.fitbit_on_wrist_minutes = 0
+            
+            v = v.get('dataset',-1)
+            if v==-1:
+                self.fitbit_on_wrist_minutes = 0
+            else:
+                self.fitbit_on_wrist_minutes = len(v)
+
+                #active zone minutes, new calculation                
+                self.zone_minutes = self.fitbit_minutes_heart_cardio * 2 + \
+                                    self.fitbit_minutes_heart_peak * 2 + \
+                                    self.fitbit_minutes_heart_fat_burn
+
+            self.save()
+
+        return {"status" : result['fitbit_heart_time_series']['status'], 
+                "message" : result['fitbit_heart_time_series']['message']}
 
     def write_summary_download_csv(self, writer):
         '''

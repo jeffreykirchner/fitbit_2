@@ -1,0 +1,46 @@
+
+<div class="card" v-show="first_load_done && session.started && session.current_experiment_phase!='Selection'">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">Check In</span>            
+
+    </div>
+    <div class="card-body">      
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Yesterday's wrist minutes:
+            </div>
+            <div class="col text-start ps-1">
+               {{yesterdays_wrist_minutes}}
+            </div>
+        </div>  
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Daily wrist minutes required to check-in:
+            </div>
+            <div class="col text-start ps-1">
+                [[session.current_parameter_set_period.minimum_wrist_minutes_str]]
+            </div>
+        </div>
+        {% if show_fitbit_connect%}
+        <div class="row">
+            <div class="col text-end pe-1">
+               Connect FitBit:
+            </div>
+            <div class="col text-start ps-1">
+                <a href="{{fitbit_registration_link}}">Connect</a>
+            </div>
+        </div>
+        {%else%}
+        <div class="row">
+            <div class="col text-end mt-2">
+                <button class="btn btn-outline-primary" 
+                        type="button" 
+                        v-on:click = "checkIn()" 
+                        v-bind:disabled="reconnecting || working"> 
+                    Check In <i class="fas fa-check"></i>
+                </button>
+            </div>            
+        </div>
+        {%endif%}
+    </div>                    
+</div> 

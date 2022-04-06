@@ -58,8 +58,13 @@
 
 <!-- summary -->
 <div class="row justify-content-center mt-4" v-cloak v-show="session.current_experiment_phase != 'Done'">
-    <div class="col-md">
+
+    <div class="col-lg">
         {%include "subject/subject_home/summary/summary_card.html"%}     
+    </div>
+
+    <div class="col-lg mt-4 mt-lg-0">
+        {%include "subject/subject_home/checkin/checkin_card.html"%}     
     </div>
 </div>
 
