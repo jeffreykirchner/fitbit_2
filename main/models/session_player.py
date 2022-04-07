@@ -70,6 +70,7 @@ class SessionPlayer(models.Model):
         self.name = ""
         self.student_id = ""
         self.email = None
+        self.fitbit_user_id = ""
 
         self.save()
     
@@ -151,7 +152,8 @@ class SessionPlayer(models.Model):
         '''
         total = 0
         
-        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
+        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block,
+                                                                        check_in=True)
 
         for p in pay_group_player_periods:
             total += p.earnings_individual
@@ -164,7 +166,8 @@ class SessionPlayer(models.Model):
         '''    
         total = 0
 
-        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
+        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block,
+                                                                        check_in=True)
 
         for p in pay_group_player_periods:
             total += p.earnings_group
@@ -179,7 +182,6 @@ class SessionPlayer(models.Model):
         pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
 
         return {"start_day" : pay_group_player_periods.first().session_period.period_number, "end_day" : pay_group_player_periods.last().session_period.period_number}
-
 
     def get_current_block_earnings(self):
         '''
@@ -215,7 +217,13 @@ class SessionPlayer(models.Model):
         '''
         return the session player period for yesterday
         '''
-        return self.session_player_periods_b.filter(session_period__period_number=self.session.get_current_session_period().period_number-1).first()
+
+        current_session_period = self.session.get_current_session_period()
+
+        if not current_session_period:
+            return None
+
+        return self.session_player_periods_b.filter(session_period__period_number=current_session_period.period_number-1).first()
     
     def pull_todays_metrics(self):
         '''
@@ -293,6 +301,10 @@ class SessionPlayer(models.Model):
             "current_block_earnings" : self.get_current_block_earnings(),
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
+            "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+
+            "individual_earnings" : todays_session_player_period.get_individual_parameter_set_payment() if todays_session_player_period else None,
+            "group_earnings" : todays_session_player_period.get_group_parameter_set_payment() if todays_session_player_period else False,
         }
     
     def json_for_subject(self, session_player):
@@ -324,7 +336,8 @@ class SessionPlayer(models.Model):
             "session_player_periods_2" : self.get_session_player_periods_2_json(),
             "parameter_set_player" : self.parameter_set_player.json(),
             "current_block_earnings" : self.get_current_block_earnings(),
-            "checked_in_today" :todays_session_player_period.check_in if todays_session_player_period else None,
+            "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
+            "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
         }
 
     def json_min(self):

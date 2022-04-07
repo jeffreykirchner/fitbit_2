@@ -7,7 +7,7 @@
     <div class="card-body">      
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
-                Yesterday's wrist minutes:
+                Yesterday's wrist time:
             </div>
             <div class="col text-start ps-1">
                {{yesterdays_wrist_minutes}}
@@ -18,7 +18,48 @@
                 Daily wrist minutes required to check-in:
             </div>
             <div class="col text-start ps-1">
-                [[session.current_parameter_set_period.minimum_wrist_minutes_str]]
+                <span v-if="session.current_parameter_set_period">
+                    [[session.current_parameter_set_period.minimum_wrist_minutes_str]]
+                </span>
+                <span v-else>
+                    ---
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Your zone minutes yesterday:
+            </div>
+            <div class="col text-start ps-1">
+                {{yesterdays_zone_minutes}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                <span v-if="session_player.checked_in_today">
+                    Your individual earnings today:
+                </span>
+                <span>
+                    Your potential individual earnings today:
+                </span>                 
+            </div>
+            <div class="col text-start ps-1">
+                $[[session_player.individual_earnings]]
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                <span v-if="session_player.group_checked_in_today">
+                    Your potential group earnings today:
+                </span>
+                <span>
+                    Your potential group earnings today:<br>
+                    (Your team is not fully checked in)
+                </span>
+
+            </div>
+            <div class="col text-start ps-1">
+               $[[session_player.group_earnings]]
             </div>
         </div>
         {% if show_fitbit_connect%}
@@ -32,14 +73,19 @@
         </div>
         {%else%}
         <div class="row">
-            <div class="col text-end mt-2">
-                <button class="btn btn-outline-primary" 
-                        type="button" 
-                        v-on:click = "checkIn()" 
-                        v-bind:disabled="reconnecting || working"> 
-                    Check In <i class="fas fa-check"></i>
-                </button>
-            </div>            
+            <span v-if="session_player.checked_in_today">
+                You are checked in for today.
+            </span>
+            <span else>
+                <div class="col text-end mt-2">
+                    <button class="btn btn-outline-primary" 
+                            type="button" 
+                            v-on:click = "checkIn()" 
+                            v-bind:disabled="reconnecting || working"> 
+                        Check In <i class="fas fa-check"></i>
+                    </button>
+                </div>
+            </span>                        
         </div>
         {%endif%}
     </div>                    

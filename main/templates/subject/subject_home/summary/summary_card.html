@@ -13,7 +13,23 @@
             <div class="col text-start ps-1">
                 [[session.current_period]]
             </div>
+        </div>
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Today's wrist time:
+            </div>
+            <div class="col text-start ps-1">
+               {{todays_wrist_minutes}}
+            </div>
         </div>  
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Today's zone minutes:
+            </div>
+            <div class="col text-start ps-1">
+                {{todays_zone_minutes}}
+            </div>
+        </div> 
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
                 Your total earnings for day [[session_player.current_block_earnings.range.start_day]] to day [[session_player.current_block_earnings.range.end_day]]:

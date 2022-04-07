@@ -88,31 +88,70 @@ class SessionPlayerPeriod(models.Model):
         self.save()
 
     
+    def get_individual_parameter_set_payment(self):
+        '''
+        calc and return individual earnings
+        '''
+        pervious_session_player_period = self.get_pervious_player_period()
+
+        if not pervious_session_player_period:
+            return 0
+
+        period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.zone_minutes)
+
+        if period_payment:
+            return period_payment.payment
+
+        return 0
+    
+    def get_group_parameter_set_payment(self):
+        '''
+        calc and return individual earnings
+        '''
+        pervious_session_player_period = self.get_pervious_player_period()
+
+        if not pervious_session_player_period:
+            return 0
+
+        period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.get_lowest_group_zone_minutes())
+
+        if period_payment:
+            return period_payment.group_bonus
+
+        return 0
+
     def calc_and_store_payment(self):
         '''
         calculate and store payment
         '''
 
         if not self.check_in:
+            self.parameter_set_period_payment=0
+            self.earnings_group=0
+            self.save()
             return {"status":"fail", "message" : "not checked in"}
 
-        pervious_session_player_period = self.get_pervious_player_period()
-        if not pervious_session_player_period:
-            return {"status":"fail", "message" : "this is the first period"}
+        self.earnings_individual = self.get_individual_parameter_set_payment()
 
-        paramter_set_period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.zone_minutes)
-
-        if paramter_set_period_payment:
-            self.earnings_individual = paramter_set_period_payment.payment
-        
-        paramter_set_period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.get_lowest_group_zone_minutes())
-        
-        if paramter_set_period_payment:
-            self.earnings_group = paramter_set_period_payment.group_bonus
+        if self.group_checked_in_today():
+            self.earnings_group = self.get_group_parameter_set_payment()
 
         self.save()
 
         return {"status":"success", "message" : ""}
+    
+    def group_checked_in_today(self):
+        '''
+        return true if all group members have checked in
+        '''
+
+        no_checkin_count = self.session_period.session_player_periods_a.filter(session_player__group_number=self.session_player.group_number,
+                                                                               check_in=False).count()
+
+        if no_checkin_count > 0 :
+            return False
+        
+        return True
     
     def get_lowest_group_zone_minutes(self):
         '''
@@ -148,7 +187,7 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         if self.session_player.fitbit_user_id == "":
-            return
+            return {"status" : "fail", "message" : "No fitbit user id"}
 
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
         #temp_s = "today"

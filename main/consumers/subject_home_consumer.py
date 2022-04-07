@@ -170,6 +170,20 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
                  "sender_channel_name": self.channel_name},
             )
 
+    async def check_in(self, event):
+        '''
+        fisish instructions
+        '''
+        result = await sync_to_async(take_check_in)(self.session_id, self.session_player_id, event["message_text"])
+        message_data = {}
+        message_data["status"] = result
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -250,16 +264,11 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         handle connection status update from group member
         '''
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Connection update")
 
     async def update_name(self, event):
         '''
         no group broadcast of name to subjects
         '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
     
     async def update_next_phase(self, event):
         '''
@@ -281,17 +290,11 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         no group broadcast of avatar to current instruction
         '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
     
     async def update_finish_instructions(self, event):
         '''
         no group broadcast of avatar to current instruction
         '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
 
 
 #local sync functions  
@@ -542,10 +545,34 @@ def take_finish_instructions(session_id, session_player_id, data):
 
     except ObjectDoesNotExist:
         logger.warning(f"take_next_instruction : {session_player_id}")
-        return {"value" : "fail", "errors" : {}, "message" : "Move Error"}       
+        return {"value" : "fail", "errors" : {}, "message" : ""}       
     
     return {"value" : "success",
             "result" : {"instructions_finished" : session_player.instructions_finished,
                         "id" : session_player_id,
                         "current_instruction_complete" : session_player.current_instruction_complete, 
+                        }}
+
+def take_check_in(session_id, session_player_id, data):
+    '''
+    take check in
+    '''
+
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Take check in: {session_id} {session_player_id} {data}")
+
+    try:       
+
+        session = Session.objects.get(id=session_id)
+        session_player = session.session_players.get(id=session_player_id)
+
+    except ObjectDoesNotExist:
+        logger.warning(f"take_check_in : {session_player_id}")
+        return {"value" : "fail", "errors" : {}, "message" : "Move Error"}       
+
+    
+    session_player_period = session_player.get_todays_session_player_period()
+    
+    return {"value" : "success",
+            "result" : {"check_in" : session_player_period.check_in,
                         }}
