@@ -24,7 +24,7 @@ drawSetup(chartID){
 /**
  * draw axis
  */
-drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel){
+drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel, today){
     
     if(document.getElementById(chartID) == null)
     {
@@ -103,14 +103,17 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
     ctx.textAlign = "center";
 
     let tempX = marginY;
-    let tempXValue=xMin;     
+    let tempXValue=xMin;    
+    
+    todayX = 0;
+    todayY = 0;
 
     for(let i=0;i<=xTickCount;i++)
     {                                       
         ctx.moveTo(tempX, h-marginX);                                   
         ctx.lineTo(tempX,  h-marginX+5);
 
-        if(i%7==0)
+        if(i%7==0 || tempXValue==today)
         {
             text = Math.round(tempXValue).toString();
 
@@ -118,6 +121,17 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
             {
                 text = "Day " + text;
             }
+            
+            //highlight today
+            if(tempXValue==today)
+            {
+               todayX = tempX;
+               todayY = h-marginX+18;
+            }
+            // else
+            // {
+            //     ctx.fillStyle = "black";
+            // }
            ctx.fillText(text, tempX, h-marginX+18);
         }
 
@@ -125,6 +139,18 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
         tempXValue += xTickValue;
     }
 
+    ctx.stroke();
+    ctx.closePath();
+
+    //draw today
+    ctx.beginPath();
+
+    ctx.fillStyle = "goldenrod";
+    ctx.fillText(today, todayX, todayY);
+    tempW = ctx.measureText(today).width;
+    tempH = 12;
+    ctx.rect(todayX - tempW/2-3, todayY - tempH/2 - 6, tempW+6, tempH+6); 
+    ctx.lineWidth = 1;
     ctx.stroke();
     ctx.closePath();
 
@@ -382,7 +408,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
     ctx.save();
     ctx.translate(w-14, (h-marginX-margin2)/2+margin2);
     ctx.rotate(Math.PI/2);                                                              
-    ctx.fillText("Your Potential Zone Minute Earnings per Day", 0, 5);
+    ctx.fillText("Your Potential Zone Minute Earnings per Day", 0, 10);
     ctx.restore();
 },
 
@@ -590,7 +616,7 @@ updateGraph(){
                  0, app.session.parameter_set.graph_y_max, 1,
                  parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
                  (parameter_set_period.graph_2_end_period_number-parameter_set_period.graph_2_start_period_number),
-                 "Daily Zone Minutes", "Day");
+                 "Daily Zone Minutes", "Day", parameter_set_period.period_number);
     
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);

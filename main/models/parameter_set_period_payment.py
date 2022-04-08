@@ -58,8 +58,8 @@ class ParameterSetPeriodPayment(models.Model):
         return{
 
             "id" : self.id,
-            "payment" : self.payment,
-            "group_bonus" : self.group_bonus,
+            "payment" : round(self.payment),
+            "group_bonus" : round(self.group_bonus),
             "parameter_set_zone_minutes" : self.parameter_set_zone_minutes.json(),
         }
     

@@ -19,6 +19,10 @@ def format_minutes(minutes) -> str:
         v += "hrs "
 
     if minutes%60 != 0 :
+
+        if v == "0hrs ":
+            v = ""
+
         v += f' {minutes%60}'
 
         if minutes%60 == 1:

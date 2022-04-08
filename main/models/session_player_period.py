@@ -3,6 +3,7 @@ session player period results
 '''
 
 #import logging
+import math
 import random
 
 from django.db import models
@@ -262,8 +263,8 @@ class SessionPlayerPeriod(models.Model):
             
             "period_number" : self.session_period.period_number,
 
-            "earnings_individual" : self.earnings_individual,
-            "earnings_group" : self.earnings_group,
+            "earnings_individual" : round(self.earnings_individual),
+            "earnings_group" : round(self.earnings_group),
             "earnings_total" : self.get_earning(),
             "zone_minutes" : self.zone_minutes,
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,

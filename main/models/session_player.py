@@ -5,8 +5,10 @@ session player model
 #import logging
 import uuid
 import logging
+import pytz
 
 from decimal import Decimal
+from datetime import datetime
 
 from django.db import models
 from django.urls import reverse
@@ -17,7 +19,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from main.models import Session
 from main.models import ParameterSetPlayer
 
-from main.globals import round_half_away_from_zero
+from main.globals import todays_date
+from main.globals import get_fitbit_metrics
 
 import main
 
@@ -44,20 +47,22 @@ class SessionPlayer(models.Model):
     instructions_finished = models.BooleanField(verbose_name='Instructions Finished', default=False)             #true once subject has completed instructions
 
     fitbit_user_id = models.CharField(max_length=100, default="",verbose_name = 'FitBit User ID')                #fitbit user id
-
+    fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')      #time when the fitbit was last synced to user's phone
+    fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                  #last fitbit device to sync
+    
     disabled =  models.BooleanField(default=False)                                                   #if true disable subject's screen
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.id}"
+        return f"Session {self.session.title}, Player {self.player_number}"
 
     class Meta:
         
         verbose_name = 'Session Player'
         verbose_name_plural = 'Session Players'
-        ordering = ['player_number']
+        ordering = ['session', 'player_number']
         constraints = [            
             models.UniqueConstraint(fields=['session', 'email'], name='unique_email_session_player', condition=~Q(email="")),
         ]
@@ -190,9 +195,9 @@ class SessionPlayer(models.Model):
 
         current_session_period = self.session.get_current_session_period()
 
-        earnings = {"individual":"0.00", 
-                    "group_bonus":"0.00", 
-                    "total":"0.00",
+        earnings = {"individual":"0", 
+                    "group_bonus":"0", 
+                    "total":"0",
                     "range": {"start_day":"---", "end_day":"---"}}
 
         if not current_session_period:
@@ -200,9 +205,9 @@ class SessionPlayer(models.Model):
 
         pay_block = current_session_period.parameter_set_period.pay_block
         
-        earnings["individual"] = self.get_pay_block_individual_earnings(pay_block)
-        earnings["group_bonus"] = self.get_pay_block_bonus_earnings(pay_block)
-        earnings["total"] = earnings["individual"] + earnings["group_bonus"]
+        earnings["individual"] = round(self.get_pay_block_individual_earnings(pay_block))
+        earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block))
+        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"])
         earnings["range"] = self.get_pay_block_range(pay_block)
 
         return earnings
@@ -230,6 +235,12 @@ class SessionPlayer(models.Model):
         pull needed metrics from yesterday and today
         '''
 
+        # last synced
+        r = self.pull_fitbit_last_synced()
+        if r["status"] == "fail" :
+            return r
+
+        #todays heartrate time series
         todays_session_player_period = self.get_todays_session_player_period()
 
         if todays_session_player_period:
@@ -238,6 +249,7 @@ class SessionPlayer(models.Model):
             if r["status"] == "fail":
                 return r
         
+        #yesterdays heart rate time series.
         yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
         if yesterdays_session_player_period:
@@ -247,6 +259,88 @@ class SessionPlayer(models.Model):
                 return r
         
         return {"status" : "success", "message" : ""}
+    
+    def pull_fitbit_last_synced(self):
+        '''
+        pull the last time a fitbit has been synced
+        '''
+
+        logger = logging.getLogger(__name__) 
+
+        data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
+        result = get_fitbit_metrics(self.fitbit_user_id, data)
+
+        if not result['devices']['status'] == 'success':
+            return {"status" : "fail", "message" : result['devices']['message']}
+
+        devices = result["devices"]["result"]
+
+        v = -1
+            
+        try:
+            v = devices[0].get("lastSyncTime",-1)                
+        except Exception  as e: 
+            logger.info(e)
+            return {"status" : "fail", "message" : "no devices found"}
+
+        if v == -1:                   
+            return False
+        else:
+            a=[]
+            
+            for i in devices:
+
+                v = datetime.strptime(i.get("lastSyncTime"),'%Y-%m-%dT%H:%M:%S.%f')
+
+                #test synced today
+                #v = v-timedelta(days=1)
+
+                logger.info(f'pull_fitbit_last_synced sync time {v}')
+
+                d = {}
+                d["last_sync"] = datetime.now(pytz.UTC)
+                d["last_sync"] = d["last_sync"].replace(hour=v.hour,minute=v.minute, second=v.second,microsecond=v.microsecond,
+                                                year=v.year,month=v.month,day=v.day)
+
+                logger.info(f'pull_fitbit_last_synced sync time {d}')
+
+                d["device"] = i.get("deviceVersion")
+
+                a.append(d)
+            
+            sorted(a, key = lambda i: i['last_sync'], reverse=True)
+
+            self.fitbit_last_synced = a[0]['last_sync'] #datetime.strptime(v,'%Y-%m-%dT%H:%M:%S.%f')
+            self.fitbit_device = a[0]['device']
+            self.save()
+
+            return {"status" : "success", "message" : ""}
+
+    def get_fitbit_last_sync_str(self):
+
+        if not self.fitbit_last_synced:
+            return "---"
+
+        return  self.fitbit_last_synced.strftime("%#m/%#d/%Y %#I:%M %p")
+    
+    def fitbit_synced_today(self):
+        '''
+            true if the subject has synced their fitbit today
+        '''
+        logger = logging.getLogger(__name__) 
+        d_today = todays_date().date()
+
+        if not self.fitbit_last_synced:
+            return False
+
+        d_fitbit=self.fitbit_last_synced.date()
+
+        #logger.info(f'fitbitSyncedToday {self} Today:{d_today} Last Synced:{d_fitbit}')
+
+        if d_fitbit >= d_today:
+            return True
+        else:
+            return False
         
     def json(self, get_chat=True):
         '''
@@ -303,8 +397,11 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
 
-            "individual_earnings" : todays_session_player_period.get_individual_parameter_set_payment() if todays_session_player_period else None,
-            "group_earnings" : todays_session_player_period.get_group_parameter_set_payment() if todays_session_player_period else False,
+            "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
+
+            "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
+            "fitbit_synced_today" : self.fitbit_synced_today(),
         }
     
     def json_for_subject(self, session_player):
@@ -338,6 +435,8 @@ class SessionPlayer(models.Model):
             "current_block_earnings" : self.get_current_block_earnings(),
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+            "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
+            "fitbit_synced_today" : self.fitbit_synced_today(),
         }
 
     def json_min(self):
