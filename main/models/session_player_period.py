@@ -80,15 +80,31 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         self.zone_minutes = random.randrange(0, 90)
+
+        self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
         
-        if random.randrange(1,10) == 1:
+        if random.randrange(1,10) == 1 or not self.wrist_time_met():
             self.check_in = False
         else:
             self.check_in = True
 
         self.save()
-
     
+    def wrist_time_met(self):
+        '''
+        return true if subject has required wrist yesterday for todays payment
+        '''
+
+        previous_player_period = self.get_pervious_player_period()
+
+        if not previous_player_period:
+            return True
+
+        if previous_player_period.fitbit_on_wrist_minutes >= self.session_period.parameter_set_period.minimum_wrist_minutes:
+            return True
+        
+        return False
+        
     def get_individual_parameter_set_payment(self):
         '''
         calc and return individual earnings
@@ -243,6 +259,16 @@ class SessionPlayerPeriod(models.Model):
         return {"status" : result['fitbit_heart_time_series']['status'], 
                 "message" : result['fitbit_heart_time_series']['message']}
 
+    def take_check_in(self):
+        '''
+        check subject in for this period
+        '''
+
+        self.check_in = True
+        self.save()
+
+        self.calc_and_store_payment()
+
     def write_summary_download_csv(self, writer):
         '''
         take csv writer and add row
@@ -252,7 +278,20 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.player_number,
                          self.session_player.parameter_set_player.id_label,
                          self.earnings,])
-        
+
+    def json_for_check_in(self):
+        '''
+        json object after check in 
+        '''
+
+        return{
+            "earnings_individual" : round(self.earnings_individual),
+            "earnings_group" : round(self.earnings_group),
+            "earnings_total" : self.get_earning(),
+            "check_in" : self.check_in,
+            "group_checked_in_today" : self.group_checked_in_today(),  
+        }
+
     def json_for_subject(self):
         '''
         json object of model
@@ -272,4 +311,5 @@ class SessionPlayerPeriod(models.Model):
             "check_in" : self.check_in,
             "period_type" : self.session_period.parameter_set_period.period_type,
             "pay_block" : self.session_period.parameter_set_period.pay_block,
+            "wrist_time_met" : self.wrist_time_met(),
         }

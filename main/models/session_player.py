@@ -270,6 +270,9 @@ class SessionPlayer(models.Model):
         data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
         result = get_fitbit_metrics(self.fitbit_user_id, data)
 
+        if not result.get('devices'):
+            return {"status" : "fail", "message" : "No devices."}
+
         if not result['devices']['status'] == 'success':
             return {"status" : "fail", "message" : result['devices']['message']}
 
@@ -402,6 +405,8 @@ class SessionPlayer(models.Model):
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_today" : self.fitbit_synced_today(),
+
+            "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
         }
     
     def json_for_subject(self, session_player):
@@ -437,6 +442,7 @@ class SessionPlayer(models.Model):
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_today" : self.fitbit_synced_today(),
+            "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
         }
 
     def json_min(self):

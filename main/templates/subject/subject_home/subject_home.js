@@ -32,13 +32,14 @@ var app = Vue.createApp({
 
                     instruction_pages : {{instruction_pages|safe}},
 
+                    check_in_error_message : "",
+
                     //graph globals
                     marginY : 80,
                     marginX : 75,
                     margin2 : 35,
                     sizeW : 0,
                     sizeH : 0,
-
                 }},
     methods: {
 

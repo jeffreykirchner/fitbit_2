@@ -9,13 +9,13 @@
             <div class="col text-end pe-1 text-nowrap">
                 Yesterday's wrist time:
             </div>
-            <div class="col text-start ps-1">
+            <div class="col text-start ps-1" v-bind:style="session_player.wrist_time_met_for_checkin ? [{}] : [{'color':'red'}]">
                {{yesterdays_wrist_minutes}}
             </div>
         </div>  
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
-                Daily wrist minutes required to check-in:
+                Yesterday's wrist minutes required to check-in today:
             </div>
             <div class="col text-start ps-1">
                 <span v-if="session.current_parameter_set_period">
@@ -39,7 +39,7 @@
                 <span v-if="session_player.checked_in_today">
                     Your individual earnings today:
                 </span>
-                <span>
+                <span v-else>
                     Your potential individual earnings today:
                 </span>                 
             </div>
@@ -52,7 +52,7 @@
                 <span v-if="session_player.group_checked_in_today">
                     Your group earnings today:
                 </span>
-                <span>
+                <span v-else>
                     Your potential group earnings today:<br>
                     <span style="color:red">(Your team is not fully checked in)</span>
                 </span>
@@ -72,12 +72,15 @@
             </div>
         </div>
         {%else%}
-        <div class="row">
-            <span v-if="session_player.checked_in_today">
-                You are checked in for today.
+        <div class="row text-end">
+            <span v-if="session_player.checked_in_today" style="color:green;font-weight:bold;">
+                You are checked in for today <i class="fas fa-check"></i>
             </span>
-            <span else>
-                <div class="col text-end mt-2">
+            <span v-else>
+                <div class="col mt-2">
+                    <span style="color:red" class="me-2">
+                        [[check_in_error_message]]
+                    </span>
                     <button class="btn btn-outline-primary" 
                             type="button" 
                             v-on:click = "checkIn()" 

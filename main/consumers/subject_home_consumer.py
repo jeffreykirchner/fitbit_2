@@ -556,7 +556,10 @@ def take_finish_instructions(session_id, session_player_id, data):
 def take_check_in(session_id, session_player_id, data):
     '''
     take check in
-    '''
+    '''    
+    status = "success"
+    error_message = ""
+    result = {}
 
     logger = logging.getLogger(__name__) 
     logger.info(f"Take check in: {session_id} {session_player_id} {data}")
@@ -565,14 +568,41 @@ def take_check_in(session_id, session_player_id, data):
 
         session = Session.objects.get(id=session_id)
         session_player = session.session_players.get(id=session_player_id)
+        session_player_period = session_player.get_todays_session_player_period()
 
     except ObjectDoesNotExist:
-        logger.warning(f"take_check_in : {session_player_id}")
-        return {"value" : "fail", "errors" : {}, "message" : "Move Error"}       
+        status = "fail"
+        error_message = "Session not available."
+        logger.warning(f"take_check_in : {session_player_id}") 
+    
+    if status == "success":
+        if not session.started:
+            status = "fail"
+            error_message = "Session not started."
+    
+    if status == "success":
+        if session.finished:
+            status = "fail"
+            error_message = "Session complete."
 
+    if status == "success":
+        if not session_player_period.wrist_time_met():
+            status = "fail"
+            error_message = "You did not wear your Fitbit long enough yesterday."
     
-    session_player_period = session_player.get_todays_session_player_period()
-    
-    return {"value" : "success",
-            "result" : {"check_in" : session_player_period.check_in,
-                        }}
+    if status == "success":
+        if not session_player.fitbit_synced_today():
+            status = "fail"
+            error_message = "Sync your Fitbit to your phone."
+
+    if status == "success":
+        session_player_period.take_check_in()
+
+    if status == "success":
+        result = session_player_period.json_for_check_in()
+    else:
+        result = { "error_message" : error_message,
+                 }
+
+    return {"value" : status,
+            "result" : result}
