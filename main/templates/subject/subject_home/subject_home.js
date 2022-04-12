@@ -33,6 +33,7 @@ var app = Vue.createApp({
                     instruction_pages : {{instruction_pages|safe}},
 
                     check_in_error_message : "",
+                    show_fitbit_connect : false,
 
                     //graph globals
                     marginY : 80,
@@ -118,7 +119,7 @@ var app = Vue.createApp({
         /** send winsock request to get session info
         */
         sendGetSession(){
-            app.sendMessage("get_session", {"playerKey" : this.playerKey});
+            app.sendMessage("get_session", {"playerKey" : this.playerKey, "first_load_done" : this.first_load_done});
         },
         
         /** take create new session
@@ -129,6 +130,7 @@ var app = Vue.createApp({
 
             app.session = messageData.status.session;
             app.session_player = messageData.status.session_player;
+            app.show_fitbit_connect = messageData.status.show_fitbit_connect;
 
             if(app.session.started)
             {

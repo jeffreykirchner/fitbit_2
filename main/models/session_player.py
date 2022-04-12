@@ -256,8 +256,10 @@ class SessionPlayer(models.Model):
             r = yesterdays_session_player_period.pull_fitbit_heart_time_series()
 
             if r["status"] == "fail":
-                return r
-        
+                return r            
+                
+        yesterdays_session_player_period.pull_secondary_metrics()
+
         return {"status" : "success", "message" : ""}
     
     def pull_fitbit_last_synced(self):
@@ -350,6 +352,7 @@ class SessionPlayer(models.Model):
         json object of model
         '''
         todays_session_player_period = self.get_todays_session_player_period()
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
         chat_all = []
         if self.session.parameter_set.enable_chat:
@@ -407,6 +410,11 @@ class SessionPlayer(models.Model):
             "fitbit_synced_today" : self.fitbit_synced_today(),
 
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
+
+            "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
+            "yesterdays_wrist_minutes" : yesterdays_session_player_period.get_formated_wrist_minutes() if yesterdays_session_player_period else "---",
+            "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+            "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
         }
     
     def json_for_subject(self, session_player):

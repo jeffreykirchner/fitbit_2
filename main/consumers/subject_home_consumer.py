@@ -46,11 +46,12 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         self.connection_uuid = event["message_text"]["playerKey"]
         self.connection_type = "subject"
+
         self.session_id = await sync_to_async(take_get_session_id)(self.connection_uuid)
 
         await self.update_local_info(event)
 
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id)
+        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
 
         #build response
         message_data = {"status":{}}
@@ -298,18 +299,36 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
 
 #local sync functions  
-def take_get_session_subject(session_player_id):
+def take_get_session_subject(session_player_id, data):
     '''
     get session info for subject
     '''
+    logger = logging.getLogger(__name__) 
+    logger.info(f"take_get_session_subject: {session_player_id} {data}")
+
     #session_id = data["sessionID"]
     #uuid = data["uuid"]
 
     #session = Session.objects.get(id=session_id)
     try:
         session_player = SessionPlayer.objects.get(id=session_player_id)
+        first_load_done = data["first_load_done"]
+
+        show_fitbit_connect = False
+
+        if session_player.fitbit_user_id == "":
+            show_fitbit_connect = True
+
+        if not first_load_done:
+            value = session_player.pull_todays_metrics()
+        
+            if  value["message"] == "re-connect required" or \
+                value["message"] == "No fitbit user id":
+
+                show_fitbit_connect = True
 
         return {"session" : session_player.session.json_for_subject(session_player), 
+                "show_fitbit_connect" : show_fitbit_connect,
                 "session_player" : session_player.json() }
 
     except ObjectDoesNotExist:

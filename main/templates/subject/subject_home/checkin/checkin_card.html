@@ -10,7 +10,7 @@
                 Yesterday's wrist time:
             </div>
             <div class="col text-start ps-1" v-bind:style="session_player.wrist_time_met_for_checkin ? [{}] : [{'color':'red'}]">
-               {{yesterdays_wrist_minutes}}
+                [[session_player.yesterdays_wrist_minutes]]
             </div>
         </div>  
         <div class="row">
@@ -31,7 +31,7 @@
                 Your zone minutes yesterday:
             </div>
             <div class="col text-start ps-1">
-                {{yesterdays_zone_minutes}}
+                [[session_player.yesterdays_zone_minutes]]
             </div>
         </div>
         <div class="row">
@@ -62,17 +62,16 @@
                $[[session_player.group_earnings]]
             </div>
         </div>
-        {% if show_fitbit_connect%}
-        <div class="row">
+
+        <div class="row" v-if="show_fitbit_connect">
             <div class="col text-end pe-1">
                Connect FitBit:
             </div>
             <div class="col text-start ps-1">
                 <a href="{{fitbit_registration_link}}">Connect</a>
             </div>
-        </div>
-        {%else%}
-        <div class="row text-end">
+        </div>        
+        <div class="row text-end" v-else>
             <span v-if="session_player.checked_in_today" style="color:green;font-weight:bold;">
                 You are checked in for today <i class="fas fa-check"></i>
             </span>
@@ -90,6 +89,6 @@
                 </div>
             </span>                        
         </div>
-        {%endif%}
+        
     </div>                    
 </div> 

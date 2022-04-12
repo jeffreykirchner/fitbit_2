@@ -186,7 +186,6 @@ class ParameterSetPeriod(models.Model):
             "graph_2_start_period_number" : self.graph_2_start_period_number,
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
-
             "pay_block" : self.pay_block,
         }
 

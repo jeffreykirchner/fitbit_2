@@ -6,7 +6,7 @@
         </span>        
 
         <span class="float-end">
-            <span v-show="reconnecting" class="me-1">
+            <span v-show="reconnecting || !first_load_done" class="me-1">
                 Connecting <i class="fas fa-cog fa-spin fa-1x"></i>
             </span>
         </span>
@@ -15,7 +15,7 @@
     <div class="card-body">
         
         <!-- graph -->
-        <div class="row">
+        <div class="row" >
             <div class="col">
                 <canvas class="graph" id="graph_id"></canvas>
             </div>

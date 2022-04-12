@@ -40,16 +40,12 @@ class SubjectHomeView(View):
             session_player = SessionPlayer.objects.get(player_key=kwargs['player_key'])
             session = session_player.session
 
-            value = session_player.pull_todays_metrics()
+           
 
             session_player_period_today = session_player.get_todays_session_player_period()
             session_player_period_yesterday = session_player.get_yesterdays_session_player_period()            
 
-            if session_player.fitbit_user_id == "" or \
-               value["message"] == "re-connect required" or \
-               value["message"] == "No fitbit user id":
-
-                show_fitbit_connect = True
+            
 
         except ObjectDoesNotExist:
             raise Http404("Subject not found.")
@@ -76,12 +72,7 @@ class SubjectHomeView(View):
                                "session_player" : session_player,
                                "session_player_json" : json.dumps(session_player.json(), cls=DjangoJSONEncoder),
                                "session" : session,
-                               "parameters" : parameters,
-                               "todays_wrist_minutes" : session_player_period_today.get_formated_wrist_minutes() if session_player_period_today else "---",
-                               "yesterdays_wrist_minutes" : session_player_period_yesterday.get_formated_wrist_minutes() if session_player_period_yesterday else "---",
-                               "todays_zone_minutes" :  session_player_period_today.zone_minutes if session_player_period_today else "---",
-                               "yesterdays_zone_minutes" :  session_player_period_yesterday.zone_minutes if session_player_period_yesterday else "---",
-                               "show_fitbit_connect" : show_fitbit_connect,
+                               "parameters" : parameters,                               
                                "fitbit_registration_link" : get_registration_link(session_player.player_key),
                                "session_json":json.dumps(session.json_for_subject(session_player), cls=DjangoJSONEncoder)})
     

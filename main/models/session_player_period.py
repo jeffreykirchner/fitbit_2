@@ -5,6 +5,7 @@ session player period results
 #import logging
 import math
 import random
+import logging
 
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
@@ -41,9 +42,8 @@ class SessionPlayerPeriod(models.Model):
     fitbit_steps = models.IntegerField(default=0)                     #todays tracker steps
     fitbit_calories = models.IntegerField(default=0)                  #todays tracker calories
 
-    fitbit_birthday = models.CharField(max_length=100, default='')  #todays fitbit listed birthday
-    fitbit_weight = models.DecimalField(decimal_places=2, default=0, max_digits=6)                      #todays fitbit listed weight
-    fitbit_height = models.DecimalField(decimal_places=2, default=0, max_digits=6)                      #todays fitbit listed height
+    fitbit_profile = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)     #todays fitbit profile
+    fitbit_activities = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #todays fitbit profile
 
     #charge 4 active zone minutes
     fitbit_minutes_heart_out_of_range = models.IntegerField(default=0)         #todays heart rate out of range
@@ -54,8 +54,8 @@ class SessionPlayerPeriod(models.Model):
     fitbit_heart_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's heart rate time series
     fitbit_sleep_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's sleep time series
 
-    fitbit_on_wrist_minutes = models.IntegerField(default=0)         #minutes fit bit was one wrist (sum of heart time series) 
-    fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)  #minimum bmp a subject must have to register active zone minutes
+    fitbit_on_wrist_minutes = models.IntegerField(default=0)          #minutes fit bit was one wrist (sum of heart time series) 
+    fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)   #minimum bmp a subject must have to register active zone minutes
 
     last_login = models.DateTimeField(null=True, blank=True)          #first time the subject logged in this day 
 
@@ -63,7 +63,7 @@ class SessionPlayerPeriod(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Player {self.session_player.parameter_set_player.id_label}, Period {self.session_period.period_number}"
+        return f"Session {self.session_period.session.title}, Player {self.session_player.parameter_set_player.id_label}, Period {self.session_period.period_number}"
 
     class Meta:
         
@@ -258,6 +258,67 @@ class SessionPlayerPeriod(models.Model):
 
         return {"status" : result['fitbit_heart_time_series']['status'], 
                 "message" : result['fitbit_heart_time_series']['message']}
+
+    def pull_secondary_metrics(self):
+        '''
+        pull extra metrics
+        '''
+
+        logger = logging.getLogger(__name__)
+
+        if self.session_player.fitbit_user_id == "":
+            return {"status" : "fail", "message" : "No fitbit user id"}
+        
+        if self.fitbit_profile:
+            logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
+            return {"status" : "fail", "message" : "Secondary metrics already pulled"}
+
+        temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
+
+        data = {}
+
+        data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
+        data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
+
+        data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
+        data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
+        data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
+        data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
+
+        data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
+        data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
+        data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
+
+        result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+
+        try:
+            self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
+            self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
+
+            self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
+            self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
+            self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
+            self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
+
+            self.fitbit_profile = result["fitbit_profile"]["result"]
+
+            #only store activities for this day
+            fitbit_activities_raw = result["fitbit_activities"]["result"]
+            
+            self.fitbit_activities = {"activities" : []}
+            for i in fitbit_activities_raw["activities"]:
+                if temp_s in i["startTime"]:
+                    self.fitbit_activities["activities"].append(i)           
+
+            #sleep
+            self.fitbit_sleep_time_series = result["fitbit_sleep_time_series"]["result"]
+            self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
+
+            self.save()
+        except KeyError as e:
+            logger.error(f"pull_secondary_metrics error: {e}")
+            
+        #logger.info(f"pull_secondary_metrics: {result}")
 
     def take_check_in(self):
         '''
