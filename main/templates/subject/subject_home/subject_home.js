@@ -184,7 +184,6 @@ var app = Vue.createApp({
             this.avatar_choice_grid_selected_col = 0;
 
             $('#endGameModal').modal('hide');
-            this.closeMoveModal();
         },
 
         /**
@@ -192,9 +191,6 @@ var app = Vue.createApp({
          */
         showEndGameModal(){
             if(this.end_game_modal_visible) return;
-
-            //hide transfer modals
-            this.closeMoveModal();
 
             //show endgame modal
             var myModal = new bootstrap.Modal(document.getElementById('endGameModal'), {

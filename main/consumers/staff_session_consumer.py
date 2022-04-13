@@ -92,7 +92,8 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
             await self.channel_layer.group_send(
                     self.room_group_name,
                     {"type": "update_start_experiment",
-                    "sender_channel_name": self.channel_name},
+                     "message_text" : {"first_load_done" : "True"},
+                     "sender_channel_name": self.channel_name},
                 )
     
     async def reset_experiment(self, event):
@@ -114,6 +115,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
             await self.channel_layer.group_send(
                     self.room_group_name,
                     {"type": "update_reset_experiment",
+                     "message_text" : {"first_load_done" : "True"},
                      "sender_channel_name": self.channel_name},
                 )
     
@@ -589,9 +591,18 @@ def take_end_early(session_id):
     make the current period the last period
     '''
 
+    logger = logging.getLogger(__name__) 
+    logger.info(f'take_end_early: Session {session_id}')
+
     session = Session.objects.get(id=session_id)
 
-    return {"value" : "success", "result" : session.parameter_set.period_count}
+    session_period = session.get_current_session_period()
+
+    if session_period:
+        session.session_periods.filter(period_number__gt = session_period.period_number).delete()
+        session.parameter_set.parameter_set_periods.filter(period_number__gt = session_period.period_number).delete()
+
+    return {"value" : "success", "session" : session.json()}
 
 def take_update_subject(session_id, data):
     '''

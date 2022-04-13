@@ -196,7 +196,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         await self.update_local_info(event)
 
         #get session json object
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id)
+        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
 
         message_data = {}
         message_data["status"] = result
@@ -216,7 +216,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         #logger.info(f'update start subjects {self.channel_name}')
 
         #get session json object
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id)
+        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
 
         message_data = {}
         message_data["status"] = result
