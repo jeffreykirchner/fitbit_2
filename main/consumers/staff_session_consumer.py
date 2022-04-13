@@ -602,6 +602,24 @@ def take_end_early(session_id):
         session.session_periods.filter(period_number__gt = session_period.period_number).delete()
         session.parameter_set.parameter_set_periods.filter(period_number__gt = session_period.period_number).delete()
 
+        for p in session.parameter_set.parameter_set_periods.all():
+            if p.graph_1_start_period_number > session_period.period_number:
+                p.graph_1_start_period_number = session_period.period_number
+                p.save()
+            
+            if p.graph_1_end_period_number > session_period.period_number:
+                p.graph_1_end_period_number = session_period.period_number
+                p.save()
+            
+            if p.graph_2_start_period_number > session_period.period_number:
+                p.graph_2_start_period_number = session_period.period_number
+                p.save()
+            
+            if p.graph_2_end_period_number > session_period.period_number:
+                p.graph_2_end_period_number = session_period.period_number
+                p.save()
+
+
     return {"value" : "success", "session" : session.json()}
 
 def take_update_subject(session_id, data):
