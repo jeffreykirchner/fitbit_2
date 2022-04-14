@@ -22,6 +22,8 @@ from main.models import Session
 from main.models import ParameterSet
 from main.models import Parameters
 
+from main.globals import todays_date
+
 # from main.globals import create_new_session_parameterset
 
 class StaffHomeConsumer(SocketConsumerMixin):
@@ -163,7 +165,7 @@ def create_new_session(auth_user):
     parameter_set.setup()
 
     session.parameter_set = parameter_set
-    session.start_date = datetime.now(pytz.UTC)
+    session.start_date = todays_date()
     session.creator = auth_user
     session.update_end_date()    
 

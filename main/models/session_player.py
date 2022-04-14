@@ -310,9 +310,9 @@ class SessionPlayer(models.Model):
                 logger.info(f'pull_fitbit_last_synced sync time {v}')
 
                 d = {}
-                d["last_sync"] = datetime.now(pytz.UTC)
+                d["last_sync"] = todays_date()
                 d["last_sync"] = d["last_sync"].replace(hour=v.hour,minute=v.minute, second=v.second,microsecond=v.microsecond,
-                                                year=v.year,month=v.month,day=v.day)
+                                                        year=v.year,month=v.month,day=v.day)
 
                 logger.info(f'pull_fitbit_last_synced sync time {d}')
 

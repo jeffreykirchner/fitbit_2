@@ -25,6 +25,7 @@ import main
 from main.models import ParameterSet
 
 from main.globals import ExperimentPhase
+from main.globals import todays_date
 
 #experiment sessoin
 class Session(models.Model):
@@ -144,7 +145,7 @@ class Session(models.Model):
         if not self.started:
             return None
         
-        session_period = self.session_periods.filter(period_date=datetime.now(pytz.UTC))
+        session_period = self.session_periods.filter(period_date=todays_date())
 
         return session_period.first()
     
@@ -253,7 +254,7 @@ class Session(models.Model):
         if not session_period:
             return True
 
-        if datetime.now(pytz.UTC).date() < session_period.period_date:
+        if todays_date().date() < session_period.period_date:
             return True
         
         return False
@@ -268,7 +269,7 @@ class Session(models.Model):
         if not session_period:
             return False
 
-        if datetime.now(pytz.UTC).date() > session_period.period_date:
+        if todays_date().date() > session_period.period_date:
             return True
         
         return False
