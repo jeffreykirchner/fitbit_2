@@ -613,36 +613,3 @@ def take_download_parameters(data):
     session = Session.objects.get(id=session_id)
    
     return {"status" : "success", "parameter_set":session.parameter_set.json()}                      
-
-    '''
-    update parameterset avatar
-    '''   
-
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset avatar: {data}")
-
-    session_id = data["sessionID"]
-    parameterset_avatar_id = data["parameterset_avatar_id"]
-    form_data = data["formData"]
-
-    try:        
-        parameter_set_avatar = ParameterSetAvatar.objects.get(id=parameterset_avatar_id)
-    except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_good paramterset_avatar, not found ID: {parameterset_avatar_id}")
-        return
-    
-    form_data_dict = {}
-
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
-
-    form = ParameterSetAvatarForm(form_data_dict, instance=parameter_set_avatar)
-
-    if form.is_valid():
-        #print("valid form")             
-        form.save()              
-
-        return {"value" : "success", "result" : parameter_set_avatar.parameter_set.json()}                      
-                                
-    logger.info("Invalid parameterset avatar form")
-    return {"value" : "fail", "errors" : dict(form.errors.items())}

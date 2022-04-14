@@ -1,6 +1,6 @@
 checkIn(){
     app.working = true;
-    app.sendMessage("check_in", {});
+    app.sendMessage("check_in", {"software_version" : app.software_version});
 },
 
 takeCheckIn(messageData){

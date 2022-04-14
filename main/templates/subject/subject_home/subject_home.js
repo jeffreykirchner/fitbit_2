@@ -13,6 +13,7 @@ var app = Vue.createApp({
                     is_subject : true,
                     working : false,
                     first_load_done : false,                       //true after software is loaded for the first time
+                    software_version : "{{parameters.software_version}}",
                     playerKey : "{{session_player.player_key}}",
                     owner_color : 0xA9DFBF,
                     other_color : 0xD3D3D3,

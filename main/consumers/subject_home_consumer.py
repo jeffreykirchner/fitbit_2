@@ -1,6 +1,7 @@
 '''
 websocket session list
 '''
+from wsgiref.simple_server import software_version
 from asgiref.sync import sync_to_async
 
 import logging
@@ -29,6 +30,7 @@ from main.globals import round_half_away_from_zero
 from main.decorators import check_sesison_started_ws
 
 import main
+from main.models.parameters import Parameters
 
 class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     '''
@@ -584,16 +586,25 @@ def take_check_in(session_id, session_player_id, data):
     logger.info(f"Take check in: {session_id} {session_player_id} {data}")
 
     try:       
+        p = Parameters.objects.first()
 
         session = Session.objects.get(id=session_id)
         session_player = session.session_players.get(id=session_player_id)
         session_player_period = session_player.get_todays_session_player_period()
+
+        software_version = data["software_version"]
 
     except ObjectDoesNotExist:
         status = "fail"
         error_message = "Session not available."
         logger.warning(f"take_check_in : {session_player_id}") 
     
+    #software version
+    if status == "success":
+        if p.software_version != software_version:
+            status = "fail"
+            error_message = "Refresh your browser."
+
     #session started
     if status == "success":
         if not session.started:
