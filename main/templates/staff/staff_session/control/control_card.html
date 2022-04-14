@@ -38,20 +38,20 @@
         </div>
 
         <!-- next experiment phase -->
-        <div class="row mt-2" v-show="(session.started && session.current_experiment_phase!='Run') || (session.finished)">
+        <div class="row mt-2" v-show="(session.started && session.current_experiment_phase != 'Run') || (session.is_after_last_period)">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
                         v-on:click = "next_experiment_phase()"
                         title="Move to next phase"
-                        v-bind:disabled="reconnecting || working || session.current_experiment_phase=='Done'">
+                        v-bind:disabled="reconnecting || working || session.finished">
                     <span v-html="move_to_next_phase_text"></span>
                 </button>
             </div>
         </div>
 
         <!-- end early -->
-        <div class="row mt-2" v-show="session.started && !session.locked">
+        <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-danger"
@@ -81,7 +81,7 @@
         </div>
         
         <!-- send invitations -->
-        <div class="row mt-2" v-show="session.started && !session.locked">
+        <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"

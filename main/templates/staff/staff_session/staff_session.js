@@ -191,7 +191,7 @@ var app = Vue.createApp({
             {
                 this.move_to_next_phase_text = '** Experiment complete **';
             }
-            else if(this.session.finished && this.session.current_experiment_phase != "Done")
+            else if(this.session.is_after_last_period && !this.session.finished)
             {
                 this.move_to_next_phase_text = 'Complete Expermient <i class="fas fa-flag-checkered"></i>';
             }

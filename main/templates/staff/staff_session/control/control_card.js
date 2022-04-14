@@ -85,8 +85,16 @@ next_experiment_phase(){
 */
 takeNextPhase(messageData){
     
-    this.session.current_experiment_phase = messageData.status.current_experiment_phase;
-    this.updatePhaseButtonText();
+    if(messageData.status.value == "success")
+    {
+        this.session.current_experiment_phase = messageData.status.current_experiment_phase;
+        this.session.finished = messageData.status.finished;
+        this.updatePhaseButtonText();
+    }
+    else
+    {
+
+    }
 
 },
 
@@ -95,8 +103,16 @@ takeNextPhase(messageData){
 */
 takeUpdateNextPhase(messageData){
     
-    this.session.current_experiment_phase = messageData.status.current_experiment_phase;
-    this.updatePhaseButtonText();
+    if(messageData.status.value == "success")
+    {
+        this.session.current_experiment_phase = messageData.status.current_experiment_phase;
+        this.session.finished = messageData.status.finished;
+        this.updatePhaseButtonText();
+    }
+    else
+    {
+
+    }
 },
 
 

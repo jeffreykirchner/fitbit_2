@@ -26,6 +26,7 @@ from main.models import Session
 from main.models import Parameters
 
 from main.globals import send_mass_email_service
+from main.globals import ExperimentPhase
 
 class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     '''
@@ -162,7 +163,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
             await self.channel_layer.group_send(
                     self.room_group_name,
                     {"type": "update_next_phase",
-                    "data": message_data["status"],
+                     "data": message_data["status"],
                      "sender_channel_name": self.channel_name},
                 )
 
@@ -769,3 +770,31 @@ def take_fill_with_test_data(session_id, data):
     return {"value" : "success",
             "session_players" : [p.json() for p in session.session_players.all()]}
     
+def take_next_phase(session_id, data):
+    '''
+    move to next phase of the experiment
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_next_phase: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+        logger.info(f'take_next_phase phase: {session.current_experiment_phase}')
+    except ObjectDoesNotExist:
+        logger.warning(f"take_next_phase session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+    
+    if session.current_experiment_phase == ExperimentPhase.INSTRUCTIONS:
+        session.current_experiment_phase = ExperimentPhase.RUN
+    elif session.current_experiment_phase == ExperimentPhase.RUN:
+        session.current_experiment_phase = ExperimentPhase.DONE
+        session.finished = True
+    
+    session.save()
+
+    return {"value" : "success",
+            "current_experiment_phase" : session.current_experiment_phase,
+            "finished" : session.finished}
+
+

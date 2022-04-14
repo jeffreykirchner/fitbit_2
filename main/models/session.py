@@ -104,6 +104,8 @@ class Session(models.Model):
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
 
+        self.current_experiment_phase = ExperimentPhase.RUN
+
         self.save()
 
         for i in self.session_players.all():
@@ -242,6 +244,35 @@ class Session(models.Model):
         for p in self.session_players.all():
             p.fill_with_test_data(period.period_number)
 
+    def is_before_first_period(self):
+        '''
+        return true if today's date is before the first period
+        '''
+        session_period = self.session_periods.first()
+
+        if not session_period:
+            return True
+
+        if datetime.now(pytz.UTC).date() < session_period.period_date:
+            return True
+        
+        return False
+
+    def is_after_last_period(self):
+        '''
+        return true if today's date is after the last period
+        '''
+
+        session_period = self.session_periods.last()
+
+        if not session_period:
+            return False
+
+        if datetime.now(pytz.UTC).date() > session_period.period_date:
+            return True
+        
+        return False
+
     def json(self):
         '''
         return json object of model
@@ -275,6 +306,8 @@ class Session(models.Model):
             "chat_all" : chat,
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
+            "is_before_first_period" : self.is_before_first_period(),
+            "is_after_last_period" : self.is_after_last_period(),
         }
     
     def json_for_subject(self, session_player):
@@ -293,11 +326,12 @@ class Session(models.Model):
             "finished":self.finished,
 
             "parameter_set":self.parameter_set.json_for_subject(),
+            "is_before_first_period" : self.is_before_first_period(),
+            "is_after_last_period" : self.is_after_last_period(),
 
             "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number)]
         }
-    
-        
+          
 @receiver(post_delete, sender=Session)
 def post_delete_parameterset(sender, instance, *args, **kwargs):
     '''

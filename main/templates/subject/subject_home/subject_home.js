@@ -127,7 +127,6 @@ var app = Vue.createApp({
         */
         takeGetSession(messageData){
             
-
             app.session = messageData.status.session;
             app.session_player = messageData.status.session_player;
             app.show_fitbit_connect = messageData.status.show_fitbit_connect;

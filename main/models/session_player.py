@@ -234,11 +234,15 @@ class SessionPlayer(models.Model):
         '''
         pull needed metrics from yesterday and today
         '''
+        logger = logging.getLogger(__name__) 
 
         # last synced
         r = self.pull_fitbit_last_synced()
         if r["status"] == "fail" :
             return r
+        
+        if not self.fitbit_synced_today():
+            return {"status" : "fail", "message" : "Not synced today"}
 
         #todays heartrate time series
         todays_session_player_period = self.get_todays_session_player_period()
@@ -252,11 +256,14 @@ class SessionPlayer(models.Model):
         #yesterdays heart rate time series.
         yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
-        if yesterdays_session_player_period:
-            r = yesterdays_session_player_period.pull_fitbit_heart_time_series()
+        if yesterdays_session_player_period :
+            if not yesterdays_session_player_period.fitbit_heart_time_series:
+                r = yesterdays_session_player_period.pull_fitbit_heart_time_series()
 
-            if r["status"] == "fail":
-                return r            
+                if r["status"] == "fail":
+                    return r   
+            else:
+                logger.info("pull_todays_metrics: Yesterday's heart rate timeseries already pulled.")
                 
         yesterdays_session_player_period.pull_secondary_metrics()
 
