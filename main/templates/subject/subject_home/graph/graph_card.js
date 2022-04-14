@@ -593,21 +593,23 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Σ=$"+session_player_partner.current_block_earnings.individual, w - 5, 18);
+    ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.individual, w - 5, 18);
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
+    ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
 
     ctx.fillStyle = "green";
     ctx.textAlign = "right";
-    ctx.fillText("Σ=$"+app.session_player.current_block_earnings.group_bonus, w - 5, h-marginX+64);
+    ctx.fillText("Sum=$"+app.session_player.current_block_earnings.group_bonus, w - 5, h-marginX+64);
 },
 
 /**
  * re-draw graph
  */
 updateGraph(){
+    if(app.session.finished || app.session.is_after_last_period || app.session.is_before_first_period) return;
+
     app.drawSetup("graph_id");
 
     parameter_set_period = app.session.current_parameter_set_period;
