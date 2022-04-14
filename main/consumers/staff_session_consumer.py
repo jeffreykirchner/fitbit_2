@@ -619,6 +619,8 @@ def take_end_early(session_id):
             if p.graph_2_end_period_number > session_period.period_number:
                 p.graph_2_end_period_number = session_period.period_number
                 p.save()
+        
+        session.update_end_date()
 
 
     return {"value" : "success", "session" : session.json()}
@@ -786,10 +788,10 @@ def take_next_phase(session_id, data):
         return {"value":"fail", "result":"session not found"}
     
     if session.current_experiment_phase == ExperimentPhase.INSTRUCTIONS:
-        session.current_experiment_phase = ExperimentPhase.RUN
+       session.current_experiment_phase = ExperimentPhase.RUN
     elif session.current_experiment_phase == ExperimentPhase.RUN:
-        session.current_experiment_phase = ExperimentPhase.DONE
-        session.finished = True
+         session.current_experiment_phase = ExperimentPhase.DONE
+         session.finished = True
     
     session.save()
 

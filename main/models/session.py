@@ -290,6 +290,11 @@ class Session(models.Model):
 
         current_parameter_set_period = self.get_current_session_period()
 
+        is_last_period = False
+        if current_parameter_set_period:
+            if current_parameter_set_period == self.session_periods.last():
+                is_last_period = True
+
         return{
             "id":self.id,
             "title":self.title,
@@ -309,6 +314,7 @@ class Session(models.Model):
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
             "is_after_last_period" : self.is_after_last_period(),
+            "is_last_period": is_last_period, 
         }
     
     def json_for_subject(self, session_player):
@@ -318,6 +324,11 @@ class Session(models.Model):
         '''
 
         current_session_period = self.get_current_session_period()
+
+        is_last_period = False
+        if current_session_period:
+            if current_session_period == self.session_periods.last():
+                is_last_period = True
 
         return{
             "started":self.started,
@@ -329,8 +340,9 @@ class Session(models.Model):
             "parameter_set":self.parameter_set.json_for_subject(),
             "is_before_first_period" : self.is_before_first_period(),
             "is_after_last_period" : self.is_after_last_period(),
+            "is_last_period": is_last_period, 
 
-            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number)]
+            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number)],
         }
           
 @receiver(post_delete, sender=Session)

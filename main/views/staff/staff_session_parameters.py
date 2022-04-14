@@ -164,6 +164,7 @@ def upload_parameter_set(v, session):
     message = ps.from_dict(v)
 
     session.update_player_count()
+    session.update_end_date()
 
     return JsonResponse({"session" : session.json(),
                          "message" : message,
