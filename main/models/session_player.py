@@ -50,7 +50,7 @@ class SessionPlayer(models.Model):
     fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')      #time when the fitbit was last synced to user's phone
     fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                  #last fitbit device to sync
     
-    disabled =  models.BooleanField(default=False)                                                   #if true disable subject's screen
+    disabled =  models.BooleanField(default=False)                                                               #if true disable subject's screen
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -386,6 +386,8 @@ class SessionPlayer(models.Model):
 
             "player_number" : self.player_number,
             "player_key" : self.player_key,
+
+            "disabled" : self.disabled,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
             "connected_count" : self.connected_count,

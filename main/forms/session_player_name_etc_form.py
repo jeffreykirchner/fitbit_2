@@ -23,3 +23,7 @@ class StaffEditNameEtcForm(forms.Form):
     group_number = forms.IntegerField(label='Group Number',
                                       widget=forms.NumberInput(attrs={"v-model":"staffEditNameEtcForm.group_number",
                                                                       "step":"1",}))
+
+    disabled = forms.ChoiceField(label='Active',
+                                 choices=((1, 'No'), (0,'Yes')),
+                                 widget=forms.Select(attrs={"v-model" : "staffEditNameEtcForm.disabled"}))

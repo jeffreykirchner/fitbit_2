@@ -53,7 +53,7 @@
 </div>
 
 <!-- complete -->
-<div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period">
+<div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period || session_player.disabled">
     <div class="col-12 fs-4 fw-bold text-center">
         <br>
         <br>
@@ -64,14 +64,14 @@
 </div>
 
 <!-- graph -->
-<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period">
+<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
     <div class="col-md">
         {%include "subject/subject_home/graph/graph_card.html"%}                
     </div>
 </div>
 
 <!-- summary -->
-<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done">
+<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
 
     <div class="col-lg">
         {%include "subject/subject_home/summary/summary_card.html"%}     

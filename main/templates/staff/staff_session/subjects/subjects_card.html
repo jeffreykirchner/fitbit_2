@@ -51,7 +51,10 @@
                             </th>
                             <th scope="col" class = "text-center m-1 p-1">
                                 Color
-                            </th>                                                  
+                            </th>  
+                            <th scope="col" class = "text-center m-1 p-1">
+                                Active
+                            </th>                                                
                             <th scope="col" class = "text-center m-1 p-1">
                                 Shareable<br>Login Link
                             </th> 
@@ -85,7 +88,15 @@
                             </td>
                             <td class="player_table_cell text-nowrap" v-bind:style="{color:p.parameter_set_player.display_color}">
                                 [[p.parameter_set_player.display_color]]
-                            </td>                                                        
+                            </td>      
+                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                <span v-if="!p.disabled > 0" style="color: lightgreen;">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span v-else style="color: crimson;">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </td>                                                  
                             <td class="player_table_cell text-nowrap">
                                 <a v-bind:href="p.login_link">Login Link</a>
                             </td>

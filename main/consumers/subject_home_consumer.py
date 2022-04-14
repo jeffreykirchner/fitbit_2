@@ -594,21 +594,31 @@ def take_check_in(session_id, session_player_id, data):
         error_message = "Session not available."
         logger.warning(f"take_check_in : {session_player_id}") 
     
+    #session started
     if status == "success":
         if not session.started:
             status = "fail"
             error_message = "Session not started."
     
+    #session not finsihed
     if status == "success":
         if session.finished:
             status = "fail"
             error_message = "Session complete."
+    
+    #player disabled
+    if status == "success":
+        if session_player.disabled:
+            status = "fail"
+            error_message = "Session complete."
 
+    #wrist time
     if status == "success":
         if not session_player_period.wrist_time_met():
             status = "fail"
             error_message = "You did not wear your Fitbit long enough yesterday."
     
+    #fitbit sync
     if status == "success":
         if not session_player.fitbit_synced_today():
             status = "fail"
