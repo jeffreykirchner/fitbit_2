@@ -6,6 +6,9 @@ from django import forms
 
 from main.models import Session
 
+from django.contrib.admin.widgets import AdminDateWidget
+from django.forms import DateInput, SelectDateWidget
+
 class SessionForm(forms.ModelForm):
     '''
     session edit form
@@ -17,8 +20,8 @@ class SessionForm(forms.ModelForm):
     start_date = forms.DateField(label="Start Date",
                                  input_formats=['%m/%d/%Y'],
                                  error_messages={'invalid' : 'Format: M/D/YYYY'},
-                                 widget=forms.DateTimeInput(attrs={"v-model" : "session.start_date",
-                                                                   "v-bind:disabled" : "session.editable === false"}))
+                                 widget=AdminDateWidget(attrs={"v-model" : "session.start_date",
+                                                               "v-bind:disabled" : "session.editable === false"}))
 
     class Meta:
         model=Session
