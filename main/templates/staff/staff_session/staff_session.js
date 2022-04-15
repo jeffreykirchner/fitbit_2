@@ -136,6 +136,9 @@ var app = Vue.createApp({
                 case "fill_with_test_data":
                     app.takeFillWithTestData(messageData);
                     break;
+                case "get_pay_block":
+                    app.take_get_pay_block(messageData);
+                    break;
             }
 
             this.first_load_done = true;
@@ -279,6 +282,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session/subjects/subjects_card.js"%}
         {%include "staff/staff_session/summary/summary_card.js"%}
         {%include "staff/staff_session/data/data_card.js"%}
+        {%include "staff/staff_session/payments/payments_card.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages

@@ -293,6 +293,21 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def get_pay_block(self, event):
+        '''
+        return the specified pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_get_pay_block)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -804,5 +819,23 @@ def take_next_phase(session_id, data):
     return {"value" : "success",
             "current_experiment_phase" : session.current_experiment_phase,
             "finished" : session.finished}
+
+def take_get_pay_block(session_id, data):
+    '''
+    return the the specifed pay block
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_get_pay_block: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+        pay_block = data["pay_block"]
+    except ObjectDoesNotExist:
+        logger.warning(f"take_get_pay_block session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    return {"value" : "success",
+            "pay_block_csv" : session.get_pay_block_csv(pay_block),}
 
 

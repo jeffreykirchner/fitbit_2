@@ -49,6 +49,6 @@ class SessionPeriod(models.Model):
         return{
             "id" : self.id,
             "period_number" : self.period_number,
-            "period_date" : self.period_date,
+            "period_date" : self.period_date.strftime("%#m/%#d/%Y"),
         }
         

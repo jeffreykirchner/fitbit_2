@@ -178,15 +178,6 @@ class SessionPlayer(models.Model):
             total += p.earnings_group
 
         return total
-    
-    def get_pay_block_range(self, pay_block):
-        '''
-        return the day range of the pay_block
-        '''
-
-        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block)
-
-        return {"start_day" : pay_group_player_periods.first().session_period.period_number, "end_day" : pay_group_player_periods.last().session_period.period_number}
 
     def get_current_block_earnings(self):
         '''
@@ -198,18 +189,29 @@ class SessionPlayer(models.Model):
         earnings = {"individual":"0", 
                     "group_bonus":"0", 
                     "total":"0",
-                    "range": {"start_day":"---", "end_day":"---"}}
+                    "range": {"start_day":{}, "end_day":{}}}
 
         if not current_session_period:
             return earnings
 
         pay_block = current_session_period.parameter_set_period.pay_block
-        
+
+        earnings = self.get_block_earnings(pay_block)
+        earnings["range"] = self.session.get_pay_block_range(pay_block)
+
+        return earnings
+    
+    def get_block_earnings(self, pay_block):
+        '''
+        return dict of earnings for pay_block
+        '''
+
+        earnings = {}
+
         earnings["individual"] = round(self.get_pay_block_individual_earnings(pay_block))
         earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block))
         earnings["total"] = round(earnings["individual"] + earnings["group_bonus"])
-        earnings["range"] = self.get_pay_block_range(pay_block)
-
+        
         return earnings
     
     def get_todays_session_player_period(self):

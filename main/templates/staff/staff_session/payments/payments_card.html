@@ -26,20 +26,26 @@
                                 Range
                             </th>
                             <th scope="col" class = "m-1 p-1">
-                                Download
+                                Copy to Clipboard
                             </th>                                                        
                         </tr>
                     </thead>
                     <tbody id="player_list">
-                        <tr v-for="(r, index) in session.pay_blocks" v-bind:key="r.id">
+                        <tr v-for="(r, index) in session.pay_blocks" v-bind:key="r.block_number">
                             <td class="player_table_cell text-nowrap">
-                                
+                                [[r.block_number]]
                             </td>
                             <td class="player_table_cell text-nowrap">
-                                
+                                [[r.range.start_day.period_date]] to [[r.range.end_day.period_date]]
                             </td>     
                             <td class="player_table_cell text-nowrap">
-                                
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        v-on:click = "get_pay_block(r.block_number)"
+                                        title="Copy earnings to clipboard"
+                                        v-bind:disabled="reconnecting || working || !session.started">
+                                    <i class="far fa-copy"></i>
+                                </button>
                             </td>                                                 
                         </tr>
                     </tbody>
