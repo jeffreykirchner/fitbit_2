@@ -9,6 +9,7 @@ import logging
 
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import transaction
 
 from main.models import SessionPlayer
 from main.models import SessionPeriod
@@ -325,10 +326,11 @@ class SessionPlayerPeriod(models.Model):
         check subject in for this period
         '''
 
-        self.check_in = True
-        self.save()
+        with transaction.atomic():
+            self.check_in = True
+            self.save()
 
-        self.calc_and_store_payment()
+            self.calc_and_store_payment()
 
     def write_summary_download_csv(self, writer):
         '''
