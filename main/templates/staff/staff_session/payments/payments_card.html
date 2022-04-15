@@ -1,0 +1,53 @@
+<div class="card" v-show="first_load_done">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+            Payments
+        </span>       
+
+        <span class="float-end">            
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Subject List')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>          
+    </div>
+    <div class="card-body" >        
+
+        <!-- player status -->
+        <div class="row justify-content-center">           
+            <div class="col-md-auto text-center">                
+                <div class="table-responsive">
+                <table class="table table-condensed"> 
+                    <thead>
+                        <tr>
+                            <th scope="col" class = "m-1 p-1">
+                                #
+                            </th>
+                            <th scope="col" class = "m-1 p-1">
+                                Range
+                            </th>
+                            <th scope="col" class = "m-1 p-1">
+                                Download
+                            </th>                                                        
+                        </tr>
+                    </thead>
+                    <tbody id="player_list">
+                        <tr v-for="(r, index) in session.pay_blocks" v-bind:key="r.id">
+                            <td class="player_table_cell text-nowrap">
+                                
+                            </td>
+                            <td class="player_table_cell text-nowrap">
+                                
+                            </td>     
+                            <td class="player_table_cell text-nowrap">
+                                
+                            </td>                                                 
+                        </tr>
+                    </tbody>
+                    
+                </table>
+                </div>
+            </div>
+        </div>          
+       
+    </div>                    
+</div> 
