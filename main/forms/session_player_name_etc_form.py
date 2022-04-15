@@ -23,6 +23,10 @@ class StaffEditNameEtcForm(forms.Form):
     group_number = forms.IntegerField(label='Group Number',
                                       widget=forms.NumberInput(attrs={"v-model":"staffEditNameEtcForm.group_number",
                                                                       "step":"1",}))
+    
+    fitbit_user_id = forms.CharField(label='Fitbit User ID',
+                                     required=False,
+                                     widget=forms.TextInput(attrs={"v-model":"staffEditNameEtcForm.fitbit_user_id",}))
 
     disabled = forms.ChoiceField(label='Active',
                                  choices=((1, 'No'), (0,'Yes')),

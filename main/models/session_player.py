@@ -419,6 +419,7 @@ class SessionPlayer(models.Model):
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_today" : self.fitbit_synced_today(),
+            "fitbit_user_id" : self.fitbit_user_id,
 
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
 

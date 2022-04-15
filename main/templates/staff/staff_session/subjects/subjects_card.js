@@ -218,6 +218,7 @@ takeUpdateSubject(messageData){
         session_player.email = messageData.status.session_player.email;
         session_player.group_number = messageData.status.session_player.group_number;
         session_player.disabled = messageData.status.session_player.disabled;
+        session_player.fitbit_user_id = messageData.status.session_player.fitbit_user_id;
     } 
     else
     {
@@ -241,6 +242,7 @@ showEditSubject:function(id){
     this.staffEditNameEtcForm.email = session_player.email;
     this.staffEditNameEtcForm.group_number = session_player.group_number;
     this.staffEditNameEtcForm.disabled = session_player.disabled ? 1 : 0;
+    this.staffEditNameEtcForm.fitbit_user_id = session_player.fitbit_user_id;
     
     var myModal = new bootstrap.Modal(document.getElementById('editSubjectModal'), {
         keyboard: false

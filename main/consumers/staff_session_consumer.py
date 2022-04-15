@@ -673,6 +673,7 @@ def take_update_subject(session_id, data):
         session_player.email = form.cleaned_data["email"]
         session_player.group_number = form.cleaned_data["group_number"]
         session_player.disabled = True if form.cleaned_data["disabled"] == "1" else False
+        session_player.fitbit_user_id =  form.cleaned_data["fitbit_user_id"]
         
         try:
             session_player.save()              
