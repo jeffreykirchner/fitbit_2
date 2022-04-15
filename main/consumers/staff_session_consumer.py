@@ -483,13 +483,18 @@ def take_update_session_form(session_id, data):
 
     for field in form_data:            
         form_data_dict[field["name"]] = field["value"]
+    
+    if session.started:
+        form_data_dict["start_date"] = session.get_start_date_string_widget()
 
     form = SessionForm(form_data_dict, instance=session)
 
     if form.is_valid():
         #print("valid form")                
-        form.save()              
-        session.update_end_date()
+        form.save()          
+
+        if not session.started:    
+            session.update_end_date()
 
         return {"status":"success", "session" : session.json()}                      
                                 

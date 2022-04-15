@@ -21,7 +21,7 @@ class SessionForm(forms.ModelForm):
                                  error_messages={'invalid' : 'Format: M/D/YYYY'},
                                  widget=DateInput(attrs={"v-model" : "session.start_date_widget",
                                                          "type": "date",
-                                                         "v-bind:disabled" : "session.editable === false"}))
+                                                         "v-bind:disabled" : "session.started"}))
 
     class Meta:
         model=Session
