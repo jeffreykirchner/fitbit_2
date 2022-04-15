@@ -321,8 +321,9 @@ def take_get_session_subject(session_player_id, data):
         if session_player.fitbit_user_id == "":
             show_fitbit_connect = True
 
-        # if not first_load_done:
+        # if not first_load_done:        
         value = session_player.pull_todays_metrics()
+        session_player.pull_missing_metrics()
     
         if  value["message"] == "re-connect required" or \
             value["message"] == "No fitbit user id":

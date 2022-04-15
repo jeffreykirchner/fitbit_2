@@ -3,6 +3,7 @@ session player model
 '''
 
 #import logging
+from unittest import result
 import uuid
 import logging
 import pytz
@@ -355,7 +356,35 @@ class SessionPlayer(models.Model):
             return True
         else:
             return False
+
+    def pull_missing_metrics(self):
+        '''
+        pull metrics subject missed
+        '''
+        logger = logging.getLogger(__name__)       
+
+        if not self.fitbit_synced_today():
+            logger.info(f"pull_missing_metrics: Error not synced today, player {self.id}")
+            return
         
+        missing_player_periods = self.session_player_periods_b.filter(fitbit_heart_time_series__isnull=True)
+
+        if not missing_player_periods:
+            logger.info(f"pull_missing_metrics: No missing periods, player {self.id}")
+            return
+        
+        start_date = missing_player_periods.first().session_period.period_date
+        end_date = missing_player_periods.last().session_period.period_date
+
+        data = {}
+
+        data["heart_rate_missing"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{start_date}/{end_date}.json'
+
+        result = get_fitbit_metrics(self.fitbit_user_id, data) 
+
+
+
+
     def json(self, get_chat=True):
         '''
         json object of model
