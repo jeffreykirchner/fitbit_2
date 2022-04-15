@@ -81,6 +81,12 @@ class Session(models.Model):
         '''
         return  self.start_date.strftime("%#m/%#d/%Y")
     
+    def get_start_date_string_widget(self):
+        '''
+        get a formatted string of start date
+        '''
+        return  self.start_date.strftime("%Y-%#m-%#d")
+    
     def get_end_date_string(self):
         '''
         get a formatted string of end date
@@ -300,6 +306,7 @@ class Session(models.Model):
             "title":self.title,
             "locked":self.locked,
             "start_date":self.get_start_date_string(),
+            "start_date_widget":self.get_start_date_string_widget(),
             "end_date":self.get_end_date_string(),
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,

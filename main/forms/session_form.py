@@ -18,10 +18,10 @@ class SessionForm(forms.ModelForm):
                                                            "v-on:keyup.enter":"sendUpdateSession()"}))
 
     start_date = forms.DateField(label="Start Date",
-                                 input_formats=['%m/%d/%Y'],
                                  error_messages={'invalid' : 'Format: M/D/YYYY'},
-                                 widget=AdminDateWidget(attrs={"v-model" : "session.start_date",
-                                                               "v-bind:disabled" : "session.editable === false"}))
+                                 widget=DateInput(attrs={"v-model" : "session.start_date_widget",
+                                                         "type": "date",
+                                                         "v-bind:disabled" : "session.editable === false"}))
 
     class Meta:
         model=Session
