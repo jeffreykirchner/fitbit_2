@@ -289,8 +289,13 @@ class Session(models.Model):
 
         session_periods = self.session_periods.filter(parameter_set_period__pay_block=pay_block)
 
-        return {"start_day" : session_periods.first().json(),
-                "end_day" : session_periods.last().json()}
+        if session_periods:
+            return {"start_day" : session_periods.first().json(),
+                    "end_day" : session_periods.last().json()}
+        else:
+            return {"start_day" : {},
+                    "end_day" : {}}
+
 
     def get_pay_block(self, pay_block_number):
         '''

@@ -30,7 +30,7 @@
                         class="btn btn-outline-primary"
                         title="Update player settings."
                         v-on:click = "sendUpdateParametersetPlayer()"
-                        v-bind:disabled="reconnecting || working">
+                        v-bind:disabled="reconnecting || working || session.started">
                     Update <i class="fas fa-sign-in-alt"></i>
                 </button>
             </div>

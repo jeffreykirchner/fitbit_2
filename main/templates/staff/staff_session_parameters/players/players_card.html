@@ -62,7 +62,7 @@
                                 class="btn btn-outline-danger"
                                 title="Remove player from parameter set."
                                 v-on:click = "sendRemoveParameterSetPlayer()"
-                                v-bind:disabled="reconnecting || working ||  session.parameter_set.parameter_set_players.length <= 1">
+                                v-bind:disabled="reconnecting || working ||  session.parameter_set.parameter_set_players.length <= 1 || session.started">
                             Delete <i class="fas fa-minus"></i> 
                         </button>
                     </div>

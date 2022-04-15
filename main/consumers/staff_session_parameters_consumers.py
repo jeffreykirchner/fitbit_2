@@ -285,7 +285,7 @@ def take_update_parameterset(data):
     except ObjectDoesNotExist:
         logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
         return
-    
+            
     form_data_dict = {}
 
     for field in form_data:            

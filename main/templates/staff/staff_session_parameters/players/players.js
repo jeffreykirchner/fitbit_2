@@ -33,6 +33,8 @@ hideEditParametersetPlayer:function(){
 /** update parameterset type settings
 */
 sendUpdateParametersetPlayer(){
+
+    if(app.session.started) return;
     
     app.working = true;
     app.sendMessage("update_parameterset_player", {"sessionID" : app.sessionID,
