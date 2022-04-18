@@ -382,9 +382,19 @@ class SessionPlayer(models.Model):
 
         result = get_fitbit_metrics(self.fitbit_user_id, data) 
 
+        result = result.get("heart_rate_missing", False)
 
+        if result:
+            result = result.get("result", False)
+        else:
+            logger.error(f"pull_missing_metrics result error: {result}")
 
-
+        if result:
+            for r in result["activities-heart"]:
+                session_player_period = self.session_player_periods_b.filter(session_period__period_date=r["dateTime"]).first()
+                session_player_period.take_heart_rate_from_date_range(r)
+        else:
+            logger.error(f"pull_missing_metrics result error: {result}")    
     def json(self, get_chat=True):
         '''
         json object of model

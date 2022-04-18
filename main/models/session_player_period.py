@@ -260,6 +260,38 @@ class SessionPlayerPeriod(models.Model):
         return {"status" : result['fitbit_heart_time_series']['status'], 
                 "message" : result['fitbit_heart_time_series']['message']}
 
+    def take_heart_rate_from_date_range(self, heart_rate_dict):
+        '''
+        take and store heart rate from date range dict.
+        '''
+
+        self.fitbit_heart_time_series = heart_rate_dict
+
+        heart_rate_zones = self.fitbit_heart_time_series["value"]["heartRateZones"]
+                
+        for i in heart_rate_zones:
+            
+            minutes = i.get("minutes", 0)
+            name =  i.get("name", "not found")
+
+            #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
+
+            if name == 'Out of Range':
+                self.fitbit_minutes_heart_out_of_range = minutes
+            elif name == 'Fat Burn':
+                self.fitbit_minutes_heart_fat_burn = minutes
+                self.fitbit_min_heart_rate_zone_bpm =  i.get("min", 0)
+            elif name == 'Cardio':
+                self.fitbit_minutes_heart_cardio = minutes
+            elif name == 'Peak':
+                self.fitbit_minutes_heart_peak = minutes
+
+        self.save()
+
+
+        
+
+
     def pull_secondary_metrics(self):
         '''
         pull extra metrics
