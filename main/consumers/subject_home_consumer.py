@@ -322,13 +322,14 @@ def take_get_session_subject(session_player_id, data):
             show_fitbit_connect = True
 
         # if not first_load_done:        
-        value = session_player.pull_todays_metrics()
-        session_player.pull_missing_metrics()
+        # value = session_player.pull_todays_metrics()
+        # session_player.pull_missing_metrics()
     
-        if  value["message"] == "re-connect required" or \
-            value["message"] == "No fitbit user id":
+        # if  value["message"] == "re-connect required" or \
+        #     value["message"] == "user not found" or \
+        #     value["message"] == "no fitbit user id":
 
-            show_fitbit_connect = True
+        #     show_fitbit_connect = True
 
         return {"session" : session_player.session.json_for_subject(session_player), 
                 "show_fitbit_connect" : show_fitbit_connect,
@@ -594,6 +595,8 @@ def take_check_in(session_id, session_player_id, data):
         session_player_period = session_player.get_todays_session_player_period()
 
         software_version = data["software_version"]
+
+        value = session_player.pull_todays_metrics()
 
     except ObjectDoesNotExist:
         status = "fail"

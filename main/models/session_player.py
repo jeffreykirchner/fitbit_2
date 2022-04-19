@@ -258,21 +258,22 @@ class SessionPlayer(models.Model):
 
         
         r = get_fitbit_metrics(self.fitbit_user_id, data)
-               
-        if r["devices"]["status"] == "fail" :
+
+        if r["status"] == "fail" :
             return r
         else:
+            r = r["result"]
             self.process_fitbit_last_synced(r["devices"]["result"])
         
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
 
-        if todays_session_player_period and r['fitbit_heart_time_series_td']["status"] != "fail":              
-            todays_session_player_period.process_fitbit_heart_time_series(r['fitbit_heart_time_series_td']['result'])
+        if todays_session_player_period and r["fitbit_heart_time_series_td"]["status"] != "fail":              
+            todays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_td"]["result"])
         
-        if yesterdays_session_player_period and r['fitbit_heart_time_series_yd']["status"] != "fail":              
-            yesterdays_session_player_period.process_fitbit_heart_time_series(r['fitbit_heart_time_series_yd']['result'])
+        if yesterdays_session_player_period and r["fitbit_heart_time_series_yd"]["status"] != "fail":              
+            yesterdays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_yd"]["result"])
             yesterdays_session_player_period.pull_secondary_metrics()
 
         return {"status" : "success", "message" : ""}
@@ -285,9 +286,9 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
 
         data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
-        result = get_fitbit_metrics(self.fitbit_user_id, data["devices"])
+        r = get_fitbit_metrics(self.fitbit_user_id, data)
 
-        return self.process_fitbit_last_synced(result)
+        return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
 
     def process_fitbit_last_synced(self, r):
         '''

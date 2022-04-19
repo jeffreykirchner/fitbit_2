@@ -207,7 +207,7 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         if self.session_player.fitbit_user_id == "":
-            return {"status" : "fail", "message" : "No fitbit user id"}
+            return {"status" : "fail", "message" : "no fitbit user id"}
 
         temp_s = self.session_period.get_fitbit_formatted_date()
         #temp_s = "today"
@@ -305,7 +305,7 @@ class SessionPlayerPeriod(models.Model):
         logger = logging.getLogger(__name__)
 
         if self.session_player.fitbit_user_id == "":
-            return {"status" : "fail", "message" : "No fitbit user id"}
+            return {"status" : "fail", "message" : "no fitbit user id"}
         
         if self.fitbit_profile:
             logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
@@ -315,7 +315,7 @@ class SessionPlayerPeriod(models.Model):
 
         data = {}
 
-        if settings.DEBUG:
+        if not settings.DEBUG:
             data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
             data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
 
@@ -330,14 +330,16 @@ class SessionPlayerPeriod(models.Model):
 
         result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
-        try:
-            self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
-            self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
+        try:           
 
-            self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
-            self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
-            self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
-            self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
+            if not settings.DEBUG:
+                self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
+                self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
+
+                self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
+                self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
+                self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
+                self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
 
             self.fitbit_profile = result["fitbit_profile"]["result"]
 
