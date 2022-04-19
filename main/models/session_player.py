@@ -3,13 +3,12 @@ session player model
 '''
 
 #import logging
-from unittest import result
+from decimal import Decimal
+from datetime import datetime, timedelta
+
 import uuid
 import logging
 import pytz
-
-from decimal import Decimal
-from datetime import datetime
 
 from django.db import models
 from django.urls import reverse
@@ -243,20 +242,13 @@ class SessionPlayer(models.Model):
         #last synced
         data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
 
-        todays_session_player_period = self.get_todays_session_player_period()
-        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
+        todays_session_player_period = self.get_todays_session_player_period()        
 
         #todays heart rate
         if todays_session_player_period:
             temp_s = todays_session_player_period.session_period.get_fitbit_formatted_date()
             data['fitbit_heart_time_series_td'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
-        
-        #yesterdays heart rate
-        if yesterdays_session_player_period:
-            temp_s = yesterdays_session_player_period.session_period.get_fitbit_formatted_date()
-            data['fitbit_heart_time_series_yd'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
-
-        
+               
         r = get_fitbit_metrics(self.fitbit_user_id, data)
 
         if r["status"] == "fail" :
@@ -271,10 +263,6 @@ class SessionPlayer(models.Model):
 
         if todays_session_player_period and r["fitbit_heart_time_series_td"]["status"] != "fail":              
             todays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_td"]["result"])
-        
-        if yesterdays_session_player_period and r["fitbit_heart_time_series_yd"]["status"] != "fail":              
-            yesterdays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_yd"]["result"])
-            yesterdays_session_player_period.pull_secondary_metrics()
 
         return {"status" : "success", "message" : ""}
     
@@ -345,19 +333,25 @@ class SessionPlayer(models.Model):
         if not self.fitbit_last_synced:
             return "---"
 
-        return  self.fitbit_last_synced.strftime("%#m/%#d/%Y %#I:%M %p")
+        prm = main.models.Parameters.objects.first()
+        tmz = pytz.timezone(prm.experiment_time_zone) 
+
+        return  self.fitbit_last_synced.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p")
     
     def fitbit_synced_today(self):
         '''
-            true if the subject has synced their fitbit today
+        true if the subject has synced their fitbit today
         '''
         logger = logging.getLogger(__name__) 
         d_today = todays_date().date()
 
         if not self.fitbit_last_synced:
             return False
+        
+        prm = main.models.Parameters.objects.first()
+        tmz = pytz.timezone(prm.experiment_time_zone)
 
-        d_fitbit=self.fitbit_last_synced.date()
+        d_fitbit=self.fitbit_last_synced.astimezone(tmz).date()
 
         #logger.info(f'fitbitSyncedToday {self} Today:{d_today} Last Synced:{d_fitbit}')
 
@@ -365,6 +359,22 @@ class SessionPlayer(models.Model):
             return True
         else:
             return False
+    
+    def fitbit_synced_last_30_min(self):
+        '''
+        true if the subject has synced their fitbit in the last 30 minutes
+        '''
+        logger = logging.getLogger(__name__)        
+
+        if not self.fitbit_last_synced:
+            return False
+        
+        prm = main.models.Parameters.objects.first()
+
+        if datetime.now(pytz.UTC) - self.fitbit_last_synced <= timedelta(minutes=30):
+            return True
+
+        return False
 
     def pull_missing_metrics(self):
         '''
@@ -451,7 +461,7 @@ class SessionPlayer(models.Model):
             "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
-            "fitbit_synced_today" : self.fitbit_synced_today(),
+            "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
             "fitbit_user_id" : self.fitbit_user_id,
 
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
@@ -494,7 +504,7 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
-            "fitbit_synced_today" : self.fitbit_synced_today(),
+            "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
         }
 

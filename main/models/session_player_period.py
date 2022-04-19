@@ -98,12 +98,7 @@ class SessionPlayerPeriod(models.Model):
         return true if subject has required wrist yesterday for todays payment
         '''
 
-        previous_player_period = self.get_pervious_player_period()
-
-        if not previous_player_period:
-            return True
-
-        if previous_player_period.fitbit_on_wrist_minutes >= self.session_period.parameter_set_period.minimum_wrist_minutes:
+        if self.fitbit_on_wrist_minutes >= self.session_period.parameter_set_period.minimum_wrist_minutes:
             return True
         
         return False

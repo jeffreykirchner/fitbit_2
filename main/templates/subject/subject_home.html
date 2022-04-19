@@ -73,11 +73,7 @@
 <!-- summary -->
 <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
 
-    <div class="col-lg">
-        {%include "subject/subject_home/summary/summary_card.html"%}     
-    </div>
-
-    <div class="col-lg mt-4 mt-lg-0">
+    <div class="col-lg-8 mt-4 mt-lg-0">
         {%include "subject/subject_home/checkin/checkin_card.html"%}     
     </div>
 </div>

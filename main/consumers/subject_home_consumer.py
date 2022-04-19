@@ -321,15 +321,15 @@ def take_get_session_subject(session_player_id, data):
         if session_player.fitbit_user_id == "":
             show_fitbit_connect = True
 
-        # if not first_load_done:        
-        # value = session_player.pull_todays_metrics()
+        if not first_load_done:        
+            value = session_player.pull_todays_metrics()
         # session_player.pull_missing_metrics()
     
-        # if  value["message"] == "re-connect required" or \
-        #     value["message"] == "user not found" or \
-        #     value["message"] == "no fitbit user id":
+            if  value["message"] == "re-connect required" or \
+                value["message"] == "user not found" or \
+                value["message"] == "no fitbit user id":
 
-        #     show_fitbit_connect = True
+                show_fitbit_connect = True
 
         return {"session" : session_player.session.json_for_subject(session_player), 
                 "show_fitbit_connect" : show_fitbit_connect,
@@ -596,7 +596,7 @@ def take_check_in(session_id, session_player_id, data):
 
         software_version = data["software_version"]
 
-        value = session_player.pull_todays_metrics()
+        # value = session_player.pull_todays_metrics()
 
     except ObjectDoesNotExist:
         status = "fail"
@@ -631,11 +631,11 @@ def take_check_in(session_id, session_player_id, data):
     if status == "success":
         if not session_player_period.wrist_time_met():
             status = "fail"
-            error_message = "You did not wear your Fitbit long enough yesterday."
+            error_message = "You did not worn your Fitbit long enough today."
     
     #fitbit sync
     if status == "success":
-        if not session_player.fitbit_synced_today():
+        if not session_player.fitbit_synced_last_30_min():
             status = "fail"
             error_message = "Sync your Fitbit to your phone."
 

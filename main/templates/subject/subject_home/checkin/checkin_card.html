@@ -1,21 +1,21 @@
 
 <div class="card">                  
     <div class="card-header fw-bold">                
-        <span class="align-middle">Check In</span>            
+        <span class="align-middle">Check In For Day [[session.current_period]]</span>            
 
     </div>
-    <div class="card-body">      
+    <div class="card-body">     
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
-                Yesterday's wrist time:
+                Today's wrist time:
             </div>
-            <div class="col text-start ps-1" v-bind:style="session_player.wrist_time_met_for_checkin ? [{}] : [{'color':'red'}]">
-                [[session_player.yesterdays_wrist_minutes]]
+            <div class="col text-start ps-1" v-bind:style="session_player.wrist_time_met_for_checkin? [] : [{color:'red'}]">
+               [[session_player.todays_wrist_minutes]]
             </div>
-        </div>  
+        </div>
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
-                Yesterday's wrist minutes required to check-in today:
+                Daily wrist minutes required to check-in:
             </div>
             <div class="col text-start ps-1">
                 <span v-if="session.current_parameter_set_period">
@@ -25,13 +25,21 @@
                     ---
                 </span>
             </div>
+        </div>        
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
+                Last Fitbit to phone sync:
+            </div>
+            <div class="col text-start ps-1" v-bind:style="session_player.fitbit_synced_last_30_min ? [] : [{color:'red'}]">
+                [[session_player.fitbit_last_synced]]
+            </div>
         </div>
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
-                Your zone minutes yesterday:
+                Today's zone minutes:
             </div>
             <div class="col text-start ps-1">
-                [[session_player.yesterdays_zone_minutes]]
+                [[session_player.todays_zone_minutes]]
             </div>
         </div>
         <div class="row">
@@ -71,23 +79,26 @@
                 <a href="{{fitbit_registration_link}}">Connect</a>
             </div>
         </div>        
-        <div class="row text-end" v-else>
-            <span v-if="session_player.checked_in_today" style="color:green;font-weight:bold;">
-                You are checked in for today <i class="fas fa-check"></i>
-            </span>
-            <span v-else>
-                <div class="col mt-2">
-                    <span style="color:red" class="me-2">
-                        [[check_in_error_message]]
+        <div class="row text-end" v-else>            
+
+            <div class="col mt-2">
+                <span style="color:red" class="me-2">
+                    [[check_in_error_message]]
+                </span>
+                <button class="btn btn-outline-primary" 
+                        type="button" 
+                        v-on:click = "checkIn()" 
+                        v-bind:disabled="reconnecting || working"> 
+                    
+                    <span v-if="session_player.checked_in_today">
+                        Check In Again <i class="fas fa-check"></i>
                     </span>
-                    <button class="btn btn-outline-primary" 
-                            type="button" 
-                            v-on:click = "checkIn()" 
-                            v-bind:disabled="reconnecting || working"> 
-                        Check In <i class="fas fa-check"></i>
-                    </button>
-                </div>
-            </span>                        
+                    <span>
+                        Check In Again <i class="fas fa-check"></i>
+                    </span>
+                    
+                </button>
+            </div>                        
         </div>
         
     </div>                    
