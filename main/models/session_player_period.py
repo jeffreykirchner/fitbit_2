@@ -10,6 +10,7 @@ import logging
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
+from django.conf import settings
 
 from main.models import SessionPlayer
 from main.models import SessionPeriod
@@ -83,7 +84,8 @@ class SessionPlayerPeriod(models.Model):
         self.zone_minutes = random.randrange(0, 90)
 
         self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
-        
+        self.fitbit_heart_time_series = {"message":"filled with test data"}
+
         if random.randrange(1,10) == 1 or not self.wrist_time_met():
             self.check_in = False
         else:
@@ -215,7 +217,7 @@ class SessionPlayerPeriod(models.Model):
         data = {'fitbit_heart_time_series' : f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'}
 
         result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
-
+        
         if  result['fitbit_heart_time_series']['status'] == 'success':
             self.fitbit_heart_time_series = result['fitbit_heart_time_series']['result']                 
 
@@ -288,10 +290,6 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
 
-
-        
-
-
     def pull_secondary_metrics(self):
         '''
         pull extra metrics
@@ -310,13 +308,14 @@ class SessionPlayerPeriod(models.Model):
 
         data = {}
 
-        data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
-        data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
+        if settings.DEBUG:
+            data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
+            data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
 
-        data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
-        data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
-        data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
-        data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
+            data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
+            data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
+            data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
+            data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
 
         data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
         data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'

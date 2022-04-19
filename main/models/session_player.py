@@ -366,35 +366,20 @@ class SessionPlayer(models.Model):
         if not self.fitbit_synced_today():
             logger.info(f"pull_missing_metrics: Error not synced today, player {self.id}")
             return
-        
-        missing_player_periods = self.session_player_periods_b.filter(fitbit_heart_time_series__isnull=True)
 
-        if not missing_player_periods:
+        today = todays_date().date()
+        
+        missing_player_period = self.session_player_periods_b.filter(fitbit_heart_time_series__isnull=True) \
+                                                             .filter(session_period__period_date__lt=today) \
+                                                             .last()
+
+        if not missing_player_period:
             logger.info(f"pull_missing_metrics: No missing periods, player {self.id}")
             return
         
-        start_date = missing_player_periods.first().session_period.period_date
-        end_date = missing_player_periods.last().session_period.period_date
+        missing_player_period.pull_fitbit_heart_time_series()
+        missing_player_period.pull_secondary_metrics()
 
-        data = {}
-
-        data["heart_rate_missing"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{start_date}/{end_date}.json'
-
-        result = get_fitbit_metrics(self.fitbit_user_id, data) 
-
-        result = result.get("heart_rate_missing", False)
-
-        if result:
-            result = result.get("result", False)
-        else:
-            logger.error(f"pull_missing_metrics result error: {result}")
-
-        if result:
-            for r in result["activities-heart"]:
-                session_player_period = self.session_player_periods_b.filter(session_period__period_date=r["dateTime"]).first()
-                session_player_period.take_heart_rate_from_date_range(r)
-        else:
-            logger.error(f"pull_missing_metrics result error: {result}")    
     def json(self, get_chat=True):
         '''
         json object of model
