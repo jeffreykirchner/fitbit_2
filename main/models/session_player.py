@@ -238,37 +238,42 @@ class SessionPlayer(models.Model):
         pull needed metrics from yesterday and today
         '''
         logger = logging.getLogger(__name__) 
+        data = {}
 
-        # last synced
-        r = self.pull_fitbit_last_synced()
-        if r["status"] == "fail" :
-            return r
+        #last synced
+        data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+
+        todays_session_player_period = self.get_todays_session_player_period()
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
+
+        #todays heart rate
+        if todays_session_player_period:
+            temp_s = todays_session_player_period.session_period.get_fitbit_formatted_date()
+            data['fitbit_heart_time_series_td'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
         
+        #yesterdays heart rate
+        if yesterdays_session_player_period:
+            temp_s = yesterdays_session_player_period.session_period.get_fitbit_formatted_date()
+            data['fitbit_heart_time_series_yd'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
+
+        
+        r = get_fitbit_metrics(self.fitbit_user_id, data)
+               
+        if r["devices"]["status"] == "fail" :
+            return r
+        else:
+            self.process_fitbit_last_synced(r["devices"]["result"])
+        
+        #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
 
-        #todays heartrate time series
-        todays_session_player_period = self.get_todays_session_player_period()
-
-        if todays_session_player_period:
-            r = todays_session_player_period.pull_fitbit_heart_time_series()
-
-            if r["status"] == "fail":
-                return r
+        if todays_session_player_period and r['fitbit_heart_time_series_td']["status"] != "fail":              
+            todays_session_player_period.process_fitbit_heart_time_series(r['fitbit_heart_time_series_td']['result'])
         
-        #yesterdays heart rate time series.
-        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
-
-        if yesterdays_session_player_period :
-            if not yesterdays_session_player_period.fitbit_heart_time_series:
-                r = yesterdays_session_player_period.pull_fitbit_heart_time_series()
-
-                if r["status"] == "fail":
-                    return r   
-            else:
-                logger.info("pull_todays_metrics: Yesterday's heart rate timeseries already pulled.")
-                
-        yesterdays_session_player_period.pull_secondary_metrics()
+        if yesterdays_session_player_period and r['fitbit_heart_time_series_yd']["status"] != "fail":              
+            yesterdays_session_player_period.process_fitbit_heart_time_series(r['fitbit_heart_time_series_yd']['result'])
+            yesterdays_session_player_period.pull_secondary_metrics()
 
         return {"status" : "success", "message" : ""}
     
@@ -280,15 +285,18 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
 
         data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
-        result = get_fitbit_metrics(self.fitbit_user_id, data)
+        result = get_fitbit_metrics(self.fitbit_user_id, data["devices"])
 
-        if not result.get('devices'):
-            return {"status" : "fail", "message" : "No devices."}
+        return self.process_fitbit_last_synced(result)
 
-        if not result['devices']['status'] == 'success':
-            return {"status" : "fail", "message" : result['devices']['message']}
+    def process_fitbit_last_synced(self, r):
+        '''
+        process result of pulling fitbit last sync time
+        '''
 
-        devices = result["devices"]["result"]
+        logger = logging.getLogger(__name__) 
+
+        devices = r
 
         v = -1
             

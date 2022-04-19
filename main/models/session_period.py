@@ -51,4 +51,11 @@ class SessionPeriod(models.Model):
             "period_number" : self.period_number,
             "period_date" : self.period_date.strftime("%#m/%#d/%Y"),
         }
+    
+    def get_fitbit_formatted_date(self):
+        '''
+        return period date in a fitbit formatted string
+        '''
+
+        return self.period_date.strftime("%Y-%m-%d")
         
