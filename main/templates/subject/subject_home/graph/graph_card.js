@@ -382,19 +382,19 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
                                             app.session.parameter_set.graph_y_max);
         y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
         
-        if (period_type=="Group Pay")
-        {
-            ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-            ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y-10);
+        // if (period_type=="Group Pay")
+        // {
+        ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+        ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y-10);
 
-            ctx.fillStyle = "green";
-            ctx.fillText("$" + payments_list[i].group_bonus, w-marginY-marginY+4, y+10);
-        }
-        else
-        {
-            ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-            ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y+4);
-        }
+        ctx.fillStyle = "green";
+        ctx.fillText("$" + payments_list[i].group_bonus, w-marginY-marginY+4, y+10);
+        // }
+        // else
+        // {
+        //     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+        //     ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y+4);
+        // }
 
         previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
     }
@@ -586,9 +586,12 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.fillText("My Pay", marginY-25, h-marginX+40);
 
-    ctx.fillStyle = "green";
-    ctx.fillText("Group", marginY-25, h-marginX+57);
-    ctx.fillText("Pay", marginY-30, h-marginX+70);
+    if(app.session_player.session_player_periods_2[i].period_type == "Group Pay")
+    {
+        ctx.fillStyle = "green";
+        ctx.fillText("Group", marginY-25, h-marginX+57);
+        ctx.fillText("Pay", marginY-30, h-marginX+70);
+    }
 
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
@@ -599,9 +602,12 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.textAlign = "right";
     ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
 
-    ctx.fillStyle = "green";
-    ctx.textAlign = "right";
-    ctx.fillText("Sum=$"+app.session_player.current_block_earnings.group_bonus, w - 5, h-marginX+64);
+    if(app.session_player.session_player_periods_2[i].period_type == "Group Pay")
+    {
+        ctx.fillStyle = "green";
+        ctx.textAlign = "right";
+        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.group_bonus, w - 5, h-marginX+64);
+    }
 },
 
 /**
@@ -623,9 +629,12 @@ updateGraph(){
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
-    app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
-                     parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
-                     parameter_set_period.period_type);
+    if(parameter_set_period.period_type == "Group Pay")
+    {
+        app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
+                        parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
+                        parameter_set_period.period_type);
+    }
     
     if(parameter_set_period.show_graph_1)
         app.drawZoneMinuteLines1("graph_id", 0, app.session.parameter_set.graph_y_max,

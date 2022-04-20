@@ -26,7 +26,7 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                        choices=PeriodType.choices,
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set_period.period_type",}))
     
-    minimum_wrist_minutes = forms.IntegerField(label="Yesterday's Minimum Wrist Minutes",
+    minimum_wrist_minutes = forms.IntegerField(label="Minimum Wrist Minutes",
                                       min_value=0,
                                       max_value=1440,
                                       widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.minimum_wrist_minutes",

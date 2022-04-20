@@ -55,7 +55,7 @@
                 $[[session_player.individual_earnings]]
             </div>
         </div>
-        <div class="row">
+        <div class="row" v-if="session.current_parameter_set_period.period_type==='Group Pay'">
             <div class="col text-end pe-1 text-nowrap">
                 <span v-if="session_player.group_checked_in_today">
                     Your group earnings today:
@@ -94,7 +94,7 @@
                         Check In Again <i class="fas fa-check"></i>
                     </span>
                     <span>
-                        Check In Again <i class="fas fa-check"></i>
+                        Check In <i class="fas fa-check"></i>
                     </span>
                     
                 </button>
