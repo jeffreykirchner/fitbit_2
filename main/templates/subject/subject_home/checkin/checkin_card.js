@@ -14,6 +14,19 @@ takeCheckIn(messageData){
         app.session_player.earnings_group = messageData.status.result.earnings_group; 
         app.session_player.earnings_total = messageData.status.result.earnings_total;
         app.check_in_error_message = "";
+
+        sp = app.findSessionPlayer(app.session_player.id);
+
+        for(i=0;i<sp.session_player_periods_2.length;i++)
+        {
+            if(sp.session_player_periods_2[i].period_number == app.session.current_period)
+            {
+                sp.session_player_periods_2[i].check_in = app.session_player.checked_in_today;
+                break;
+            }
+        }
+
+        app.updateGraph();
     } 
     else
     {

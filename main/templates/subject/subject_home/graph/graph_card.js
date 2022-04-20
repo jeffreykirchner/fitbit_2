@@ -443,23 +443,121 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
  */
 drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
 
+    //draw group
     for(let i=0;i<app.session.session_players.length;i++)
     {
         let player = app.session.session_players[i];
         let dataSet=[];
 
-        for(let j=0;j<player.session_player_periods_2.length;j++)
+        
+        if(player.id != app.session_player.id)
         {
-            let session_player_period = player.session_player_periods_2[j];
-
-            if(session_player_period.period_number<app.session.current_period)
+            for(let j=0;j<player.session_player_periods_2.length;j++)
             {
-                dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                let session_player_period = player.session_player_periods_2[j];
+                
+                if(session_player_period.period_number<app.session.current_period || 
+                   (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
+                    {
+                        dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                    }
+                
             }
+
+            app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
+                        3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
+        }
+    }
+
+    //draw local player
+    for(let i=0;i<app.session.session_players.length;i++)
+    {
+        let player = app.session.session_players[i];
+        let dataSet=[];
+
+        
+        if(player.id == app.session_player.id)
+        {
+            for(let j=0;j<player.session_player_periods_2.length;j++)
+            {
+                let session_player_period = player.session_player_periods_2[j];
+
+                if(session_player_period.period_number<app.session.current_period || 
+                  (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
+                    {
+                        dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                    }
+                
+            }
+            
+            app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
+                        3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
+
+
+            break;
+        }
+    }
+
+},
+
+/**
+ * draw dot for todays zone minutes
+ */
+drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
+    let canvas = document.getElementById(chartID);
+    let ctx = canvas.getContext('2d');
+
+    let w = app.sizeW;
+    let h = app.sizeH;
+
+    let marginY=app.marginY;
+    let marginX=app.marginX;
+    let margin2=app.margin2;
+
+    let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
+
+    ctx.save()
+    ctx.translate(marginY, h-marginX);
+    ctx.font="bold 14px Georgia";
+    ctx.textAlign = "left";
+    ctx.lineCap = "round";
+
+    //draw group
+    for(let i=0;i<app.session.session_players.length;i++)
+    {
+        let player = app.session.session_players[i];
+        let dataSet=[];
+
+        
+        if(player.id != app.session_player.id)
+        {
+            today_zone_minutes = -1;
+            x_index = -1;
+
+            for(let j=0;j<player.session_player_periods_2.length;j++)
+            {
+                let session_player_period = player.session_player_periods_2[j];
+
+                if(session_player_period.period_number==app.session.current_period)
+                {
+                    today_zone_minutes = session_player_period.zone_minutes;
+                    x_index = j;
+                    break;
+                }
+                
+            }
+
+            ctx.beginPath();
+            ctx.arc(app.convertToX(x_index, yMax, yMin, h-marginX-margin2, ctx.lineWidth),
+                    app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, ctx.lineWidth),
+                    10, 0, 2 * Math.PI);
+            ctx.stroke();
         }
 
-        app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                     3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
+
+
+
+        ctx.restore();
     }
 
 },
@@ -643,6 +741,8 @@ updateGraph(){
     app.drawZoneMinuteLines2("graph_id", 0, app.session.parameter_set.graph_y_max,
                             parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
     
+    app.drawTodaysZoneMinutes("graph_id", 0, app.session.parameter_set.graph_y_max,
+                              parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number);
 
     app.drawPeriodEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
                             parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,

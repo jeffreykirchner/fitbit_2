@@ -148,7 +148,7 @@ class SessionPlayer(models.Model):
         fill session player with test data up to, but not including period
         '''
 
-        for p in self.session_player_periods_b.filter(session_period__period_number__lt = period):
+        for p in self.session_player_periods_b.filter(session_period__period_number__lte = period):
             p.fill_with_test_data()
 
     def get_pay_block_individual_earnings(self, pay_block):
