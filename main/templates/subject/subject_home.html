@@ -70,11 +70,17 @@
     </div>
 </div>
 
-<!-- summary -->
+<!-- checkin -->
 <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
+    <div class="col-lg-6 mt-4 mt-lg-0">
+        {%include "subject/subject_home/checkin/checkin_card.html"%}   
+          
+    </div>
+</div>
 
-    <div class="col-lg-8 mt-4 mt-lg-0">
-        {%include "subject/subject_home/checkin/checkin_card.html"%}     
+<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
+    <div class="col-lg-6 mt-4 mt-lg-0">
+        {%include "subject/subject_home/connect/connect_card.html"%}   
     </div>
 </div>
 

@@ -1,5 +1,5 @@
 
-<div class="card">                  
+<div class="card" v-if="!show_fitbit_connect">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">Check In For Day [[session.current_period]]</span>            
 
@@ -9,8 +9,11 @@
             <div class="col text-end pe-1 text-nowrap">
                 Today's wrist time:
             </div>
-            <div class="col text-start ps-1" v-bind:style="session_player.wrist_time_met_for_checkin? [] : [{color:'red'}]">
+            <div class="col text-start ps-1" v-if="!show_fitbit_connect" v-bind:style="session_player.wrist_time_met_for_checkin? [] : [{color:'red'}]">
                [[session_player.todays_wrist_minutes]]
+            </div>
+            <div class="col text-start ps-1" v-else>
+                ---
             </div>
         </div>
         <div class="row">
@@ -69,17 +72,8 @@
             <div class="col text-start ps-1">
                $[[session_player.group_earnings]]
             </div>
-        </div>
-
-        <div class="row" v-if="show_fitbit_connect">
-            <div class="col text-end pe-1">
-               Connect FitBit:
-            </div>
-            <div class="col text-start ps-1">
-                <a href="{{fitbit_registration_link}}">Connect</a>
-            </div>
-        </div>        
-        <div class="row text-end" v-else>            
+        </div>       
+        <div class="row text-end">            
 
             <div class="col mt-2">
                 <span style="color:red" class="me-2">

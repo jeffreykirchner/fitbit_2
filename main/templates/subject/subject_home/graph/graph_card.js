@@ -504,35 +504,38 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
  * draw dot for todays zone minutes
  */
 drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
-    let canvas = document.getElementById(chartID);
-    let ctx = canvas.getContext('2d');
+    var canvas = document.getElementById(chartID);
+    var ctx = canvas.getContext('2d');           
 
-    let w = app.sizeW;
-    let h = app.sizeH;
+    var w = app.sizeW;
+    var h = app.sizeH;
 
-    let marginY=app.marginY;
-    let marginX=app.marginX;
-    let margin2=app.margin2;
+    var marginY=app.marginY;
+    var marginX=app.marginX;
+    var margin2=app.margin2;
 
-    let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
+    var markerWidth = 1;
 
     ctx.save()
+    
     ctx.translate(marginY, h-marginX);
-    ctx.font="bold 14px Georgia";
-    ctx.textAlign = "left";
-    ctx.lineCap = "round";
+    ctx.moveTo(0, 0);
+
+    // ctx.font="bold 14px Georgia";
+    // ctx.textAlign = "left";
+    // ctx.lineCap = "round";
+    // ctx.strokeStyle="black";
+    // ctx.lineWidth=markerWidth;
 
     //draw group
     for(let i=0;i<app.session.session_players.length;i++)
     {
         let player = app.session.session_players[i];
-        let dataSet=[];
 
-        
         if(player.id != app.session_player.id)
         {
-            today_zone_minutes = -1;
-            x_index = -1;
+            let today_zone_minutes = -1;
+            let x_index = -1;
 
             for(let j=0;j<player.session_player_periods_2.length;j++)
             {
@@ -545,20 +548,55 @@ drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
                     break;
                 }
                 
-            }
+            }            
 
             ctx.beginPath();
-            ctx.arc(app.convertToX(x_index, yMax, yMin, h-marginX-margin2, ctx.lineWidth),
-                    app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, ctx.lineWidth),
-                    10, 0, 2 * Math.PI);
+            x = app.convertToX(x_index+1, xMax, xMin, w-marginY-marginY, markerWidth);
+            y = app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle=player.parameter_set_player.display_color;
+            ctx.fill();
             ctx.stroke();
         }
-
-
-
-
-        ctx.restore();
     }
+
+    //draw local player
+    for(let i=0;i<app.session.session_players.length;i++)
+    {
+        let player = app.session.session_players[i];
+
+        if(player.id == app.session_player.id)
+        {
+            let today_zone_minutes = -1;
+            let x_index = -1;
+
+            for(let j=0;j<player.session_player_periods_2.length;j++)
+            {
+                let session_player_period = player.session_player_periods_2[j];
+
+                if(session_player_period.period_number==app.session.current_period)
+                {
+                    today_zone_minutes = session_player_period.zone_minutes;
+                    x_index = j;
+                    break;
+                }
+                
+            }            
+
+            ctx.beginPath();
+            x = app.convertToX(x_index+1, xMax, xMin, w-marginY-marginY, markerWidth);
+            y = app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle=player.parameter_set_player.display_color;
+            ctx.fill();
+            ctx.stroke();
+
+            break;
+        }
+    }
+
+
+    ctx.restore();
 
 },
 

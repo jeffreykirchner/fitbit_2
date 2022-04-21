@@ -242,7 +242,7 @@ var app = Vue.createApp({
         },
         
         {%include "subject/subject_home/chat/chat_card.js"%}
-        {%include "subject/subject_home/summary/summary_card.js"%}
+        {%include "subject/subject_home/connect/connect_card.js"%}
         {%include "subject/subject_home/checkin/checkin_card.js"%}
         {%include "subject/subject_home/test_mode/test_mode.js"%}
         {%include "subject/subject_home/instructions/instructions_card.js"%}

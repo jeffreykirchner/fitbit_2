@@ -107,12 +107,12 @@ class SessionPlayerPeriod(models.Model):
         '''
         calc and return individual earnings
         '''
-        pervious_session_player_period = self.get_pervious_player_period()
+        # pervious_session_player_period = self.get_pervious_player_period()
 
-        if not pervious_session_player_period:
-            return 0
+        # if not pervious_session_player_period:
+        #     return 0
 
-        period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.zone_minutes)
+        period_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
 
         if period_payment:
             return period_payment.payment
@@ -123,12 +123,12 @@ class SessionPlayerPeriod(models.Model):
         '''
         calc and return individual earnings
         '''
-        pervious_session_player_period = self.get_pervious_player_period()
+        # pervious_session_player_period = self.get_pervious_player_period()
 
-        if not pervious_session_player_period:
-            return 0
+        # if not pervious_session_player_period:
+        #     return 0
 
-        period_payment = self.session_period.parameter_set_period.get_payment(pervious_session_player_period.get_lowest_group_zone_minutes())
+        period_payment = self.session_period.parameter_set_period.get_payment(self.get_lowest_group_zone_minutes())
 
         if period_payment:
             return period_payment.group_bonus
