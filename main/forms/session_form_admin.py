@@ -35,4 +35,4 @@ class SessionFormAdmin(forms.ModelForm):
 
     class Meta:
         model=Session
-        fields = ('creator', 'collaborators', 'title', 'shared', 'locked', 'soft_delete')
+        fields = ('creator', 'collaborators', 'title', 'shared', 'locked', 'soft_delete', 'parameter_set')

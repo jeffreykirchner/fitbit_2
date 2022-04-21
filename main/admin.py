@@ -13,6 +13,7 @@ from main.forms import InstructionSetFormAdmin
 from main.models import Parameters
 from main.models import ParameterSet
 from main.models import ParameterSetPlayer
+from main.models import ParameterSetPeriod
 
 from main.models import Session
 from main.models import SessionPlayer
@@ -42,8 +43,65 @@ class ParametersAdmin(admin.ModelAdmin):
 
     actions = []
 
-admin.site.register(ParameterSet)
 admin.site.register(ParameterSetPlayer)
+
+@admin.register(ParameterSetPeriod)
+class ParameterSetPeriodAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['parameter_set', 'period_number']
+
+class ParameterSetPeriodInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = ParameterSetPeriod
+    fields = ['period_type', 'minimum_wrist_minutes', 'pay_block']
+    readonly_fields = ['period_type', 'minimum_wrist_minutes', 'pay_block']
+
+@admin.register(ParameterSet)
+class ParameterSetAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = []
+    inlines = [ParameterSetPeriodInline, ]
+    
+class SessionPlayerPeriodInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = SessionPlayerPeriod
+    fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
+    readonly_fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
+
+@admin.register(SessionPlayerPeriod)
+class SessionPlayerPeriodAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['session_period', 'session_player']
 
 class SessionPlayerInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
@@ -58,33 +116,6 @@ class SessionPlayerInline(admin.TabularInline):
     fields = ['player_number', 'name' , 'email']
     readonly_fields = ['player_number', 'name' , 'email']
 
-@admin.register(Session)
-class SessionAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
-      
-    def has_delete_permission(self, request, obj=None):
-        return False
-    
-    readonly_fields = []
-    
-    form = SessionFormAdmin
-
-    inlines = [SessionPlayerInline, ]
-
-class SessionPlayerPeriodInline(admin.TabularInline):
-    def has_add_permission(self, request, obj=None):
-        return False
-      
-    def has_delete_permission(self, request, obj=None):
-        return False
-    
-    show_change_link = True
-
-    model = SessionPlayerPeriod
-    fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
-    readonly_fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
-    
 @admin.register(SessionPlayer)
 class SessionPlayerAdmin(admin.ModelAdmin):
 
@@ -97,6 +128,20 @@ class SessionPlayerAdmin(admin.ModelAdmin):
     readonly_fields = ['session', 'parameter_set_player', 'player_number']
     inlines = [SessionPlayerPeriodInline, ]
 
+class sessionPeriodInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = SessionPeriod
+
 @admin.register(SessionPeriod)
 class SessionPeriodAdmin(admin.ModelAdmin):
 
@@ -106,18 +151,24 @@ class SessionPeriodAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
     
+    def has_change_permission(self, request, obj=None):
+        return False
+    
     readonly_fields = []
 
-@admin.register(SessionPlayerPeriod)
-class SessionPlayerPeriodAdmin(admin.ModelAdmin):
 
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
       
     def has_delete_permission(self, request, obj=None):
         return False
     
-    readonly_fields = ['session_period', 'session_player']
+    form = SessionFormAdmin
+
+    inlines = [SessionPlayerInline, sessionPeriodInline]
+    readonly_fields = ['parameter_set',]
 
 #instruction set page
 class InstructionPageInline(admin.TabularInline):
