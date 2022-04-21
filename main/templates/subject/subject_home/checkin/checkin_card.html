@@ -75,7 +75,7 @@
         </div>       
         <div class="row text-end">            
 
-            <div class="col mt-2">
+            <div class="col mt-2" v-if="fitbit_error_message ==''">              
                 <span style="color:red" class="me-2">
                     [[check_in_error_message]]
                 </span>
@@ -92,7 +92,10 @@
                     </span>
                     
                 </button>
-            </div>                        
+            </div>   
+            <div class="col mt-2" v-else style="color:red">              
+                [[fitbit_error_message]]
+            </div>                     
         </div>
         
     </div>                    

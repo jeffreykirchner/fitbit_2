@@ -35,6 +35,7 @@ var app = Vue.createApp({
 
                     check_in_error_message : "",
                     show_fitbit_connect : false,
+                    fitbit_error_message : "",
 
                     //graph globals
                     marginY : 80,
@@ -131,6 +132,7 @@ var app = Vue.createApp({
             app.session = messageData.status.session;
             app.session_player = messageData.status.session_player;
             app.show_fitbit_connect = messageData.status.show_fitbit_connect;
+            app.fitbit_error_message =  messageData.status.fitbit_error_message;
 
             if(app.session.started)
             {

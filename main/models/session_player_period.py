@@ -326,8 +326,8 @@ class SessionPlayerPeriod(models.Model):
         r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
         if r['status'] == 'fail':
-            logger.error(f'pull_secondary_metrics error: {r["message"]}')
-            return
+            logger.error(f'pull_secondary_metrics error: {r["message"]}')            
+            return {"status" : r['status'], "message" : r["message"]}
 
         result = r['result']
 
@@ -360,7 +360,7 @@ class SessionPlayerPeriod(models.Model):
         except KeyError as e:
             logger.error(f"pull_secondary_metrics error: {e}")
             
-        #logger.info(f"pull_secondary_metrics: {result}")
+        return {"status" : "success", "message" :""}
 
     def take_check_in(self):
         '''

@@ -311,6 +311,7 @@ def take_get_session_subject(session_player_id, data):
     #uuid = data["uuid"]
 
     #session = Session.objects.get(id=session_id)
+    fitbit_error_message = ""
     try:
         session_player = SessionPlayer.objects.get(id=session_player_id)
         first_load_done = data["first_load_done"]
@@ -323,17 +324,22 @@ def take_get_session_subject(session_player_id, data):
         if not first_load_done:        
             value = session_player.pull_todays_metrics()
     
-            if  value["message"] == "re-connect required" or \
-                value["message"] == "user not found" or \
-                value["message"] == "no fitbit user id":
+            if value["status"] == "fail":
+                if value["message"] == "re-connect required" or \
+                   value["message"] == "user not found" or \
+                   value["message"] == "no fitbit user id":
 
-                show_fitbit_connect = True
+                    show_fitbit_connect = True
+                    fitbit_error_message = "Connect your fitbit the app."
+                else:
+                    fitbit_error_message = "Fitbit is not available, try again later."
             else:
                 session_player.pull_missing_metrics()
                 pass                
 
         return {"session" : session_player.session.json_for_subject(session_player), 
                 "show_fitbit_connect" : show_fitbit_connect,
+                "fitbit_error_message" : fitbit_error_message,
                 "session_player" : session_player.json() }
 
     except ObjectDoesNotExist:
@@ -641,7 +647,7 @@ def take_check_in(session_id, session_player_id, data):
             error_message = "Sync your Fitbit to your phone."
 
     if status == "success":
-        session_player_period.take_check_in()
+        r = session_player_period.take_check_in()
 
     if status == "success":
         result = {"session_player" : session_player.json()}
