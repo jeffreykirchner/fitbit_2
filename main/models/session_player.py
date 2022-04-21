@@ -396,8 +396,10 @@ class SessionPlayer(models.Model):
             logger.info(f"pull_missing_metrics: No missing periods, player {self.id}")
             return
         
+        logger.info(f"pull_missing_metrics: player {self.id}, period {missing_player_period.session_period.period_number}")
+        
         missing_player_period.pull_fitbit_heart_time_series()
-        #missing_player_period.pull_secondary_metrics()
+        missing_player_period.pull_secondary_metrics()
 
     def json(self, get_chat=True):
         '''

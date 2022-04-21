@@ -302,9 +302,9 @@ class SessionPlayerPeriod(models.Model):
         if self.session_player.fitbit_user_id == "":
             return {"status" : "fail", "message" : "no fitbit user id"}
         
-        if self.fitbit_profile:
-            logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
-            return {"status" : "fail", "message" : "Secondary metrics already pulled"}
+        # if self.fitbit_profile:
+        #     logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
+        #     return {"status" : "fail", "message" : "Secondary metrics already pulled"}
 
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
 
@@ -323,7 +323,13 @@ class SessionPlayerPeriod(models.Model):
         data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
         data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
 
-        result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+        r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+
+        if r['status'] == 'fail':
+            logger.error(f'pull_secondary_metrics error: {r["message"]}')
+            return
+
+        result = r['result']
 
         try:           
 
@@ -367,6 +373,8 @@ class SessionPlayerPeriod(models.Model):
 
             self.calc_and_store_payment()
 
+        self.pull_secondary_metrics()
+        
     def write_summary_download_csv(self, writer):
         '''
         take csv writer and add row
