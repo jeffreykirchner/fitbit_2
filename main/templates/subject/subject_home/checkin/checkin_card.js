@@ -22,6 +22,8 @@ takeCheckIn(messageData){
             if(sp.session_player_periods_2[i].period_number == app.session.current_period)
             {
                 sp.session_player_periods_2[i].check_in = app.session_player.checked_in_today;
+                sp.session_player_periods_2[i].earnings_individual = app.session_player.earnings_individual;
+                sp.session_player_periods_2[i].earnings_group = app.session_player.earnings_group;
                 break;
             }
         }

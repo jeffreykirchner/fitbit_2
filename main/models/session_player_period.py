@@ -211,13 +211,13 @@ class SessionPlayerPeriod(models.Model):
         
         data = {'fitbit_heart_time_series' : f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'}
 
-        result = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+        r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
-        if  result['fitbit_heart_time_series']['status'] == 'success':
-            self.process_fitbit_heart_time_series(result['fitbit_heart_time_series']['result'])
+        if  r['status'] == 'success':
+            self.process_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'])
             
-        return {"status" : result['fitbit_heart_time_series']['status'], 
-                "message" : result['fitbit_heart_time_series']['message']}
+        return {"status" : r['result']['fitbit_heart_time_series']['status'], 
+                "message" : r['result']['fitbit_heart_time_series']['message']}
     
     def process_fitbit_heart_time_series(self, d):
         '''

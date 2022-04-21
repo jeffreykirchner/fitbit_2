@@ -397,7 +397,7 @@ class SessionPlayer(models.Model):
             return
         
         missing_player_period.pull_fitbit_heart_time_series()
-        missing_player_period.pull_secondary_metrics()
+        #missing_player_period.pull_secondary_metrics()
 
     def json(self, get_chat=True):
         '''
