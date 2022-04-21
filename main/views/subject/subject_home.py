@@ -1,5 +1,5 @@
 '''
-staff view
+subject view
 '''
 import logging
 import json

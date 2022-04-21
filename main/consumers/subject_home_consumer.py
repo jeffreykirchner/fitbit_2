@@ -602,6 +602,7 @@ def take_check_in(session_id, session_player_id, data):
         session_player_period = session_player.get_todays_session_player_period()
 
         software_version = data["software_version"]
+        client_current_period = data["current_period"]
 
         # value = session_player.pull_todays_metrics()
 
@@ -613,6 +614,18 @@ def take_check_in(session_id, session_player_id, data):
     #software version
     if status == "success":
         if p.software_version != software_version:
+            status = "fail"
+            error_message = "Refresh your browser."
+    
+    #period number
+    if status == "success":
+        if session_player_period.session_period.period_number != client_current_period:
+            status = "fail"
+            error_message = "Refresh your browser."
+    
+    #check for survey
+    if status == "success":
+        if session_player.get_current_survey_link() != "":
             status = "fail"
             error_message = "Refresh your browser."
 

@@ -6,6 +6,7 @@ session player period results
 import math
 import random
 import logging
+import uuid
 
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
@@ -33,6 +34,9 @@ class SessionPlayerPeriod(models.Model):
     sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
 
     check_in = models.BooleanField(verbose_name='Checked In', default=False)          #true if player was able to check in this period
+
+    survey_complete = models.BooleanField(verbose_name='Survey Complete', default=True)          #true if player has completed the survey for this period.
+    activity_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Subject Activity Key')
 
     #fitbit metrics
     #charge 3 metrics depriciated
@@ -374,6 +378,26 @@ class SessionPlayerPeriod(models.Model):
             self.calc_and_store_payment()
 
         self.pull_secondary_metrics()
+    
+    def get_survey_link(self):
+        '''
+        get survey link
+        '''
+
+        if self.survey_complete:
+            return ""
+
+        #https://chapmanu.co1.qualtrics.com/jfe/form/SV_9BJPiWNYT9hZ6tM?student_id=[student%20id]&session_id=10786&first_name=[first%20name]&last_name=[last%20name]&email=[email]&recruiter_id=[recruiter%20id]
+        link_string = f'{self.session_period.parameter_set_period.survey_link}?'
+        link_string += f'student_id={self.session_player.student_id}&'
+        link_string += f'session_id={self.session_player.session.id}&'
+        link_string += f'name={self.session_player.name}&'
+        link_string += f'subject_id={self.session_player.student_id}&'
+        link_string += f'period={self.session_period.period_number}&'
+        link_string += f'activity_key={self.activity_key}&'
+        link_string += f'session_name={self.session_period.session.title}&'
+
+        return link_string
         
     def write_summary_download_csv(self, writer):
         '''
@@ -418,4 +442,6 @@ class SessionPlayerPeriod(models.Model):
             "period_type" : self.session_period.parameter_set_period.period_type,
             "pay_block" : self.session_period.parameter_set_period.pay_block,
             "wrist_time_met" : self.wrist_time_met(),
+            "survey_complete" : self.survey_complete,           
+
         }

@@ -22,7 +22,7 @@ class ParameterSetPeriod(models.Model):
     period_number = models.IntegerField(verbose_name='Period Number', default=1)                                       #period number 1 to N
     period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY)              #type of payment system used
 
-    survey_required = models.BooleanField(default=False, verbose_name="Survey Complete")                               #if true show the survey below
+    survey_required = models.BooleanField(default=False, verbose_name="Survey Required")                               #if true show the survey below
     survey_link = models.CharField(max_length = 1000, default = '', verbose_name = 'Survey Link')
 
     show_notice = models.BooleanField(default=False, verbose_name="Show Notice")                                       #if true show notice below

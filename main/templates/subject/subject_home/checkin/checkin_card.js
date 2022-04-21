@@ -1,6 +1,6 @@
 checkIn(){
     app.working = true;
-    app.sendMessage("check_in", {"software_version" : app.software_version});
+    app.sendMessage("check_in", {"software_version" : app.software_version, "current_period" : app.session.current_period});
 },
 
 takeCheckIn(messageData){

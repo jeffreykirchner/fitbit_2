@@ -90,7 +90,7 @@ class SessionPlayer(models.Model):
         session_player_periods = []
 
         for i in self.session.session_periods.all():
-            session_player_periods.append(main.models.SessionPlayerPeriod(session_period=i, session_player=self))
+            session_player_periods.append(main.models.SessionPlayerPeriod(session_period=i, session_player=self, survey_complete=not i.parameter_set_period.survey_required))
         
         main.models.SessionPlayerPeriod.objects.bulk_create(session_player_periods)
 
@@ -400,13 +400,30 @@ class SessionPlayer(models.Model):
         
         missing_player_period.pull_fitbit_heart_time_series()
         missing_player_period.pull_secondary_metrics()
+    
+    def get_current_survey_link(self):
+        '''
+        return, if any, the current survey link
+        '''
+
+        todays_session_player_period = self.get_todays_session_player_period()
+
+        survey_link = ""
+
+        if todays_session_player_period:
+            survey_session_period = self.session_player_periods_b.filter(survey_complete=False,
+                                                                         session_period__period_number__lte=todays_session_player_period.session_period.period_number).first()
+
+            if survey_session_period:
+                survey_link = survey_session_period.get_survey_link()
+        
+        return survey_link
 
     def json(self, get_chat=True):
         '''
         json object of model
         '''
         todays_session_player_period = self.get_todays_session_player_period()
-        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
         chat_all = []
         if self.session.parameter_set.enable_chat:
@@ -422,7 +439,7 @@ class SessionPlayer(models.Model):
         session_player_periods_group_2_json = []
 
         for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
-            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())
+            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())       
 
         return{
             "id" : self.id,      
@@ -469,9 +486,9 @@ class SessionPlayer(models.Model):
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
 
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
-            "yesterdays_wrist_minutes" : yesterdays_session_player_period.get_formated_wrist_minutes() if yesterdays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
-            "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
+
+            "survey_link" : self.get_current_survey_link(),
         }
     
     def json_for_subject(self, session_player):

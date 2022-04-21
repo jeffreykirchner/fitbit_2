@@ -3,6 +3,7 @@
     <div class="card-header fw-bold">                
         <span class="align-middle">Check In For Day [[session.current_period]]</span>            
 
+        <span class="float-end text-success" v-if="session_player.checked_in_today">You are checked in for day [[session.current_period]] <i class="fas fa-check"></i></span>
     </div>
     <div class="card-body">     
         <div class="row">
@@ -48,10 +49,20 @@
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
                 <span v-if="session_player.checked_in_today">
-                    Your individual earnings today:
+                    <span  v-if="session.current_parameter_set_period.period_type==='Group Pay'">
+                        Your individual earnings today:
+                    </span>
+                    <span v-else>
+                        Your earnings today:
+                    </span>
                 </span>
                 <span v-else>
-                    Your potential individual earnings today:
+                    <span  v-if="session.current_parameter_set_period.period_type==='Group Pay'">
+                        Your potential individual earnings today:
+                    </span>
+                    <span v-else>
+                        Your potential earnings today:
+                    </span>
                 </span>                 
             </div>
             <div class="col text-start ps-1">
@@ -73,7 +84,13 @@
                $[[session_player.group_earnings]]
             </div>
         </div>       
-        <div class="row text-end">            
+        <div class="row text-end fw-bold" v-if="session_player.survey_link != ''">            
+
+            <div class="col mt-2" v-if="fitbit_error_message ==''">              
+                Complete the survey before check in: <a v-bind:href="session_player.survey_link" target="_blank">Open Survey</a>
+            </div>                                 
+        </div>
+        <div class="row text-end" v-else>            
 
             <div class="col mt-2" v-if="fitbit_error_message ==''">              
                 <span style="color:red" class="me-2">
