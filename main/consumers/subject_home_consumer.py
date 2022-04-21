@@ -644,7 +644,7 @@ def take_check_in(session_id, session_player_id, data):
         session_player_period.take_check_in()
 
     if status == "success":
-        result = session_player_period.json_for_check_in()
+        result = {"session_player" : session_player.json()}
     else:
         result = { "error_message" : error_message,
                  }
