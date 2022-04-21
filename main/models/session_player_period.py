@@ -65,7 +65,7 @@ class SessionPlayerPeriod(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Session {self.session_period.session.title}, Player {self.session_player.parameter_set_player.id_label}, Period {self.session_period.period_number}"
+        return f"Period {self.session_period.period_number}, Date {self.session_period.period_date}"
 
     class Meta:
         

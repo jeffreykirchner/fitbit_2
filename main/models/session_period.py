@@ -26,7 +26,7 @@ class SessionPeriod(models.Model):
     updated= models.DateTimeField(auto_now= True)
 
     def __str__(self):
-        return f"{self.id}"
+        return f"Session {self.session.title}, Periods {self.period_number}, Date {self.period_date}"
 
     class Meta:
         constraints = [

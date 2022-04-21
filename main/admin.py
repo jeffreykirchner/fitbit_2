@@ -23,9 +23,11 @@ from main.models import  HelpDocs
 
 from main.models.instruction_set import InstructionSet
 from main.models.instruction import Instruction
+from main.models.session_period import SessionPeriod
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 
+@admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
     '''
     parameters model admin
@@ -40,21 +42,82 @@ class ParametersAdmin(admin.ModelAdmin):
 
     actions = []
 
-admin.site.register(Parameters, ParametersAdmin)
-
 admin.site.register(ParameterSet)
 admin.site.register(ParameterSetPlayer)
 
+class SessionPlayerInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
 
+    model = SessionPlayer
+    fields = ['player_number', 'name' , 'email']
+    readonly_fields = ['player_number', 'name' , 'email']
+
+@admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = []
+    
     form = SessionFormAdmin
 
-admin.site.register(Session, SessionAdmin)
+    inlines = [SessionPlayerInline, ]
 
+class SessionPlayerPeriodInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
 
-admin.site.register(SessionPlayer)
-admin.site.register(SessionPlayerChat)
-admin.site.register(SessionPlayerPeriod)
+    model = SessionPlayerPeriod
+    fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
+    readonly_fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
+    
+@admin.register(SessionPlayer)
+class SessionPlayerAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['session', 'parameter_set_player', 'player_number']
+    inlines = [SessionPlayerPeriodInline, ]
+
+@admin.register(SessionPeriod)
+class SessionPeriodAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = []
+
+@admin.register(SessionPlayerPeriod)
+class SessionPlayerPeriodAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['session_period', 'session_player']
 
 #instruction set page
 class InstructionPageInline(admin.TabularInline):
@@ -66,6 +129,7 @@ class InstructionPageInline(admin.TabularInline):
       model = Instruction
       can_delete = True
 
+@admin.register(InstructionSet)
 class InstructionSetAdmin(admin.ModelAdmin):
     form = InstructionSetFormAdmin
 
@@ -92,7 +156,5 @@ class InstructionSetAdmin(admin.ModelAdmin):
       ]
     
     actions = [duplicate_set]
-
-admin.site.register(InstructionSet, InstructionSetAdmin)
 
 admin.site.register(HelpDocs)

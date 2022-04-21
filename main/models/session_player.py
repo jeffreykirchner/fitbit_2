@@ -56,7 +56,7 @@ class SessionPlayer(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Session {self.session.title}, Player {self.player_number}"
+        return f"Player {self.player_number}"
 
     class Meta:
         
