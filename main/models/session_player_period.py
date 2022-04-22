@@ -326,6 +326,7 @@ class SessionPlayerPeriod(models.Model):
         data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
         data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
         data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
+        data["fitbit_heart_time_series"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
 
         r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
@@ -346,6 +347,7 @@ class SessionPlayerPeriod(models.Model):
                 self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
                 self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
 
+            self.process_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"])
             self.fitbit_profile = result["fitbit_profile"]["result"]
 
             #only store activities for this day
@@ -371,13 +373,13 @@ class SessionPlayerPeriod(models.Model):
         check subject in for this period
         '''
 
+        self.pull_secondary_metrics()
+
         with transaction.atomic():
             self.check_in = True
             self.save()
 
             self.calc_and_store_payment()
-
-        self.pull_secondary_metrics()
     
     def get_survey_link(self):
         '''
