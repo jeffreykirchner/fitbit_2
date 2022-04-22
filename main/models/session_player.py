@@ -35,6 +35,7 @@ class SessionPlayer(models.Model):
     player_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Player Key')      #login and channel key
     connecting = models.BooleanField(default=False, verbose_name='Consumer is connecting')              #true when a consumer is connceting
     connected_count = models.IntegerField(verbose_name='Number of consumer connections', default=0)     #number of consumers connected to this subject
+    channel_name = models.CharField(verbose_name='Django channels key', max_length = 1000, default="")  #key issued from django channels
 
     name = models.CharField(verbose_name='Full Name', max_length = 100, default="")                     #subject's full name
     student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="")              #subject's student ID number

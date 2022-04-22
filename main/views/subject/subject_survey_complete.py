@@ -9,6 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views import View
 from django.shortcuts import render
 from django.urls import reverse
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from main.models import Parameters
 from main.models import SessionPlayerPeriod
@@ -32,6 +34,13 @@ class SubjectSurveyCompleteView(View):
 
         except ObjectDoesNotExist:
             raise Http404("Subject not found.")
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send) \
+                     (str(session_player_period.session_player.channel_name), {
+                        'type': 'survey_complete',
+                        'message_text': {}
+                      })
 
         parameters = Parameters.objects.first()
 

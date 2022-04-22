@@ -186,6 +186,20 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         message["messageData"] = message_data
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def survey_complete(self, event):
+        '''
+        survey complete
+        '''
+        result = await sync_to_async(take_survey_complete)(self.session_id, self.session_player_id, event["message_text"])
+        message_data = {}
+        message_data["status"] = result
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -256,7 +270,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         update connection's information
         '''
-        result = await sync_to_async(take_update_local_info)(self.session_id, self.connection_uuid, event)
+        result = await sync_to_async(take_update_local_info)(self.session_id, self.connection_uuid, self.channel_name, event)
 
         logger = logging.getLogger(__name__) 
         logger.info(f"update_local_info {result}")
@@ -432,13 +446,14 @@ def take_chat(session_id, session_player_id, data):
 
     return {"value" : "success", "result" : result}
 
-def take_update_local_info(session_id, player_key, data):
+def take_update_local_info(session_id, player_key, channel_name, data):
     '''
     update connection's information
     '''
 
     try:
         session_player = SessionPlayer.objects.get(player_key=player_key)
+        session_player.channel_name = channel_name
         session_player.save()
 
         return {"session_player_id" : session_player.id}
@@ -675,3 +690,30 @@ def take_check_in(session_id, session_player_id, data):
 
     return {"value" : status,
             "result" : result}
+
+def take_survey_complete(session_id, session_player_id, data):
+    '''
+    take survey complete
+    '''    
+    status = "success"
+    error_message = ""
+    result = {}
+
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Take check in: {session_id} {session_player_id} {data}")
+
+    try:       
+        p = Parameters.objects.first()
+
+        session = Session.objects.get(id=session_id)
+        session_player = session.session_players.get(id=session_player_id)
+        session_player_period = session_player.get_todays_session_player_period()
+
+    except ObjectDoesNotExist:
+        status = "fail"
+        error_message = "Session not available."
+        logger.warning(f"take_survey_complete : {session_player_id}") 
+    
+    
+    return {"value" : status,
+            "result" : {"session_player" : session_player.json()}}

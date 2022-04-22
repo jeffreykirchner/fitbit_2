@@ -98,6 +98,9 @@ var app = Vue.createApp({
                 case "check_in":
                     app.takeCheckIn(messageData);
                     break;
+                case "survey_complete":
+                    app.takeCheckIn(messageData);
+                    break;
                 
             }
 
@@ -211,7 +214,19 @@ var app = Vue.createApp({
 
         },
 
-      
+        takeSurveyComplete(messageData){
+
+            if(messageData.status.value == "success")
+            {
+                app.session_player = messageData.status.result.session_player;
+            }
+            else
+            {
+                
+            }
+        },
+
+
         /** take next period response
          * @param messageData {json}
         */
@@ -224,12 +239,6 @@ var app = Vue.createApp({
             this.session_player = messageData.status.session_player;
 
             app.updateChatDisplay();          
-        },
-
-        /** hide choice grid modal modal
-        */
-        hideChoiceGridModal(){
-            this.avatar_choice_modal_visible=false;
         },
 
         /** hide choice grid modal modal

@@ -89,7 +89,7 @@ class SocketConsumerMixin(AsyncWebsocketConsumer):
         message_type = text_data_json['messageType']   #name of child method to be called
         message_text = text_data_json['messageText']   #data passed to above method
 
-        # Send message to room group
+        # Send message to individual
         await self.channel_layer.send(
             self.channel_name,
             {
