@@ -59,6 +59,13 @@ class SessionPeriod(models.Model):
         '''
 
         return self.period_date.strftime("%a")
+    
+    def get_formatted_day_of_week_full(self):
+        '''
+        return formatted day of week
+        '''
+
+        return self.period_date.strftime("%A")
 
     def get_fitbit_formatted_date(self):
         '''

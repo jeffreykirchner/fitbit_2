@@ -355,11 +355,11 @@ class Session(models.Model):
                                                     .order_by('-timestamp')[:100:-1]
                ]
 
-        current_parameter_set_period = self.get_current_session_period()
+        current_session_period = self.get_current_session_period()
 
         is_last_period = False
-        if current_parameter_set_period:
-            if current_parameter_set_period == self.session_periods.last():
+        if current_session_period:
+            if current_session_period == self.session_periods.last():
                 is_last_period = True
 
         return{
@@ -371,8 +371,11 @@ class Session(models.Model):
             "end_date":self.get_end_date_string(),
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
-            "current_parameter_set_period": self.get_current_session_period().json() if current_parameter_set_period else None,
-            "current_period" : current_parameter_set_period.period_number if current_parameter_set_period else "---",
+
+            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            "current_period" : current_session_period.period_number if current_session_period else "---",
+            "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
             "session_periods":[i.json() for i in self.session_periods.all()],
@@ -402,8 +405,11 @@ class Session(models.Model):
         return{
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
+            
             "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
             "current_period"  : current_session_period.period_number if current_session_period else "---",
+            "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+
             "finished":self.finished,
 
             "parameter_set":self.parameter_set.json_for_subject(),

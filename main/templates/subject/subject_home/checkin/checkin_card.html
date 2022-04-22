@@ -1,7 +1,7 @@
 
 <div class="card" v-if="!show_fitbit_connect &&  session.current_parameter_set_period">                  
     <div class="card-header fw-bold">                
-        <span class="align-middle">Check In For Day [[session.current_period]]</span>            
+        <span class="align-middle">Check In For [[session.current_period_day_of_week]]</span>            
 
         <span class = "float-end">
             <span class="text-success" v-if="session_player.checked_in_today">You are checked in for day [[session.current_period]] <i class="fas fa-check"></i></span>
