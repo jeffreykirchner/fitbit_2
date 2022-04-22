@@ -1,9 +1,15 @@
 
-<div class="card" v-if="!show_fitbit_connect">                  
+<div class="card" v-if="!show_fitbit_connect &&  session.current_parameter_set_period">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">Check In For Day [[session.current_period]]</span>            
 
-        <span class="float-end text-success" v-if="session_player.checked_in_today">You are checked in for day [[session.current_period]] <i class="fas fa-check"></i></span>
+        <span class = "float-end">
+            <span class="text-success" v-if="session_player.checked_in_today">You are checked in for day [[session.current_period]] <i class="fas fa-check"></i></span>
+
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('{{subject_check_in_help_doc}}')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>        
     </div>
     <div class="card-body">     
         <div class="row">

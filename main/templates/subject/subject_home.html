@@ -31,6 +31,7 @@
 {% block content %}
 
 <!-- modals -->
+{%include "help_modal.html"%}
 
 <!-- instructions -->
 <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">

@@ -13,6 +13,7 @@ var app = Vue.createApp({
                     is_subject : true,
                     working : false,
                     first_load_done : false,                       //true after software is loaded for the first time
+                    helpText : "Loading ...",
                     software_version : "{{parameters.software_version}}",
                     playerKey : "{{session_player.player_key}}",
                     owner_color : 0xA9DFBF,
@@ -101,6 +102,9 @@ var app = Vue.createApp({
                 case "survey_complete":
                     app.takeCheckIn(messageData);
                     break;
+                case "help_doc":
+                    app.takeLoadHelpDoc(messageData);
+                    break;
                 
             }
 
@@ -139,7 +143,7 @@ var app = Vue.createApp({
 
             if(app.session.started)
             {
-               app.updateGraph();
+                setTimeout(app.updateGraph, 250);
             }
             else
             {
@@ -258,6 +262,7 @@ var app = Vue.createApp({
         {%include "subject/subject_home/test_mode/test_mode.js"%}
         {%include "subject/subject_home/instructions/instructions_card.js"%}
         {%include "subject/subject_home/graph/graph_card.js"%}
+        {%include "js/help_doc.js"%}
     
         /** clear form error messages
         */

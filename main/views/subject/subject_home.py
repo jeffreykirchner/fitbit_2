@@ -38,14 +38,9 @@ class SubjectHomeView(View):
 
         try:
             session_player = SessionPlayer.objects.get(player_key=kwargs['player_key'])
-            session = session_player.session
+            session = session_player.session           
 
-           
-
-            session_player_period_today = session_player.get_todays_session_player_period()
-            session_player_period_yesterday = session_player.get_yesterdays_session_player_period()            
-
-            
+            session_player_period_today = session_player.get_todays_session_player_period()         
 
         except ObjectDoesNotExist:
             raise Http404("Subject not found.")
@@ -57,6 +52,13 @@ class SubjectHomeView(View):
         # sprite_sheet_css = generate_css_sprite_sheet('main/static/avatars.json', static('avatars.png'))
 
         parameters = Parameters.objects.first()
+
+        subject_graph_help_doc = "Subject graph help individual"
+        subject_check_in_help_doc = "Subject check in help individual"
+        
+        if session_player_period_today and session_player_period_today.session_period.parameter_set_period.period_type == "Group Pay":
+            subject_graph_help_doc = "Subject graph help group"
+            subject_check_in_help_doc = "Subject check in help group"
 
         return render(request=request,
                       template_name=self.template_name,
@@ -72,7 +74,9 @@ class SubjectHomeView(View):
                                "session_player" : session_player,
                                "session_player_json" : json.dumps(session_player.json(), cls=DjangoJSONEncoder),
                                "session" : session,
-                               "parameters" : parameters,                               
+                               "parameters" : parameters,
+                               "subject_graph_help_doc" : subject_graph_help_doc,   
+                               "subject_check_in_help_doc" : subject_check_in_help_doc,                            
                                "fitbit_registration_link" : get_registration_link(session_player.player_key),
                                "session_json":json.dumps(session.json_for_subject(session_player), cls=DjangoJSONEncoder)})
     

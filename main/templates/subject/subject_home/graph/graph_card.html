@@ -9,8 +9,11 @@
             <span v-show="reconnecting || !first_load_done" class="me-1">
                 Connecting <i class="fas fa-cog fa-spin fa-1x"></i>
             </span>
-        </span>
 
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('{{subject_graph_help_doc}}')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>
     </div>
     <div class="card-body">
         
