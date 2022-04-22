@@ -439,6 +439,7 @@ class SessionPlayerPeriod(models.Model):
             "id" : self.id,    
             
             "period_number" : self.session_period.period_number,
+            "period_day_of_week" : self.session_period.get_formatted_day_of_week(),
 
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),

@@ -50,8 +50,16 @@ class SessionPeriod(models.Model):
             "id" : self.id,
             "period_number" : self.period_number,
             "period_date" : self.period_date.strftime("%#m/%#d/%Y"),
+            "period_day_of_week" : self.get_formatted_day_of_week()
         }
     
+    def get_formatted_day_of_week(self):
+        '''
+        return formatted day of week
+        '''
+
+        return self.period_date.strftime("%a")
+
     def get_fitbit_formatted_date(self):
         '''
         return period date in a fitbit formatted string

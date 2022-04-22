@@ -101,39 +101,42 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
     //x ticks
     ctx.beginPath();                                                               
     ctx.textAlign = "center";
+    ctx.font="bold 14px Georgia";
 
     let tempX = marginY;
     let tempXValue=xMin;    
     
     todayX = 0;
     todayY = 0;
+    todayText = "";
 
     for(let i=0;i<=xTickCount;i++)
     {                                       
         ctx.moveTo(tempX, h-marginX);                                   
         ctx.lineTo(tempX,  h-marginX+5);
 
-        if(i%7==0 || tempXValue==today)
-        {
-            text = Math.round(tempXValue).toString();
+       
+        // {
+        //text = Math.round(tempXValue).toString();
+        text = app.session_player.session_player_periods_2[i].period_day_of_week;
 
-            if(i==0)
-            {
-                text = "Day " + text;
-            }
-            
-            //highlight today
-            if(tempXValue==today)
-            {
-               todayX = tempX;
-               todayY = h-marginX+18;
-            }
-            // else
-            // {
-            //     ctx.fillStyle = "black";
-            // }
-           ctx.fillText(text, tempX, h-marginX+18);
+        if(tempXValue==today)
+        {
+            todayText = text;
         }
+                    
+        //highlight today
+        if(tempXValue==today)
+        {
+            todayX = tempX;
+            todayY = h-marginX+18;
+        }
+        // else
+        // {
+        //     ctx.fillStyle = "black";
+        // }
+        ctx.fillText(text, tempX, h-marginX+18);
+        //}
 
         tempX += ((w-marginY-marginY)/ (xTickCount));
         tempXValue += xTickValue;
@@ -146,10 +149,10 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
     ctx.beginPath();
 
     ctx.fillStyle = "goldenrod";
-    ctx.fillText(today, todayX, todayY);
-    tempW = ctx.measureText(today).width;
+    ctx.fillText(todayText, todayX, todayY);
+    tempW = ctx.measureText(todayText).width;
     tempH = 12;
-    ctx.rect(todayX - tempW/2-3, todayY - tempH/2 - 6, tempW+6, tempH+6); 
+    //ctx.rect(todayX - tempW/2-3, todayY - tempH/2 - 6, tempW+6, tempH+2); 
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.closePath();
