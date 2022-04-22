@@ -666,7 +666,7 @@ def take_check_in(session_id, session_player_id, data):
     if status == "success":
         if not session_player_period.wrist_time_met():
             status = "fail"
-            error_message = "You did not worn your Fitbit long enough today."
+            error_message = "You have not worn your Fitbit long enough today."
     
     #fitbit sync
     if status == "success":
