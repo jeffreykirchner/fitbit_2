@@ -220,8 +220,11 @@ class SessionPlayerPeriod(models.Model):
         if  r['status'] == 'success':
             self.process_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'])
             
-        return {"status" : r['result']['fitbit_heart_time_series']['status'], 
-                "message" : r['result']['fitbit_heart_time_series']['message']}
+            return {"status" : r['result']['fitbit_heart_time_series']['status'], 
+                    "message" : r['result']['fitbit_heart_time_series']['message']}
+        else:
+            return {"status" : "fail", 
+                    "message" : r['message']}
     
     def process_fitbit_heart_time_series(self, d):
         '''
@@ -373,13 +376,16 @@ class SessionPlayerPeriod(models.Model):
         check subject in for this period
         '''
 
-        self.pull_secondary_metrics()
+        r = self.pull_secondary_metrics()
 
-        with transaction.atomic():
-            self.check_in = True
-            self.save()
+        if r["status"] == "success":
+            with transaction.atomic():
+                self.check_in = True
+                self.save()
 
-            self.calc_and_store_payment()
+                self.calc_and_store_payment()
+            
+        return r
     
     def get_survey_link(self):
         '''

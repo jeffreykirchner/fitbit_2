@@ -276,7 +276,10 @@ class SessionPlayer(models.Model):
         data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
         r = get_fitbit_metrics(self.fitbit_user_id, data)
 
-        return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
+        if r["status"]=="success":
+            return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
+        else:
+            return {"status" : "fail", "message" : r["message"]}
 
     def process_fitbit_last_synced(self, r):
         '''
@@ -296,7 +299,7 @@ class SessionPlayer(models.Model):
             return {"status" : "fail", "message" : "no devices found"}
 
         if v == -1:                   
-            return False
+            return {"status" : "fail", "message" : "last sync error"}
         else:
             a=[]
             

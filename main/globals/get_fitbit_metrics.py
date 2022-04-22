@@ -3,6 +3,7 @@ pull fitbit metrics
 '''
 
 import logging
+from async_timeout import timeout
 import requests
 import json
 
@@ -22,14 +23,18 @@ def get_fitbit_metrics(fitbit_user, metrics_dict):
 
     headers = {'Content-Type' : 'application/json', 'Accept' : 'application/json'}
 
-    request_result = requests.post(f'{settings.FITBIT_MS_URL}/get-metrics',
-                                   json=data,
-                                   auth=(str(settings.FITBIT_MS_USERNAME), str(settings.FITBIT_MS_PASS)),
-                                   headers=headers)
-    
-    # if request_result.status_code == 500:        
-    #     logger.warning(f'send_mass_email_service error: {request_result}')
-    #     return {"mail_count":0, "error_message":"Mail service error"}
+    try:
+        request_result = requests.post(f'{settings.FITBIT_MS_URL}/get-metrics',
+                                    json=data,
+                                    auth=(str(settings.FITBIT_MS_USERNAME), str(settings.FITBIT_MS_PASS)),
+                                    headers=headers,
+                                    timeout=10)
+    except requests.Timeout:
+        logger.error(f"get_fitbit_metrics timeout: {data}")
+        return {"status":"fail","message":"timeout", "result":{}}
+    except requests.ConnectionError:
+        logger.error(f"get_fitbit_metrics connection error: {data}")
+        return {"status":"fail","message":"timeout", "result":{}} 
    
     logger.info(f"get_fitbit_metrics response: {request_result.json()}")
 
