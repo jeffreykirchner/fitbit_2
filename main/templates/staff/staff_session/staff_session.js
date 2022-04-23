@@ -36,6 +36,8 @@ var app = Vue.createApp({
                     emailDefaultText : `{{parameters.invitation_text|safe}}`,
 
                     csv_email_list : "",           //csv email list
+                    
+                    current_subject : 0,   //subject being viewed
                 }},
     methods: {
 

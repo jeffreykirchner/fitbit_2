@@ -260,3 +260,22 @@ hideEditSubject:function(){
        
     }
 },
+
+/** show view subject modal
+*/
+showViewSubject:function(id){
+    
+    app.current_subject = id;
+
+    var myModal = new bootstrap.Modal(document.getElementById('viewSubjectModal'), {
+        keyboard: false
+        })
+
+    myModal.toggle();
+},
+
+/** hide view subject modal
+*/
+hideViewSubject:function(){
+    
+},

@@ -495,6 +495,72 @@ class SessionPlayer(models.Model):
             "survey_link" : self.get_current_survey_link(),
         }
     
+    def json_for_staff(self):
+        '''
+        return json for staff screen
+        '''
+
+        todays_session_player_period = self.get_todays_session_player_period()
+        
+        session_player_periods_group_1_json = []
+
+        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
+            session_player_periods_group_1_json.append(p.get_session_player_periods_1_json())
+        
+        session_player_periods_group_2_json = []
+
+        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
+            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())       
+
+        return{
+            "id" : self.id,      
+            "name" : self.name,
+            "student_id" : self.student_id,   
+            "email" : self.email,
+            "group_number" : self.group_number,
+
+            "player_number" : self.player_number,
+            "player_key" : self.player_key,
+
+            "disabled" : self.disabled,
+
+            "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
+            "connected_count" : self.connected_count,
+
+            "parameter_set_player" : self.parameter_set_player.json(),
+
+            "new_chat_message" : False,           #true on client side when a new un read message comes in
+
+            "current_instruction" : self.current_instruction,
+            "current_instruction_complete" : self.current_instruction_complete,
+            "instructions_finished" : self.instructions_finished,
+
+            "session_player_periods_1" : self.get_session_player_periods_1_json(),
+            "session_player_periods_2" : self.get_session_player_periods_2_json(),
+
+            "session_player_periods_1_group" : session_player_periods_group_1_json,
+            "session_player_periods_2_group" : session_player_periods_group_2_json,
+
+            "current_block_earnings" : self.get_current_block_earnings(),
+
+            "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
+            "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+
+            "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
+
+            "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
+            "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
+            "fitbit_user_id" : self.fitbit_user_id,
+
+            "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
+
+            "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
+            "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+
+            "survey_link" : self.get_current_survey_link(),
+        }
+    
     def json_for_subject(self, session_player):
         '''
         json model for subject screen

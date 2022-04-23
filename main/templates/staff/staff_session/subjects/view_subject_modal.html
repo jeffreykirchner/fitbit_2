@@ -1,0 +1,43 @@
+{% load crispy_forms_tags %}
+
+<!-- view subject Modal -->
+<div class="modal fade" id="viewSubjectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewSubjectModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">View Subject</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            
+            <table class="table table-condensed"> 
+                <thead>
+                    <tr>
+                        <th scope="col" class = "m-1 p-1">
+                            Period
+                        </th>
+                        <th scope="col" class = "m-1 p-1">
+                            Date
+                        </th>
+                                                   
+                    </tr>
+                </thead>
+                <tbody id="player_list">
+                    <tr v-for="(p, index) in session.session_players[current_subject]" v-bind:key="p.id">
+                        <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                            [[p.player_number]]
+                        </td>
+                        <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                            [[p.parameter_set_player.id_label]]
+                        </td>
+                                                   
+                    </tr>
+                </tbody>
+                
+            </table>
+
+        </div>
+    
+    </div>
+</div>
+</div>
