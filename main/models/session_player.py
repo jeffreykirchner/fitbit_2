@@ -535,11 +535,7 @@ class SessionPlayer(models.Model):
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
 
-            "session_player_periods_1" : self.get_session_player_periods_1_json(),
-            "session_player_periods_2" : self.get_session_player_periods_2_json(),
-
-            "session_player_periods_1_group" : session_player_periods_group_1_json,
-            "session_player_periods_2_group" : session_player_periods_group_2_json,
+            "session_player_periods" : [i.json_for_subject() for i in self.session_player_periods_b.all()],
 
             "current_block_earnings" : self.get_current_block_earnings(),
 
