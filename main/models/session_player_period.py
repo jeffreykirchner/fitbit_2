@@ -19,6 +19,8 @@ from main.models import SessionPeriod
 from main.globals import get_fitbit_metrics
 from main.globals import format_minutes
 
+import main
+
 
 class SessionPlayerPeriod(models.Model):
     '''
@@ -28,7 +30,7 @@ class SessionPlayerPeriod(models.Model):
     session_player = models.ForeignKey(SessionPlayer, on_delete=models.CASCADE, related_name="session_player_periods_b")
 
     earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)        #earnings from individual activity this period
-    earnings_group = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)             #earnings from group bonus this period
+    earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)             #earnings from group bonus this period
 
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
     sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
@@ -151,11 +153,14 @@ class SessionPlayerPeriod(models.Model):
             return {"status":"fail", "message" : "not checked in"}
 
         self.earnings_individual = self.get_individual_parameter_set_payment()
+        self.save()
 
         if self.group_checked_in_today():
-            self.earnings_group = self.get_group_parameter_set_payment()
+            e = self.get_group_parameter_set_payment()
 
-        self.save()
+            g = main.models.SessionPlayerPeriod.objects.filter(session_period=self.session_period,
+                                                               session_player__group_number=self.session_player.group_number)
+            g.update(earnings_group=e)
 
         return {"status":"success", "message" : ""}
     
