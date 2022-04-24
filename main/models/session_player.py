@@ -510,7 +510,9 @@ class SessionPlayer(models.Model):
         session_player_periods_group_2_json = []
 
         for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
-            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())       
+            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())      
+
+        period_number = todays_session_player_period.session_period.period_number if todays_session_player_period else 0 
 
         return{
             "id" : self.id,      
@@ -535,7 +537,7 @@ class SessionPlayer(models.Model):
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
 
-            "session_player_periods" : [i.json_for_subject() for i in self.session_player_periods_b.all()],
+            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.filter(session_period__period_number__lte=period_number)],
 
             "current_block_earnings" : self.get_current_block_earnings(),
 

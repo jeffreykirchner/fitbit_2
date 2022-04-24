@@ -36,6 +36,7 @@ class SessionPlayerPeriod(models.Model):
     sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
 
     check_in = models.BooleanField(verbose_name='Checked In', default=False)          #true if player was able to check in this period
+    check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)          #true if staff forces a check in
 
     survey_complete = models.BooleanField(verbose_name='Survey Complete', default=True)          #true if player has completed the survey for this period.
     activity_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Subject Activity Key')
@@ -453,6 +454,32 @@ class SessionPlayerPeriod(models.Model):
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
             "check_in" : self.check_in,
+            "period_type" : self.session_period.parameter_set_period.period_type,
+            "pay_block" : self.session_period.parameter_set_period.pay_block,
+            "wrist_time_met" : self.wrist_time_met(),
+            "survey_complete" : self.survey_complete,           
+
+        }
+    
+    def json_for_staff(self):
+        '''
+        json object of model
+        '''
+
+        return{
+            "id" : self.id,    
+            
+            "period_number" : self.session_period.period_number,
+            "fitbit_formatted_date" : self.session_period.get_formatted_date(),
+
+            "earnings_individual" : round(self.earnings_individual),
+            "earnings_group" : round(self.earnings_group),
+            "earnings_total" : self.get_earning(),
+            "zone_minutes" : self.zone_minutes,
+            "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
+            "last_login" : self.last_login,
+            "check_in" : self.check_in,
+            "check_in_forced" : self.check_in_forced,
             "period_type" : self.session_period.parameter_set_period.period_type,
             "pay_block" : self.session_period.parameter_set_period.pay_block,
             "wrist_time_met" : self.wrist_time_met(),
