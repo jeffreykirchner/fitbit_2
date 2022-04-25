@@ -364,6 +364,8 @@ var app = Vue.createApp({
 
         window.addEventListener('resize', this.updateGraph);
 
+        setTimeout(this.updateGraph, 250);
+
     },
 
 }).mount('#app');

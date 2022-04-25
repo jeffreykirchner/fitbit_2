@@ -745,10 +745,30 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     }
 },
 
+drawLoadingScreen(chartID){
+    let canvas = document.getElementById(chartID);
+    let ctx = canvas.getContext('2d');
+
+    let w = canvas.width;
+    let h = canvas.height;
+
+    ctx.font="14px Georgia";                              
+    ctx.textAlign = "center";
+    ctx.fillText("Loading ...", w/2, h/2);
+},
+
 /**
  * re-draw graph
  */
 updateGraph(){
+
+    //show loading screen
+    if(!app.first_load_done)
+    {
+        app.drawLoadingScreen("graph_id");
+        return;
+    }
+
     if(app.session.finished || app.session.is_after_last_period || app.session.is_before_first_period) return;
 
     app.drawSetup("graph_id");
