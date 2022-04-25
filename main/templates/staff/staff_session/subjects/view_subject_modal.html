@@ -83,8 +83,14 @@
                             <span v-if="p.check_in_forced" style="color: lightgreen;">
                                 <i class="fas fa-check"></i>
                             </span>
-                            <span v-else-if="!p.check_in">
-                                <i class="far fa-arrow-alt-circle-left"></i>
+                            <span v-else-if="!p.check_in">                                
+                                <button type="button"
+                                        class="btn btn-outline-secondary btn-sm"
+                                        v-on:click = "sendForceCheckIn(p.id)"
+                                        title="Force Check In"
+                                        v-bind:disabled="reconnecting || working">
+                                    <i class="far fa-arrow-alt-circle-left"></i>
+                                </button>
                             </span>                            
                          </td>                       
                     </tr>

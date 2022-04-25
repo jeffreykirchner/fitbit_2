@@ -141,6 +141,9 @@ var app = Vue.createApp({
                 case "get_pay_block":
                     app.take_get_pay_block(messageData);
                     break;
+                case "force_check_in":
+                    app.takeForceCheckIn(messageData);
+                    break;
             }
 
             this.first_load_done = true;
