@@ -71,6 +71,13 @@
     </div>
 </div>
 
+<!-- notice -->
+<div class="row justify-content-center mt-4" v-if="session.current_parameter_set_period.show_notice">
+    <div class="col-lg-6 mt-4 mt-lg-0">
+        {%include "subject/subject_home/notice/notice_card.html"%}   
+    </div>
+</div>
+
 <!-- checkin -->
 <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
     <div class="col-lg-6 mt-4 mt-lg-0">
