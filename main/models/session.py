@@ -181,11 +181,9 @@ class Session(models.Model):
 
         writer.writerow(["Session ID", "Period", "Client #", "Label", "Earnings ¢"])
 
-        session_player_periods = main.models.SessionPlayerPeriod.objects.filter(session_player__in=self.session_players.all()) \
-                                                                        .order_by('session_period__period_number')
-
-        for p in session_player_periods.all():
-            p.write_summary_download_csv(writer)
+        for p in self.session_periods.all():
+            for s_p in p.session_player_periods_a.all():
+                s_p.write_summary_download_csv(writer)
 
         return output.getvalue()
     
