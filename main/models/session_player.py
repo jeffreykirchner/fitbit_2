@@ -422,6 +422,27 @@ class SessionPlayer(models.Model):
                 survey_link = survey_session_period.get_survey_link()
         
         return survey_link
+    
+    def get_current_missed_check_ins(self):
+        '''
+        return the number of missed check in up to now
+        '''
+
+        #session not started for before first period
+        if not self.session.started or self.session.is_before_first_period():
+            return 0
+        
+        #session is complete
+        if self.session.is_after_last_period():
+            return self.session_player_periods_b.filter(check_in=False).count()
+
+        todays_session_player_period = self.get_todays_session_player_period()
+
+        if not todays_session_player_period:
+            return 0
+
+        #session in progress
+        return self.session_player_periods_b.filter(check_in=False, session_period__period_number__lt=todays_session_player_period.session_period.period_number).count()
 
     def json(self, get_chat=True):
         '''
@@ -543,6 +564,7 @@ class SessionPlayer(models.Model):
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+            "missed_check_ins" : self.get_current_missed_check_ins(),
 
             "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
             "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
