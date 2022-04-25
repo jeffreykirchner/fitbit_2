@@ -27,6 +27,7 @@ from main.models import Parameters
 
 from main.globals import send_mass_email_service
 from main.globals import ExperimentPhase
+from main.models.session_player_period import SessionPlayerPeriod
 
 class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     '''
@@ -300,6 +301,19 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_get_pay_block)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+    async def force_check_in(self, event):
+        '''
+        force a subject to check in a given day
+        '''
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_force_check_in)(self.session_id,  event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -838,5 +852,28 @@ def take_get_pay_block(session_id, data):
 
     return {"value" : "success",
             "pay_block_csv" : session.get_pay_block_csv(pay_block),}
+
+def take_force_check_in(session_id, data):
+    '''
+    force a check in for a subject on a given day
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_force_check_in: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+        session_player_period = SessionPlayerPeriod.objects.get(id=data["id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_force_check_in session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    session_player_period.take_check_in()
+    
+    session_player_period.check_in_forced = True
+    session_player_period.save()
+
+    return {"value" : "success",
+            "session_player_period" : session_player_period.json_for_staff(),}
 
 

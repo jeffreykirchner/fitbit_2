@@ -36,6 +36,8 @@ var app = Vue.createApp({
                     emailDefaultText : `{{parameters.invitation_text|safe}}`,
 
                     csv_email_list : "",           //csv email list
+                    
+                    current_subject : 0,   //subject being viewed
                 }},
     methods: {
 
@@ -138,6 +140,9 @@ var app = Vue.createApp({
                     break;
                 case "get_pay_block":
                     app.take_get_pay_block(messageData);
+                    break;
+                case "force_check_in":
+                    app.takeForceCheckIn(messageData);
                     break;
             }
 

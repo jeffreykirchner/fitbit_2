@@ -260,3 +260,60 @@ hideEditSubject:function(){
        
     }
 },
+
+/** show view subject modal
+*/
+showViewSubject:function(id){
+    
+    app.current_subject = id;
+
+    var myModal = new bootstrap.Modal(document.getElementById('viewSubjectModal'), {
+        keyboard: false
+        })
+
+    myModal.toggle();
+},
+
+/** hide view subject modal
+*/
+hideViewSubject:function(){
+    
+},
+
+/** send session update form   
+*/
+sendForceCheckIn(id){
+    if (!confirm('Force check in?')) {
+        return;
+    }
+    
+    this.working = true;
+    app.sendMessage("force_check_in",
+                   {"id" : id});
+},
+
+/** take update subject response
+ * @param messageData {json} result of update, either sucess or fail with errors
+*/
+takeForceCheckIn(messageData){
+   
+    this.working = false;
+
+    if(messageData.status.value == "success")
+    {             
+        let session_player = app.session.session_players[app.current_subject];
+
+        for(i=0;i<session_player.session_player_periods.length;i++)
+        {
+            if(session_player.session_player_periods[i].id == messageData.status.session_player_period.id)
+            {
+                session_player.session_player_periods[i] = messageData.status.session_player_period;
+                break;
+            }
+        }
+    } 
+    else
+    {
+        
+    } 
+},

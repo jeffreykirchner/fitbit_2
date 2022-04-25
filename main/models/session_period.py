@@ -49,9 +49,16 @@ class SessionPeriod(models.Model):
         return{
             "id" : self.id,
             "period_number" : self.period_number,
-            "period_date" : self.period_date.strftime("%#m/%#d/%Y"),
+            "period_date" : self.get_formatted_date(),
             "period_day_of_week" : self.get_formatted_day_of_week()
         }
+    
+    def get_formatted_date(self):
+        '''
+        return formatted day of week
+        '''
+
+        return self.period_date.strftime("%#m/%#d/%Y")
     
     def get_formatted_day_of_week(self):
         '''

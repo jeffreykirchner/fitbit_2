@@ -378,8 +378,7 @@ class Session(models.Model):
 
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
-            "session_periods":[i.json() for i in self.session_periods.all()],
-            "session_players":[i.json(False) for i in self.session_players.all()],
+            "session_players":[i.json_for_staff() for i in self.session_players.all()],
             "chat_all" : chat,
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,

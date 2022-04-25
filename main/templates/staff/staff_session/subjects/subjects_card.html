@@ -61,6 +61,9 @@
                             <th scope="col" class = "text-center m-1 p-1">
                                 Connected
                             </th>
+                            <th scope="col" class = "text-center m-1 p-1">
+                                History
+                            </th> 
                             <th scope="col" class = "text-center m-1 p-1" v-show="session.current_experiment_phase == 'Instructions'">
                                 Instructions
                             </th>                            
@@ -107,6 +110,9 @@
                                 <span v-else style="color: crimson;">
                                     <i class="fas fa-times"></i>
                                 </span>
+                            </td>
+                            <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index)">
+                                <i class="fas fa-history"></i>
                             </td>
                             <td class="player_table_cell text-nowrap" v-show="session.current_experiment_phase == 'Instructions'">
                                 [[p.instructions_finished ? "Finished" : "Page " + p.current_instruction.toString()]]
