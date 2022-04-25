@@ -402,6 +402,7 @@ class Session(models.Model):
                 is_last_period = True
 
         return{
+            "id":self.id,
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
             
