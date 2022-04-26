@@ -189,20 +189,24 @@ class Session(models.Model):
 
         return output.getvalue()
     
-    def get_download_action_csv(self):
+    def get_download_heart_rate_csv(self):
         '''
-        return data actions in csv format
+        return heart rate data in csv format
         '''
         output = io.StringIO()
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Period", "Time", "Client #", "Action", "Info", "Info (JSON)", "Timestamp"])
+        v = ["Session ID", "Period", "Player", "Group"]
 
-        session_player_chats = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all())
+        for i in range(1440):
+            v.append(str(timedelta(minutes=i)))
 
-        for p in session_player_chats.all():
-            p.write_action_download_csv(writer)
+        writer.writerow(v)
+
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+                s_p.write_heart_rate_download_csv(writer)
 
         return output.getvalue()
     

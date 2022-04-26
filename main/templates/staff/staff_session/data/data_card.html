@@ -22,15 +22,15 @@
             </div>
         </div>
 
-        <!-- actions data -->
+        <!-- heart rate data -->
         <div class="row mt-2">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "downloadActionsData()"
+                        v-on:click = "downloadHeartRateData()"
                         title="Download Action Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Actions <i class="fas fa-scroll"></i>
+                    Download Heart Rate <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>

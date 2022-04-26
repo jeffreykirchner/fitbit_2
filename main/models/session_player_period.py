@@ -4,6 +4,7 @@ session player period results
 
 #import logging
 from datetime import datetime
+from datetime import timedelta
 import math
 import random
 import logging
@@ -461,6 +462,30 @@ class SessionPlayerPeriod(models.Model):
                          self.get_earning(),
                          self.get_last_login_str(),
                          ])
+    
+    def write_heart_rate_download_csv(self, writer):
+        '''
+        take csv writer and add row
+        '''
+        # ["Session ID", "Period", "Player", "Group", 
+        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
+        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+
+        v = [self.session_period.session.id,
+             self.session_period.period_number,
+             self.session_player.player_number,
+             self.session_player.group_number]
+
+        if self.fitbit_heart_time_series:
+            time_dict = {}
+
+            for i in self.fitbit_heart_time_series["activities-heart-intraday"]["dataset"]:
+                time_dict[i["time"]] = i["value"] 
+
+            for i in range(1440):
+                v.append(time_dict.get(str(timedelta(minutes=i)), ""))
+        
+        writer.writerow(v)
 
     def json_for_check_in(self):
         '''

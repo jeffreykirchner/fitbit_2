@@ -1,7 +1,7 @@
 /**send download summary data
 */
 downloadSummaryData(){
-    app.$data.working = true;
+    app.working = true;
     this.data_downloading = true;
     app.sendMessage("download_summary_data", {});
 },
@@ -15,7 +15,7 @@ takeDownloadSummaryData(messageData){
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Trade_Steal_Summary_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Summary_Data_Session_" + app.$data.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -26,22 +26,22 @@ takeDownloadSummaryData(messageData){
 
 /**send download summary data
 */
-downloadActionsData(){
-    app.$data.working = true;
+downloadHeartRateData(){
+    app.working = true;
     this.data_downloading = true;
-    app.sendMessage("download_action_data", {});
+    app.sendMessage("download_heart_rate_data", {});
 },
 
 /** take download summary data
  * @param messageData {json}
 */
-takeDownloadActionData(messageData){
+takeDownloadHeartRateData(messageData){
 
     var downloadLink = document.createElement("a");
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Trade_Steal_Action_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Heart_Rate_Data_Session_" + app.$data.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
