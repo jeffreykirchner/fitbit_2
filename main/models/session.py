@@ -179,9 +179,11 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Period", "Client #", "Label", "Earnings ¢"])
+        writer.writerow(["Session ID", "Period", "Player #", "Partner", 
+                         "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
+                         "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])
 
-        for p in self.session_periods.all():
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
             for s_p in p.session_player_periods_a.all():
                 s_p.write_summary_download_csv(writer)
 
