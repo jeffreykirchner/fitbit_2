@@ -3,10 +3,12 @@ session player period results
 '''
 
 #import logging
+from datetime import datetime
 import math
 import random
 import logging
 import uuid
+import pytz
 
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
@@ -321,7 +323,12 @@ class SessionPlayerPeriod(models.Model):
 
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
 
+        #test date
+        #temp_s = "2021-1-25"
+
         data = {}
+
+        data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
 
         if not settings.DEBUG:
             data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
@@ -346,6 +353,7 @@ class SessionPlayerPeriod(models.Model):
         result = r['result']
 
         try:           
+            self.session_player.process_fitbit_last_synced(result["devices"]["result"])
 
             if not settings.DEBUG:
                 self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
@@ -356,7 +364,8 @@ class SessionPlayerPeriod(models.Model):
                 self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
                 self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
 
-            self.process_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"])
+            self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
+            self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
             self.fitbit_profile = result["fitbit_profile"]["result"]
 
             #only store activities for this day
@@ -370,6 +379,9 @@ class SessionPlayerPeriod(models.Model):
             #sleep
             self.fitbit_sleep_time_series = result["fitbit_sleep_time_series"]["result"]
             self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
+
+            #store pull time           
+            self.last_login = datetime.now()
 
             self.save()
         except KeyError as e:
@@ -412,16 +424,43 @@ class SessionPlayerPeriod(models.Model):
         link_string += f'session_name={self.session_period.session.title}&'
 
         return link_string
-        
+
+    def get_last_login_str(self):
+
+        if not self.last_login:
+            return ""
+
+        prm = main.models.Parameters.objects.first()
+        tmz = pytz.timezone(prm.experiment_time_zone) 
+
+        return  self.last_login.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p") 
+
     def write_summary_download_csv(self, writer):
         '''
         take csv writer and add row
         '''
+        # ["Session ID", "Period", "Player", "Group", 
+        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
+        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+
         writer.writerow([self.session_period.session.id,
                          self.session_period.period_number,
                          self.session_player.player_number,
-                         self.session_player.parameter_set_player.id_label,
-                         self.earnings,])
+                         self.session_player.group_number,
+                         self.zone_minutes,
+                         self.sleep_minutes,
+                         self.fitbit_minutes_heart_peak,
+                         self.fitbit_minutes_heart_cardio,
+                         self.fitbit_minutes_heart_fat_burn,
+                         self.fitbit_minutes_heart_out_of_range,
+                         self.fitbit_on_wrist_minutes,
+                         self.check_in,
+                         self.check_in_forced,
+                         self.earnings_individual,
+                         self.earnings_group,
+                         self.get_earning(),
+                         self.get_last_login_str(),
+                         ])
 
     def json_for_check_in(self):
         '''

@@ -240,30 +240,22 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
         data = {}
 
-        #last synced
-        data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
-
         todays_session_player_period = self.get_todays_session_player_period()        
 
-        #todays heart rate
+        #if during session
         if todays_session_player_period:
-            temp_s = todays_session_player_period.session_period.get_fitbit_formatted_date()
-            data['fitbit_heart_time_series_td'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
-               
-        r = get_fitbit_metrics(self.fitbit_user_id, data)
+            r = todays_session_player_period.pull_secondary_metrics()
+        else:
+            data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+            r = get_fitbit_metrics(self.fitbit_user_id, data)
+            self.process_fitbit_last_synced(r["devices"]["result"])
 
         if r["status"] == "fail" :
             return r
-        else:
-            r = r["result"]
-            self.process_fitbit_last_synced(r["devices"]["result"])
-        
+                    
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
-
-        if todays_session_player_period and r["fitbit_heart_time_series_td"]["status"] != "fail":              
-            todays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_td"]["result"])
 
         return {"status" : "success", "message" : ""}
     
