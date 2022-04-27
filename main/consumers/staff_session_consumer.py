@@ -849,6 +849,8 @@ def take_get_pay_block(session_id, data):
     except ObjectDoesNotExist:
         logger.warning(f"take_get_pay_block session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
+    
+    session.back_fill_for_pay_block(pay_block)
 
     return {"value" : "success",
             "pay_block_csv" : session.get_pay_block_csv(pay_block),}
@@ -868,11 +870,11 @@ def take_force_check_in(session_id, data):
         logger.warning(f"take_force_check_in session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
 
-    session_player_period.take_check_in()
-    
     session_player_period.check_in_forced = True
     session_player_period.save()
 
+    session_player_period.take_check_in(False)
+    
     return {"value" : "success",
             "session_player_period" : session_player_period.json_for_staff(),}
 

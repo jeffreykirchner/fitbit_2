@@ -677,7 +677,7 @@ def take_check_in(session_id, session_player_id, data):
             error_message = "Sync your Fitbit to your phone."
 
     if status == "success":
-        r = session_player_period.take_check_in()
+        r = session_player_period.take_check_in(True)
 
         if r["status"] == "fail":
             status = "fail"

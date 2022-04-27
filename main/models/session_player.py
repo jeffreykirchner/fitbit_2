@@ -240,11 +240,12 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
         data = {}
 
-        todays_session_player_period = self.get_todays_session_player_period()        
+        todays_session_player_period = self.get_todays_session_player_period()   
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()     
 
         #if during session
         if todays_session_player_period:
-            r = todays_session_player_period.pull_secondary_metrics()
+            r = todays_session_player_period.pull_secondary_metrics(True)
         else:
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
@@ -256,7 +257,18 @@ class SessionPlayer(models.Model):
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
+        
+        #do back pull if needed
+        if yesterdays_session_player_period:
+            if not yesterdays_session_player_period.back_pull:
+                yesterdays_session_player_period.back_pull=True
+                yesterdays_session_player_period.save()
 
+            if yesterdays_session_player_period.check_in:
+                yesterdays_session_player_period.take_check_in(False)
+            else:
+                yesterdays_session_player_period.pull_secondary_metrics(False)
+                
         return {"status" : "success", "message" : ""}
     
     def pull_fitbit_last_synced(self):
@@ -395,7 +407,7 @@ class SessionPlayer(models.Model):
         logger.info(f"pull_missing_metrics: player {self.id}, period {missing_player_period.session_period.period_number}")
         
         #missing_player_period.pull_fitbit_heart_time_series()
-        missing_player_period.pull_secondary_metrics()
+        missing_player_period.pull_secondary_metrics(False)
     
     def get_current_survey_link(self):
         '''

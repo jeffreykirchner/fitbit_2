@@ -38,8 +38,9 @@ class SessionPlayerPeriod(models.Model):
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
     sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
 
-    check_in = models.BooleanField(verbose_name='Checked In', default=False)          #true if player was able to check in this period
-    check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)          #true if staff forces a check in
+    check_in = models.BooleanField(verbose_name='Checked In', default=False)                     #true if player was able to check in this period
+    check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)       #true if staff forces a check in
+    back_pull = models.BooleanField(verbose_name='Back Pull', default=False)                     #true if session period data was pulled the next day to fill in missing time
 
     survey_complete = models.BooleanField(verbose_name='Survey Complete', default=True)          #true if player has completed the survey for this period.
     activity_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Subject Activity Key')
@@ -69,8 +70,8 @@ class SessionPlayerPeriod(models.Model):
     fitbit_on_wrist_minutes = models.IntegerField(default=0)          #minutes fit bit was one wrist (sum of heart time series) 
     fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)   #minimum bmp a subject must have to register active zone minutes
 
-    last_login = models.DateTimeField(null=True, blank=True)          #first time the subject logged in this day 
-
+    last_login = models.DateTimeField(null=True, blank=True)          #last time the subject logged this day
+    
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -161,10 +162,12 @@ class SessionPlayerPeriod(models.Model):
 
         if self.group_checked_in_today():
             e = self.get_group_parameter_set_payment()
+        else:
+            e = 0
 
-            g = main.models.SessionPlayerPeriod.objects.filter(session_period=self.session_period,
-                                                               session_player__group_number=self.session_player.group_number)
-            g.update(earnings_group=e)
+        g = main.models.SessionPlayerPeriod.objects.filter(session_period=self.session_period,
+                                                           session_player__group_number=self.session_player.group_number)
+        g.update(earnings_group=e)
 
         return {"status":"success", "message" : ""}
     
@@ -308,7 +311,7 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
 
-    def pull_secondary_metrics(self):
+    def pull_secondary_metrics(self, save_pull_time):
         '''
         pull extra metrics
         '''
@@ -353,7 +356,7 @@ class SessionPlayerPeriod(models.Model):
 
         result = r['result']
 
-        try:           
+        try:       
             self.session_player.process_fitbit_last_synced(result["devices"]["result"])
 
             if not settings.DEBUG:
@@ -382,7 +385,8 @@ class SessionPlayerPeriod(models.Model):
             self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
 
             #store pull time           
-            self.last_login = datetime.now()
+            if save_pull_time:
+                self.last_login = datetime.now()
 
             self.save()
         except KeyError as e:
@@ -390,12 +394,12 @@ class SessionPlayerPeriod(models.Model):
             
         return {"status" : "success", "message" :""}
 
-    def take_check_in(self):
+    def take_check_in(self, save_pull_time):
         '''
         check subject in for this period
         '''
 
-        r = self.pull_secondary_metrics()
+        r = self.pull_secondary_metrics(save_pull_time)
 
         if r["status"] == "success":
             with transaction.atomic():

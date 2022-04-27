@@ -303,7 +303,6 @@ class Session(models.Model):
             return {"start_day" : {},
                     "end_day" : {}}
 
-
     def get_pay_block(self, pay_block_number):
         '''
         return dict of payblocks
@@ -316,7 +315,6 @@ class Session(models.Model):
         for p in self.session_players.all():
 
             payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block_number)}
-
             pay_block["payments"].append(payment)
 
         return pay_block
@@ -347,6 +345,25 @@ class Session(models.Model):
                 pay_blocks[str(p.pay_block)] = self.get_pay_block(p.pay_block)
 
         return pay_blocks
+    
+    def back_fill_for_pay_block(self, pay_block_number):
+        '''
+        back fill last day of a pay block
+        '''
+        
+        for i in self.session_players.all():
+
+            p = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number).last()
+
+            if not p.back_pull:
+
+                p.back_pull=True
+                p.save()
+
+                if p.check_in:
+                    p.take_check_in(False)
+                else:
+                    p.pull_secondary_metrics(False)
 
     def json(self):
         '''
