@@ -28,7 +28,7 @@
                 <button type="button"
                         class="btn btn-outline-primary"
                         v-on:click = "downloadHeartRateData()"
-                        title="Download Action Data"
+                        title="Download Heart Rate Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
                     Download Heart Rate <i class="fas fa-scroll"></i>
                 </button>
@@ -40,10 +40,10 @@
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "downloadRecruiterData()"
-                        title="Download Recruiter Data"
+                        v-on:click = "downloadActivityData()"
+                        title="Download Activites"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Recruiter Payments <i class="fas fa-scroll"></i>
+                    Download Activites <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>

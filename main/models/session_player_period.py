@@ -440,9 +440,9 @@ class SessionPlayerPeriod(models.Model):
         '''
         take csv writer and add row
         '''
-        # ["Session ID", "Period", "Player", "Group", 
-        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
-        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+    #    ["Session ID", "Period", "Player", "Group", 
+    #                      "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Wrist Time", 
+    #                      "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
 
         writer.writerow([self.session_period.session.id,
                          self.session_period.period_number,
@@ -454,6 +454,7 @@ class SessionPlayerPeriod(models.Model):
                          self.fitbit_minutes_heart_cardio,
                          self.fitbit_minutes_heart_fat_burn,
                          self.fitbit_minutes_heart_out_of_range,
+                         self.fitbit_min_heart_rate_zone_bpm,
                          self.fitbit_on_wrist_minutes,
                          self.check_in,
                          self.check_in_forced,
@@ -486,6 +487,24 @@ class SessionPlayerPeriod(models.Model):
                 v.append(time_dict.get(str(timedelta(minutes=i)), ""))
         
         writer.writerow(v)
+    
+    def write_heart_rate_download_csv(self, writer):
+        '''
+        take csv writer and add row
+        '''
+        # ["Session ID", "Period", "Player", "Group", 
+        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
+        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+
+       
+
+        if self.fitbit_activities:
+            v = [self.session_period.session.id,
+                    self.session_period.period_number,
+                    self.session_player.player_number,
+                    self.session_player.group_number]
+        
+            writer.writerow(v)
 
     def json_for_check_in(self):
         '''

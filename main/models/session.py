@@ -180,7 +180,7 @@ class Session(models.Model):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
         writer.writerow(["Session ID", "Period", "Player", "Group", 
-                         "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
+                         "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Wrist Time", 
                          "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
@@ -210,18 +210,21 @@ class Session(models.Model):
 
         return output.getvalue()
     
-    def get_download_recruiter_csv(self):
+    def get_download_activities_csv(self):
         '''
-        return data recruiter in csv format
+        return activites data recruiter in csv format
         '''
         output = io.StringIO()
 
-        writer = csv.writer(output)
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        session_players = self.session_players.all()
+        v = ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time"]
 
-        for p in session_players:
-            writer.writerow([p.student_id, p.earnings/100])
+        writer.writerow(v)
+
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+                s_p.write_heart_rate_download_csv(writer)
 
         return output.getvalue()
     

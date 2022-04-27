@@ -108,8 +108,8 @@ var app = Vue.createApp({
                 case "download_heart_rate_data":
                     app.takeDownloadHeartRateData(messageData);
                     break;
-                case "download_recruiter_data":
-                    app.takeDownloadRecruiterData(messageData);
+                case "download_activites_data":
+                    app.takedownloadActivityData(messageData);
                     break;
                 case "download_payment_data":
                     app.takeDownloadPaymentData(messageData);

@@ -196,13 +196,13 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def download_recruiter_data(self, event):
+    async def download_activites_data(self, event):
         '''
-        download summary data
+        download activties data
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_recruiter_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_activites_data)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -603,14 +603,14 @@ def take_download_heart_rate_data(session_id):
 
     return {"value" : "success", "result" : session.get_download_heart_rate_csv()}
 
-def take_download_recruiter_data(session_id):
+def take_download_activites_data(session_id):
     '''
-    download recruiter data for session
+    download activites data for session
     '''
 
     session = Session.objects.get(id=session_id)
 
-    return {"value" : "success", "result" : session.get_download_recruiter_csv()}
+    return {"value" : "success", "result" : session.get_download_activities_csv()}
 
 def take_download_payment_data(session_id):
     '''

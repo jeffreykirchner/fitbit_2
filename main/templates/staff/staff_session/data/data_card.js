@@ -52,22 +52,22 @@ takeDownloadHeartRateData(messageData){
 
 /**send download recruiter data
 */
-downloadRecruiterData(){
+downloadActivityData(){
     app.$data.working = true;
     this.data_downloading = true;
-    app.sendMessage("download_recruiter_data", {});
+    app.sendMessage("download_activites_data", {});
 },
 
 /** take download recruiter data
  * @param messageData {json}
 */
-takeDownloadRecruiterData(messageData){
+takedownloadActivityData(messageData){
 
     var downloadLink = document.createElement("a");
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Trade_Steal_Recruiter_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Activity_Data_Session_" + app.$data.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
