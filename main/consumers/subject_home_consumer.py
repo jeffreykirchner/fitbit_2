@@ -683,9 +683,9 @@ def take_check_in(session_id, session_player_id, data):
             status = "fail"
             error_message = "Fitbit is not available, try again later."
        
-
     if status == "success":
-        result = {"session_player" : session_player.json()}
+        result = {"session_player" : session_player.json(),
+                  "session" : session.json_for_subject(session_player)}
     else:
         result = { "error_message" : error_message,
                  }
