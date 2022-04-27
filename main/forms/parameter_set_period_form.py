@@ -42,35 +42,35 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                   required=False,
                                   widget=TinyMCE(attrs={"rows":20, "cols":100,"v-model":"current_parameter_set_period.notice_text"}))
     
-    show_graph_1 = forms.ChoiceField(label='Show Graph 1',
+    show_graph_1 = forms.ChoiceField(label='Show Back Graph',
                                    choices=((1, 'Yes'), (0,'No')),
                                    widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph_1"}))
 
                         
-    graph_1_start_period_number = forms.IntegerField(label="Graph 1 Start Day",
+    graph_1_start_period_number = forms.IntegerField(label="Back Graph Start Day",
                                                    min_value=1,
                                                    widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_1_start_period_number",
                                                                                    "step":"1",
                                                                                    "min":"1"}))                                                           
 
-    graph_1_end_period_number = forms.IntegerField(label="Graph 1 End Day",
+    graph_1_end_period_number = forms.IntegerField(label="Back Graph End Day",
                                                  min_value=1,
                                                  widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_1_end_period_number",
                                                                                  "step":"1",
                                                                                  "min":"1"}))
     
-    show_graph_2 = forms.ChoiceField(label='Show Graph 2',
+    show_graph_2 = forms.ChoiceField(label='Show Front Graph',
                                    choices=((1, 'Yes'), (0,'No')),
                                    widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.show_graph_2"}))
 
                         
-    graph_2_start_period_number = forms.IntegerField(label="Graph 2 Start Day",
+    graph_2_start_period_number = forms.IntegerField(label="Front Graph Start Day",
                                                      min_value=1,
                                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_2_start_period_number",
                                                                                      "step":"1",
                                                                                      "min":"1"}))                                                           
 
-    graph_2_end_period_number = forms.IntegerField(label="Graph 2 End Day",
+    graph_2_end_period_number = forms.IntegerField(label="Front Graph End Day",
                                                    min_value=1,
                                                    widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.graph_2_end_period_number",
                                                                                    "step":"1",
