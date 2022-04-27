@@ -488,23 +488,45 @@ class SessionPlayerPeriod(models.Model):
         
         writer.writerow(v)
     
-    def write_heart_rate_download_csv(self, writer):
+    def write_activities_download_csv(self, writer):
         '''
         take csv writer and add row
         '''
-        # ["Session ID", "Period", "Player", "Group", 
-        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
-        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
-
+    #    ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time"]
        
 
         if self.fitbit_activities:
-            v = [self.session_period.session.id,
-                    self.session_period.period_number,
-                    self.session_player.player_number,
-                    self.session_player.group_number]
-        
-            writer.writerow(v)
+
+            for a in self.fitbit_activities["activities"]:
+                v = [self.session_period.session.id,
+                        self.session_period.period_number,
+                        self.session_player.player_number,
+                        self.session_player.group_number]
+                
+                v.append(a["activityName"])
+
+                #zone minutes
+                zone_minutes = 0
+
+                if a.get("activeZoneMinutes", False):
+                    zone_minutes = a["activeZoneMinutes"].get("totalMinutes", 0)
+
+                v.append(zone_minutes)
+
+                #start/end time
+                start_time = datetime.strptime(a.get("startTime"),'%Y-%m-%dT%H:%M:%S.%f%z')
+                end_time = start_time + timedelta(milliseconds=a.get("duration"))
+
+                prm = main.models.Parameters.objects.first()
+                tmz = pytz.timezone(prm.experiment_time_zone) 
+
+                v.append(start_time.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p"))
+                v.append(end_time.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p"))
+
+                #log type
+                v.append(a.get("logType"))
+
+                writer.writerow(v)
 
     def json_for_check_in(self):
         '''

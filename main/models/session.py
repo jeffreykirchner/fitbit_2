@@ -212,19 +212,19 @@ class Session(models.Model):
     
     def get_download_activities_csv(self):
         '''
-        return activites data recruiter in csv format
+        return activities data recruiter in csv format
         '''
         output = io.StringIO()
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time"]
+        v = ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
 
         writer.writerow(v)
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
             for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
-                s_p.write_heart_rate_download_csv(writer)
+                s_p.write_activities_download_csv(writer)
 
         return output.getvalue()
     

@@ -55,7 +55,7 @@ takeDownloadHeartRateData(messageData){
 downloadActivityData(){
     app.$data.working = true;
     this.data_downloading = true;
-    app.sendMessage("download_activites_data", {});
+    app.sendMessage("download_activities_data", {});
 },
 
 /** take download recruiter data
