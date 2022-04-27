@@ -107,7 +107,10 @@
                         v-on:click = "checkIn()" 
                         v-bind:disabled="reconnecting || working"> 
                     
-                    <span v-if="session_player.checked_in_today">
+                    <span v-if="working">
+                        <i class="fas fa-cog fa-spin fa-1x"></i>
+                    </span>
+                    <span v-else-if="session_player.checked_in_today">
                         Check In Again <i class="fas fa-check"></i>
                     </span>
                     <span v-else>
