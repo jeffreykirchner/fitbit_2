@@ -23,6 +23,14 @@
         border-style: solid;
         border-width: 1px;
     }
+
+    .chat {       
+        width: 100%;
+        height: 300px;
+        word-breaK:break-word;
+        overflow-y:scroll;
+        background-color: ghostwhite;
+    }
        
 </style>
 
@@ -85,38 +93,49 @@
         </div>
     </div>
     
-    <!-- notice -->
-    <div class="row justify-content-center mt-4" v-if="session.current_parameter_set_period.show_notice">
-        <div class="col-lg-6 mt-4 mt-lg-0">
-            {%include "subject/subject_home/notice/notice_card.html"%}   
+    <div class="row justify-content-center mt-3">
+        <div class="col-lg-4" v-cloak v-if="session.enable_chat && first_load_done">
+            <div class="row justify-content-center" >
+                <div class="col-lg mb-3 mb-lg-0">
+                    {%include "subject/subject_home/chat/chat_card.html"%}   
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <!-- checkin -->
-    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
-        <div class="col-lg-6 mt-4 mt-lg-0">
-            {%include "subject/subject_home/checkin/checkin_card.html"%}   
-              
+        <div class="col-lg-8">
+             <!-- notice -->    
+            <div class="row justify-content-center" v-cloak v-if="session.current_parameter_set_period && session.current_parameter_set_period.show_notice">
+                <div class="col-lg mt-lg-0 mb-3">
+                    {%include "subject/subject_home/notice/notice_card.html"%}   
+                </div>
+            </div>            
+            <!-- checkin -->
+            <div class="row justify-content-center" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
+                <div class="col-lg">
+                    {%include "subject/subject_home/checkin/checkin_card.html"%}   
+                </div>
+            </div>
+            
+            <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    {%include "subject/subject_home/connect/connect_card.html"%}   
+                </div>
+            </div>
+            
+            <div class="row justify-content-center mt-2 pb-0 mb-0">
+                <div class="col-md text-end text-muted">
+                    <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
+                </div>  
+            </div>
+            
+            <div class="row justify-content-center pt-0 mt-0">
+                <div class="col-md text-end text-muted">
+                    <span class="align-middle">v[[software_version]]</span>
+                </div>  
+            </div>
         </div>
+
     </div>
-    
-    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
-        <div class="col-lg-6 mt-4 mt-lg-0">
-            {%include "subject/subject_home/connect/connect_card.html"%}   
-        </div>
-    </div>
-    
-    <div class="row justify-content-center mt-2 pb-0 mb-0">
-        <div class="col-md text-end text-muted">
-            <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
-        </div>  
-    </div>
-    
-    <div class="row justify-content-center pt-0 mt-0">
-        <div class="col-md text-end text-muted">
-            <span class="align-middle">v[[software_version]]</span>
-        </div>  
-    </div>
+   
 </div>
 <!-- instructions -->
 

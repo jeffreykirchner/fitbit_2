@@ -7,13 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 import main
 
-class ChatTypes(models.TextChoices):
-    '''
-    chat types
-    '''
-    ALL = 'All', _('All')
-    INDIVIDUAL = 'Individual', _('Individual')
-
 class ExperimentPhase(models.TextChoices):
     '''
     experiment phases

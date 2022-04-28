@@ -3,6 +3,7 @@ session player chat
 '''
 
 #import logging
+import pytz
 
 from django.db import models
 from django.db.models import Q
@@ -11,7 +12,9 @@ from django.db.models import F
 from main.models import SessionPlayer
 from main.models import SessionPeriod
 
-from main.globals import ChatTypes
+from main.globals import todays_date
+
+import main
 
 class SessionPlayerChat(models.Model):
     '''
@@ -20,10 +23,8 @@ class SessionPlayerChat(models.Model):
     session_period = models.ForeignKey(SessionPeriod, on_delete=models.CASCADE, related_name="session_player_chats_a")
     session_player = models.ForeignKey(SessionPlayer, on_delete=models.CASCADE, related_name="session_player_chats_b")
 
-    session_player_recipients = models.ManyToManyField(SessionPlayer, related_name="session_player_chats_c")
-
-    text = models.CharField(max_length = 1000, default="Chat here", verbose_name="Chat Text")             #chat text
-    chat_type = models.CharField(max_length=100, choices=ChatTypes.choices, verbose_name="Chat Type")     #target of chat
+    text = models.CharField(max_length = 1000, default="Chat here", verbose_name="Chat Text")       #chat text
+    show_time_stamp = models.BooleanField(default=False)                                            #show time stamp in chat box if this is true        
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -62,10 +63,8 @@ class SessionPlayerChat(models.Model):
 
             "sender_client_number" : self.session_player.player_number,
 
-            "session_player_recipients" : [i.parameter_set_player.id_label for i in self.session_player_recipients.all()],
-
             "text" : self.text,
-            "chat_type" : self.chat_type,
+            
         }
 
     def json_for_subject(self):
@@ -73,11 +72,26 @@ class SessionPlayerChat(models.Model):
         json object of model
         '''
 
+        time_stamp_text = ""
+
+        if self.show_time_stamp:
+            prm = main.models.Parameters.objects.first()
+            tmz = pytz.timezone(prm.experiment_time_zone) 
+            
+            timestamp_tmz =  self.timestamp.astimezone(tmz)
+
+            if timestamp_tmz.date() == todays_date().date():
+                time_stamp_text = timestamp_tmz.strftime("%#I:%M %p")
+            else:
+                time_stamp_text = timestamp_tmz.strftime("%#m/%#d/%Y %#I:%M %p")
+
         return{
             "id" : self.id,    
             "sender_label" : self.session_player.parameter_set_player.id_label,  
             "sender_id" : self.session_player.id,    
             "text" : self.text,
+            "show_time_stamp" : self.show_time_stamp,
+            "time_stamp_text" : time_stamp_text,
         }
         
     #return json object of class
@@ -87,13 +101,9 @@ class SessionPlayerChat(models.Model):
         '''
 
         return{
-            "id" : self.id,         
-
+            "id" : self.id,       
+            "send_id" : self.session_player.id,  
             "sender_label" : self.session_player.parameter_set_player.id_label,
-
-            "session_player_recipients" : [i.parameter_set_player.id_label for i in self.session_player_recipients.all()],
-
             "text" : self.text,
-            "chat_type" : self.chat_type,
         }
         

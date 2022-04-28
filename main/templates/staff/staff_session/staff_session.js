@@ -228,10 +228,10 @@ var app = Vue.createApp({
             let result = messageData.status;
             let chat = result.chat;
 
-            if(this.session.chat_all.length>=100)
-                this.session.chat_all.shift();
+            if(this.session.chat.length>=100)
+                this.session.chat.shift();
             
-            this.session.chat_all.push(chat);
+            this.session.chat.push(chat);
             app.updateChatDisplay(false);
         },
 
@@ -240,12 +240,12 @@ var app = Vue.createApp({
          */
         updateChatDisplay(force_scroll){
             
-            this.chat_list_to_display=this.session.chat_all;
+            this.chat_list_to_display=this.session.chat;
 
             //add spacers
             for(let i=this.chat_list_to_display.length;i<18;i++)
             {
-                this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0, chat_type:'All'})
+                this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0})
             }
 
             //scroll to view

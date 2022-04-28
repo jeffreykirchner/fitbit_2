@@ -1,0 +1,46 @@
+
+<div class="card">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">Chat</span>                    
+    </div>
+    <div class="card-body">     
+        <div class="row justify-content-center">
+            <div class="col chat">
+                <div class="p-1"
+                     v-for="(c, index) in chat_list_to_display" v-bind:key="c.id">
+
+                    <div v-if="c.sender_id==session_player.id" 
+                            class="text-end ps-5 pe-2" 
+                            v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"
+                            v-bind:id="'chat_id_' + c.id">
+                        [[c.text]]
+                    </div>
+
+                    <div v-else class="pe-5 ps-2" v-bind:id="'chat_id_' + c.id">
+                        <span class="fw-bold">Partner:</span> [[c.text]]
+                    </div>
+                </div>                   
+            </div>
+        </div>
+        <div class="row justify-content-center mt-2">
+            <div class="col">
+                <div class="input-group">
+                    <input type="text" 
+                           class="form-control" 
+                           placeholder="Chat Text" 
+                           v-model="chat_text"
+                           aria-label="Chat Text"                           
+                           v-on:keyup.enter="sendChat()"
+                           aria-describedby="send_chat_id">
+                    <button class="btn btn-outline-primary"
+                            type="button" 
+                            id="send_chat_id" 
+                            title="Send Chat"
+                            v-bind:disabled="reconnecting || working || session.started===false || session.finished"
+                            v-on:click="sendChat()">Send <i class="far fa-comment"></i></button>
+                </div>          
+            </div>
+        </div>
+        
+    </div>                    
+</div> 

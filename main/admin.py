@@ -103,6 +103,19 @@ class SessionPlayerPeriodAdmin(admin.ModelAdmin):
     
     readonly_fields = ['session_period', 'session_player']
 
+@admin.register(SessionPlayerChat)
+class SessionPlayerChatAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    
+    
+    readonly_fields = []
+
 class SessionPlayerInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False

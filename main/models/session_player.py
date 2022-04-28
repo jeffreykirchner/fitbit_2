@@ -249,7 +249,8 @@ class SessionPlayer(models.Model):
         else:
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
-            self.process_fitbit_last_synced(r["devices"]["result"])
+            if r["status"] != "fail":
+                self.process_fitbit_last_synced(r["devices"]["result"])
 
         if r["status"] == "fail" :
             return r
@@ -454,11 +455,13 @@ class SessionPlayer(models.Model):
         '''
         todays_session_player_period = self.get_todays_session_player_period()
 
-        chat_all = []
+        chat = []
+
         if self.session.parameter_set.enable_chat:
-            chat_all = [c.json_for_subject() for c in self.session_player_chats_c.filter(chat_type=main.globals.ChatTypes.ALL)
-                                                                                   .order_by('-timestamp')[:100:-1]
-                       ] if get_chat else [],
+            chat = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects.filter(session_player__in=self.session.session_players.all())
+                                                                                        .filter(session_player__group_number=self.group_number)     
+                                                                                .order_by('-timestamp')[:100:-1]
+                    ]
         
         session_player_periods_group_1_json = []
 
@@ -487,7 +490,7 @@ class SessionPlayer(models.Model):
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
-            "chat_all" : chat_all,
+            "chat" : chat,
             "new_chat_message" : False,           #true on client side when a new un read message comes in
 
             "current_instruction" : self.current_instruction,
@@ -593,21 +596,10 @@ class SessionPlayer(models.Model):
 
         todays_session_player_period = self.get_todays_session_player_period()
 
-        chat_individual = []
-
-        if self.session.parameter_set.enable_chat:
-            chat_individual = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects \
-                                                                            .filter(chat_type=main.globals.ChatTypes.INDIVIDUAL) \
-                                                                            .filter(Q(Q(session_player_recipients=session_player) & Q(session_player=self)) |
-                                                                                    Q(Q(session_player_recipients=self) & Q(session_player=session_player)))
-                                                                            .order_by('-timestamp')[:100:-1]
-                                ],
-
         return{
             "id" : self.id,  
 
             "player_number" : self.player_number,
-            "chat_individual" :chat_individual,
             "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
             "session_player_periods_1" : self.get_session_player_periods_1_json(),

@@ -27,7 +27,7 @@ class ParameterSetPlayer(models.Model):
     class Meta:
         verbose_name = 'Parameter Set Player'
         verbose_name_plural = 'Parameter Set Players'
-        ordering=['id_label']
+        ordering=['id']
 
     def from_dict(self, source):
         '''

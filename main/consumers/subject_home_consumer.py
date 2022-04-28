@@ -1,6 +1,8 @@
 '''
 websocket session list
 '''
+from datetime import datetime
+from datetime import timedelta
 from wsgiref.simple_server import software_version
 from asgiref.sync import sync_to_async
 
@@ -8,8 +10,8 @@ import logging
 import copy
 import json
 import string
+import pytz
 from copy import copy
-from copy import deepcopy
 
 from django.core.exceptions import  ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
@@ -24,7 +26,6 @@ from main.models import Session
 from main.models import SessionPlayer
 from main.models import SessionPlayerChat
 
-from main.globals import ChatTypes
 from main.globals import round_half_away_from_zero
 
 from main.decorators import check_sesison_started_ws
@@ -70,19 +71,18 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         take chat from client
         '''        
-        result = await sync_to_async(take_chat)(self.session_id, self.session_player_id, event["message_text"])
+        r = await sync_to_async(take_chat)(self.session_id, self.session_player_id, event["message_text"])
 
-        if result["value"] == "fail":
-            await self.send(text_data=json.dumps({'message': result}, cls=DjangoJSONEncoder))
+        if r["value"] == "fail":
+            await self.send(text_data=json.dumps({'message': r}, cls=DjangoJSONEncoder))
             return
 
-        event_result = result["result"]
+        event_result = r["result"]
 
         subject_result = {}
-        subject_result["chat_type"] = event_result["chat_type"]
         subject_result["sesson_player_target"] = event_result.get("sesson_player_target", -1)
         subject_result["chat"] = event_result["chat_for_subject"]
-        subject_result["value"] = result["value"]
+        subject_result["value"] = r["value"]
 
         staff_result = {}
         staff_result["chat"] = event_result["chat_for_staff"]
@@ -98,14 +98,18 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
         #if success send to all connected clients
-        if result["value"] == "success":
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {"type": "update_chat",
-                 "subject_result": subject_result,
-                 "staff_result": staff_result,
-                 "sender_channel_name": self.channel_name},
-            )
+        if r["value"] == "success":
+
+            for p in event_result["recipients"]:
+
+                await self.channel_layer.send(
+                    p,
+                    {"type": "update_chat",
+                    "subject_result": subject_result,
+                    "staff_result": staff_result,
+                    "sender_channel_name": self.channel_name}
+                )
+
 
     async def name(self, event):
         '''
@@ -257,12 +261,6 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         if self.channel_name == event['sender_channel_name']:
             return
-        
-        if message_data['status']['chat_type'] == "Individual" and \
-           message_data['status']['sesson_player_target'] != self.session_player_id and \
-           message_data['status']['chat']['sender_id'] != self.session_player_id:
-
-           return
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
@@ -381,7 +379,6 @@ def take_chat(session_id, session_player_id, data):
     logger.info(f"take chat: {session_id} {session_player_id} {data}")
 
     try:
-        recipients = data["recipients"] 
         chat_text = data["text"]
     except KeyError:
          return {"value" : "fail", "result" : {"message" : "Invalid chat."}}
@@ -406,40 +403,22 @@ def take_chat(session_id, session_player_id, data):
     if session.current_experiment_phase != main.globals.ExperimentPhase.RUN:
             return {"value" : "fail", "result" : {"message" : "Session not running."}}
 
-    if recipients == "all":
-        session_player_chat.chat_type = ChatTypes.ALL
-    else:
-        if not session.parameter_set.enable_chat:
-            logger.warning(f"take chat: private chat not enabled :{session_id} {session_player_id} {data}")
-            return {"value" : "fail",
-                    "result" : {"message" : "Private chat not allowed."}}
+    #return group channel ids
+    result["recipients"] = [p.channel_name for p in session.session_players.filter(group_number=session_player.group_number)]
 
-        session_player_chat.chat_type = ChatTypes.INDIVIDUAL
+    #if more than one hour since last chat message then show date
 
-    result["chat_type"] = session_player_chat.chat_type
-    result["recipients"] = []
+    c = main.models.SessionPlayerChat.objects.filter(session_player__in=session.session_players.all()) \
+                                             .filter(session_player__group_number=session_player.group_number) \
+                                             .order_by('timestamp').last()
 
+    if not c:
+        session_player_chat.show_time_stamp = True
+    elif datetime.now(pytz.UTC) - c.timestamp>timedelta(minutes=60):
+        session_player_chat.show_time_stamp = True
+        
     session_player_chat.text = chat_text
     session_player_chat.save()
-
-    if recipients == "all":
-        session_player_chat.session_player_recipients.add(*session.session_players.all())
-
-        result["recipients"] = [i.id for i in session.session_players.all()]
-    else:
-        sesson_player_target = SessionPlayer.objects.get(id=recipients)
-
-        if sesson_player_target in session.session_players.all():
-            session_player_chat.session_player_recipients.add(sesson_player_target)
-        else:
-            session_player_chat.delete()
-            logger.warning(f"take chat: chat at none group member : {session_id} {session_player_id} {data}")
-            return {"value" : "fail", "result" : {"Player not in group."}}
-
-        result["sesson_player_target"] = sesson_player_target.id
-
-        result["recipients"].append(session_player.id)
-        result["recipients"].append(sesson_player_target.id)
     
     result["chat_for_subject"] = session_player_chat.json_for_subject()
     result["chat_for_staff"] = session_player_chat.json_for_staff()

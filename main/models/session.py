@@ -371,13 +371,13 @@ class Session(models.Model):
         '''
 
         chat = []
-        if self.parameter_set.enable_chat: 
-            chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
-                                                    .filter(session_player__in=self.session_players.all())\
-                                                    .prefetch_related('session_player_recipients')
-                                                    .select_related('session_player__parameter_set_player')
-                                                    .order_by('-timestamp')[:100:-1]
-               ]
+        # if self.parameter_set.enable_chat: 
+        #     chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
+        #                                             .filter(session_player__in=self.session_players.all())\
+        #                                             .prefetch_related('session_player_recipients')
+        #                                             .select_related('session_player__parameter_set_player')
+        #                                             .order_by('-timestamp')[:100:-1]
+        #       ]
 
         current_session_period = self.get_current_session_period()
 
@@ -403,7 +403,7 @@ class Session(models.Model):
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
             "session_players":[i.json_for_staff() for i in self.session_players.all()],
-            "chat_all" : chat,
+            "chat" : chat,
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
@@ -433,6 +433,8 @@ class Session(models.Model):
             "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
             "current_period"  : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+
+            "enable_chat" : self.parameter_set.enable_chat,
 
             "finished":self.finished,
 

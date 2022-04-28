@@ -21,7 +21,7 @@ class ParameterSet(models.Model):
     '''    
     instruction_set = models.ForeignKey(InstructionSet, on_delete=models.CASCADE, related_name="parameter_sets")
     
-    enable_chat = models.BooleanField(default=False, verbose_name = 'Private Chat')                           #if true subjects can privately chat one on one
+    enable_chat = models.BooleanField(default=False, verbose_name = 'Enable Chat')                           #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
 
     display_block = models.IntegerField(verbose_name='Number of Periods to Display', default=28)              #number of periods to display in subject graph
