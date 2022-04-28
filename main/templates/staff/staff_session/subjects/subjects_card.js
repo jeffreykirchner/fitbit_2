@@ -152,18 +152,11 @@ takeUpdateEmailList(messageData){
     {            
         $('#uploadEmailModal').modal('hide');    
 
-        result = messageData.status.result;
-
-        for(i=0; i<result.length; i++)
-        {
-            let session_player = app.findSessionPlayer(result[i].id);
-            session_player.email = (result[i].email);
-        }
+        app.session = messageData.status.result.session;
     } 
     else
     {
-        app.$data.cancelModal=true;                           
-        app.displayErrors(messageData.status.errors);
+        
     } 
 },
 
