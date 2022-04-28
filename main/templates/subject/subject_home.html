@@ -33,75 +33,92 @@
 <!-- modals -->
 {%include "help_modal.html"%}
 
+<!-- show only on virtical phone -->
+<div class="d-sm-none">
+    <div class="row justify-content-center mt-4 " v-cloak>
+        <div class="col mt-4 fs-3 text-center">
+            <br>
+            This screen resolution is not supported.<br><br>
+            If you are using a mobile device, try turning your device horizontally.<br><br>
+            <i class="fas fa-mobile-alt fa-2x"></i>
+            <i class="fas fa-undo fa-lg ps-4 pe-4"></i>
+            <i class="fas fa-mobile-alt fa-rotate-270 fa-2x"></i>
+        </div>
+    </div>
+</div>
+<!-- hide on vertical phone -->
+<div class="d-none d-sm-block">
+    <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
+        <div class="col-md">
+            {%include "subject/subject_home/instructions/instructions_card.html"%}
+        </div>
+    </div>
+    
+    <!-- experiment -->
+    
+    <!-- not started -->
+    <div class="row justify-content-center mt-4" v-cloak v-show="session.started == false || session.is_before_first_period">
+        <div class="col-12 fs-4 fw-bold text-center">
+            <br>
+            <br>
+            <br>
+            <br>
+            Please wait for the experiment to begin.
+        </div>
+    </div>
+    
+    <!-- complete -->
+    <div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period || session_player.disabled">
+        <div class="col-12 fs-4 fw-bold text-center">
+            <br>
+            <br>
+            <br>
+            <br>
+            The experiment is complete, thank you for your participation.
+        </div>
+    </div>
+    
+    <!-- graph -->
+    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
+        <div class="col-md">
+            {%include "subject/subject_home/graph/graph_card.html"%}                
+        </div>
+    </div>
+    
+    <!-- notice -->
+    <div class="row justify-content-center mt-4" v-if="session.current_parameter_set_period.show_notice">
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            {%include "subject/subject_home/notice/notice_card.html"%}   
+        </div>
+    </div>
+    
+    <!-- checkin -->
+    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            {%include "subject/subject_home/checkin/checkin_card.html"%}   
+              
+        </div>
+    </div>
+    
+    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            {%include "subject/subject_home/connect/connect_card.html"%}   
+        </div>
+    </div>
+    
+    <div class="row justify-content-center mt-2 pb-0 mb-0">
+        <div class="col-md text-end text-muted">
+            <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
+        </div>  
+    </div>
+    
+    <div class="row justify-content-center pt-0 mt-0">
+        <div class="col-md text-end text-muted">
+            <span class="align-middle">v[[software_version]]</span>
+        </div>  
+    </div>
+</div>
 <!-- instructions -->
-<div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
-    <div class="col-md">
-        {%include "subject/subject_home/instructions/instructions_card.html"%}
-    </div>
-</div>
 
-<!-- experiment -->
-
-<!-- not started -->
-<div class="row justify-content-center mt-4" v-cloak v-show="session.started == false || session.is_before_first_period">
-    <div class="col-12 fs-4 fw-bold text-center">
-        <br>
-        <br>
-        <br>
-        <br>
-        Please wait for the experiment to begin.
-    </div>
-</div>
-
-<!-- complete -->
-<div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period || session_player.disabled">
-    <div class="col-12 fs-4 fw-bold text-center">
-        <br>
-        <br>
-        <br>
-        <br>
-        The experiment is complete, thank you for your participation.
-    </div>
-</div>
-
-<!-- graph -->
-<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
-    <div class="col-md">
-        {%include "subject/subject_home/graph/graph_card.html"%}                
-    </div>
-</div>
-
-<!-- notice -->
-<div class="row justify-content-center mt-4" v-if="session.current_parameter_set_period.show_notice">
-    <div class="col-lg-6 mt-4 mt-lg-0">
-        {%include "subject/subject_home/notice/notice_card.html"%}   
-    </div>
-</div>
-
-<!-- checkin -->
-<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
-    <div class="col-lg-6 mt-4 mt-lg-0">
-        {%include "subject/subject_home/checkin/checkin_card.html"%}   
-          
-    </div>
-</div>
-
-<div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
-    <div class="col-lg-6 mt-4 mt-lg-0">
-        {%include "subject/subject_home/connect/connect_card.html"%}   
-    </div>
-</div>
-
-<div class="row justify-content-center mt-2 pb-0 mb-0">
-    <div class="col-md text-end text-muted">
-        <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
-    </div>  
-</div>
-
-<div class="row justify-content-center pt-0 mt-0">
-    <div class="col-md text-end text-muted">
-        <span class="align-middle">v[[software_version]]</span>
-    </div>  
-</div>
 
 {% endblock %}
