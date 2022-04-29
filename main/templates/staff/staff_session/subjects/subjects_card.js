@@ -291,7 +291,7 @@ updateChatDisplay(){
     //add spacers
     for(let i=this.chat_list_to_display.length;i<18;i++)
     {
-        this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0})
+        this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:this.session.session_players[app.current_subject].id})
     }
 },
 
