@@ -9,6 +9,8 @@
                 <div class="p-1"
                      v-for="(c, index) in chat_list_to_display" v-bind:key="c.id">
 
+                    <div class="text-center text-muted" v-if="c.show_time_stamp">[[c.time_stamp_text]]</div>
+
                     <div v-if="c.sender_id==session_player.id" 
                             class="text-end ps-5 pe-2" 
                             v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"

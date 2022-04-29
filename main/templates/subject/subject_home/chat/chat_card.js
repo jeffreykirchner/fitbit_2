@@ -52,7 +52,7 @@ updateChatDisplay(){
     this.chat_list_to_display=Array.from(this.session_player.chat);
     
     //add spacers
-    for(let i=this.chat_list_to_display.length;i<12;i++)
+    for(let i=this.chat_list_to_display.length;i<9;i++)
     {
         this.chat_list_to_display.unshift({id:i*-1, text:"|", sender_id:this.session_player.id})
     }

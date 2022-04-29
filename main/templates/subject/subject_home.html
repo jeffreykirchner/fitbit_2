@@ -94,14 +94,14 @@
     </div>
     
     <div class="row justify-content-center mt-3">
-        <div class="col-lg-4" v-cloak v-if="session.enable_chat && first_load_done">
+        <div class="col-lg-5" v-cloak v-if="session.enable_chat && first_load_done">
             <div class="row justify-content-center" >
                 <div class="col-lg mb-3 mb-lg-0">
                     {%include "subject/subject_home/chat/chat_card.html"%}   
                 </div>
             </div>
         </div>
-        <div class="col-lg-8">
+        <div class="col-lg-7">
              <!-- notice -->    
             <div class="row justify-content-center" v-cloak v-if="session.current_parameter_set_period && session.current_parameter_set_period.show_notice">
                 <div class="col-lg mt-lg-0 mb-3">

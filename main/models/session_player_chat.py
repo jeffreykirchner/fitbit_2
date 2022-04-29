@@ -81,9 +81,9 @@ class SessionPlayerChat(models.Model):
             timestamp_tmz =  self.timestamp.astimezone(tmz)
 
             if timestamp_tmz.date() == todays_date().date():
-                time_stamp_text = timestamp_tmz.strftime("%#I:%M %p")
+                time_stamp_text = "Today " + timestamp_tmz.strftime("%-I:%M %p")
             else:
-                time_stamp_text = timestamp_tmz.strftime("%#m/%#d/%Y %#I:%M %p")
+                time_stamp_text = timestamp_tmz.strftime("%-m/%-d/%Y %-I:%M %p")
 
         return{
             "id" : self.id,    
