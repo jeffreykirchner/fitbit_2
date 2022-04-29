@@ -160,10 +160,10 @@ var app = Vue.createApp({
 
             if(!app.first_load_done)
             {
-                setTimeout(function(){
-                            document.getElementById("id_graph_card").scrollIntoView();
-                           }, 
-                           500);
+                // setTimeout(function(){
+                //             document.getElementById("id_graph_card").scrollIntoView();
+                //            }, 
+                //            500);
             }
 
             if(this.session.current_experiment_phase == 'Instructions')
