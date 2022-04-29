@@ -163,7 +163,7 @@ var app = Vue.createApp({
                 setTimeout(function(){
                             document.getElementById("id_graph_card").scrollIntoView();
                            }, 
-                           250);
+                           500);
             }
 
             if(this.session.current_experiment_phase == 'Instructions')
