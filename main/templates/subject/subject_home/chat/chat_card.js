@@ -48,6 +48,7 @@ takeUpdateChat(messageData){
 /** update chat displayed on the screen
  */
 updateChatDisplay(){
+    if(!this.session.enable_chat) return;
 
     this.chat_list_to_display=Array.from(this.session_player.chat);
     

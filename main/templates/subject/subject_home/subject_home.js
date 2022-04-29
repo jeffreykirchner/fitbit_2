@@ -98,7 +98,7 @@ var app = Vue.createApp({
                     app.takeCheckIn(messageData);
                     break;
                 case "survey_complete":
-                    app.takeCheckIn(messageData);
+                    app.takeSurveyComplete(messageData);
                     break;
                 case "help_doc":
                     app.takeLoadHelpDoc(messageData);
@@ -156,12 +156,14 @@ var app = Vue.createApp({
                     app.updateChatDisplay();               
                 }
 
+            }
 
-                // if game is finished show modal
-                if(app.$data.session.finished)
-                {
-                    this.showEndGameModal();
-                }
+            if(!app.first_load_done)
+            {
+                setTimeout(function(){
+                            document.getElementById("id_graph_card").scrollIntoView();
+                           }, 
+                           250);
             }
 
             if(this.session.current_experiment_phase == 'Instructions')
@@ -191,22 +193,6 @@ var app = Vue.createApp({
             this.avatar_choice_grid_selected_col = 0;
 
             $('#endGameModal').modal('hide');
-        },
-
-        /**
-         * show the end game modal
-         */
-        showEndGameModal(){
-            if(this.end_game_modal_visible) return;
-
-            //show endgame modal
-            var myModal = new bootstrap.Modal(document.getElementById('endGameModal'), {
-                keyboard: false
-                })
-            
-            myModal.toggle();
-
-            this.end_game_modal_visible = true;
         },
 
          /**
