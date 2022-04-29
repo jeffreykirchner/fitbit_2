@@ -66,6 +66,7 @@ updateChatDisplay(){
 },
 
 updateChatDisplayScroll(){
+    return;
     if(!app.session.enable_chat) return;
     
     var elmnt = document.getElementById("chat_id_" + app.chat_list_to_display[this.chat_list_to_display.length-1].id.toString());

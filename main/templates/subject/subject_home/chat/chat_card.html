@@ -11,23 +11,25 @@
     </div>
     <div class="card-body">     
         <div class="row justify-content-center">
-            <div class="col chat">
-                <div class="p-1"
-                     v-for="(c, index) in chat_list_to_display" v-bind:key="c.id">
+            <div class="col">             
+                <div class = "chat">
+                    <div class="p-1"
+                        v-for="(c, index) in chat_list_to_display.slice().reverse()" v-bind:key="c.id">
 
-                    <div class="text-center text-muted" v-if="c.show_time_stamp">[[c.time_stamp_text]]</div>
+                        <div class="text-center text-muted" v-if="c.show_time_stamp">[[c.time_stamp_text]]</div>
 
-                    <div v-if="c.sender_id==session_player.id" 
-                            class="text-end ps-5 pe-2" 
-                            v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"
-                            v-bind:id="'chat_id_' + c.id">
-                        [[c.text]]
+                        <div v-if="c.sender_id==session_player.id" 
+                                class="text-end ps-5 pe-2" 
+                                v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"
+                                v-bind:id="'chat_id_' + c.id">
+                            [[c.text]]
+                        </div>
+
+                        <div v-else class="pe-5 ps-2" v-bind:id="'chat_id_' + c.id">
+                            <span class="fw-bold">Partner:</span> [[c.text]]
+                        </div>
                     </div>
-
-                    <div v-else class="pe-5 ps-2" v-bind:id="'chat_id_' + c.id">
-                        <span class="fw-bold">Partner:</span> [[c.text]]
-                    </div>
-                </div>                   
+                </div>        
             </div>
         </div>
         <div class="row justify-content-center mt-2">
