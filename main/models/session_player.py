@@ -491,7 +491,6 @@ class SessionPlayer(models.Model):
             "parameter_set_player" : self.parameter_set_player.json(),
 
             "chat" : chat,
-            "new_chat_message" : False,           #true on client side when a new un read message comes in
 
             "current_instruction" : self.current_instruction,
             "current_instruction_complete" : self.current_instruction_complete,
@@ -528,6 +527,14 @@ class SessionPlayer(models.Model):
         return json for staff screen
         '''
 
+        chat = []
+
+        if self.session.parameter_set.enable_chat:
+            chat = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects.filter(session_player__in=self.session.session_players.all())
+                                                                                        .filter(session_player__group_number=self.group_number)     
+                                                                                .order_by('-timestamp')[:100:-1]
+                    ]
+
         todays_session_player_period = self.get_todays_session_player_period()
         
         session_player_periods_group_1_json = []
@@ -559,11 +566,11 @@ class SessionPlayer(models.Model):
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
-            "new_chat_message" : False,           #true on client side when a new un read message comes in
-
             "current_instruction" : self.current_instruction,
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
+
+            "chat" : chat,
 
             "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.filter(session_period__period_number__lte=period_number)],
 
@@ -600,7 +607,6 @@ class SessionPlayer(models.Model):
             "id" : self.id,  
 
             "player_number" : self.player_number,
-            "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
             "session_player_periods_1" : self.get_session_player_periods_1_json(),
             "session_player_periods_2" : self.get_session_player_periods_2_json(),

@@ -87,9 +87,6 @@ var app = Vue.createApp({
                 case "update_reset_experiment":
                     app.takeUpdateResetExperiment(messageData);
                     break;
-                case "update_chat":
-                    app.takeUpdateChat(messageData);
-                    break;
                 case "update_connection_status":
                     app.takeUpdateConnectionStatus(messageData);
                     break;   
@@ -111,8 +108,8 @@ var app = Vue.createApp({
                 case "download_activities_data":
                     app.takedownloadActivityData(messageData);
                     break;
-                case "download_payment_data":
-                    app.takeDownloadPaymentData(messageData);
+                case "download_chat_data":
+                    app.takeDownloadChatData(messageData);
                     break;
                 case "update_next_instruction":
                     app.takeNextInstruction(messageData);
@@ -173,8 +170,6 @@ var app = Vue.createApp({
         *    @param messageData {json} session day in json format
         */
         takeGetSession(messageData){
-            
-           
 
             app.$data.session = messageData.session;
 
@@ -220,63 +215,13 @@ var app = Vue.createApp({
             }
         },
 
-        /** take updated data from goods being moved by another player
-        *    @param messageData {json} session day in json format
-        */
-        takeUpdateChat(messageData){
-            
-            let result = messageData.status;
-            let chat = result.chat;
-
-            if(this.session.chat.length>=100)
-                this.session.chat.shift();
-            
-            this.session.chat.push(chat);
-            app.updateChatDisplay(false);
-        },
-
-        /**
-         * update chat
-         */
-        updateChatDisplay(force_scroll){
-            
-            this.chat_list_to_display=this.session.chat;
-
-            //add spacers
-            for(let i=this.chat_list_to_display.length;i<18;i++)
-            {
-                this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0})
-            }
-
-            //scroll to view
-            if(this.chat_list_to_display.length>0)
-            {
-                Vue.nextTick(() => {app.updateChatDisplayScroll(force_scroll)});        
-            }
-        },
-
-        /**
-         * scroll to newest chat element
-         */
-        updateChatDisplayScroll(force_scroll){
-
-            if(!app.session.enable_chat) return;
-
-            if(window.innerHeight + window.pageYOffset >= document.body.offsetHeight || force_scroll)
-            {
-                var elmnt = document.getElementById("chat_id_" + app.$data.chat_list_to_display[app.$data.chat_list_to_display.length-1].id.toString());
-                elmnt.scrollIntoView(); 
-            }
-        },
-
         /**
          * take update end game
          */
-         takeUpdateEndGame(messageData){
+        takeUpdateEndGame(messageData){
 
-         },
+        },
 
-       
         //do nothing on when enter pressed for post
         onSubmit(){
             //do nothing

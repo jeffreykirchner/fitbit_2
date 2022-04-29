@@ -209,13 +209,13 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def download_payment_data(self, event):
+    async def download_chat_data(self, event):
         '''
-        download payment data
+        download chat data
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_payment_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_chat_data)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -611,14 +611,14 @@ def take_download_activities_data(session_id):
 
     return {"value" : "success", "result" : session.get_download_activities_csv()}
 
-def take_download_payment_data(session_id):
+def take_download_chat_data(session_id):
     '''
-    download payment data for session
+    download chat data for session
     '''
 
     session = Session.objects.get(id=session_id)
 
-    return {"value" : "success", "result" : session.get_download_payment_csv()}
+    return {"value" : "success", "result" : session.get_download_chat_csv()}
 
 def take_end_early(session_id):
     '''
@@ -774,7 +774,6 @@ def take_email_list(session_id, data):
     
     return {"value" : "success", "result" : {"session":session.json()}}
             
-
 def take_fill_with_test_data(session_id, data):
     '''
     fill subjects with test data up to this point in the experiment

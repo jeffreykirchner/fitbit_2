@@ -45,15 +45,18 @@ class SessionPlayerChat(models.Model):
         '''
         take csv writer and add row
         '''        
+
+        # ["Session ID", "Period", "Player", "Group", "Chat", "Timestamp"]
+
+        prm = main.models.Parameters.objects.first()
+        tmz = pytz.timezone(prm.experiment_time_zone) 
        
-        writer.writerow([self.session_player.session.id,
-                        self.session_period.period_number,
-                        self.session_player.player_number,
-                        self.session_player.parameter_set_player.id_label,
-                        "Chat",
-                        self.text,
-                        self.json_csv(),
-                        self.timestamp])
+        writer.writerow([self.session_period.session.id,
+                         self.session_period.period_number,
+                         self.session_player.player_number,
+                         self.session_player.group_number,
+                         self.text,
+                         self.timestamp.astimezone(tmz).strftime("%m/%d/%Y %I:%M:%S %p")])
 
     def json_csv(self):
         '''

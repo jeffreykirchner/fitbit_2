@@ -48,6 +48,16 @@
         background-color:#ececec;
     }
 
+    .chat {       
+        width: 100%;
+        height: 600px;
+        word-breaK:break-word;
+        overflow-y:scroll;
+        background-color: ghostwhite;
+        display:flex; 
+        flex-direction:column-reverse;
+    }
+
 </style>
 
 {{ form.media }}
@@ -61,6 +71,7 @@
 {%include "staff/staff_session/session/edit_session_modal.html"%}
 {%include "staff/staff_session/subjects/edit_subject_modal.html"%}
 {%include "staff/staff_session/subjects/view_subject_modal.html"%}
+{%include "staff/staff_session/subjects/view_subject_chat_modal.html"%}
 {%include "staff/staff_session/subjects/upload_email_list.html"%}
 {%include "staff/staff_session/control/sendInvitationModal.html"%}
 
@@ -72,14 +83,12 @@
             <div class="col mb-2">
                 {%include "staff/staff_session/subjects/subjects_card.html"%} 
             </div>               
-        </div>        
-        {%if session.parameter_set.enable_chat%}
+        </div>       
         <div class="row">
             <div class="col">
                {%include "staff/staff_session/graph/graph_card.html"%} 
             </div>            
         </div>   
-        {%endif%}         
     </div>
     <div class="col-md-3">
         <div class="row">

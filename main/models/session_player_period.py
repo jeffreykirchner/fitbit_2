@@ -438,7 +438,7 @@ class SessionPlayerPeriod(models.Model):
         prm = main.models.Parameters.objects.first()
         tmz = pytz.timezone(prm.experiment_time_zone) 
 
-        return  self.last_login.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p") 
+        return  self.last_login.astimezone(tmz).strftime("%m/%d/%Y %I:%M:%S %p") 
 
     def write_summary_download_csv(self, writer):
         '''

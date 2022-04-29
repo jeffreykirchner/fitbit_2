@@ -25,124 +25,108 @@
         <div class="row justify-content-center">           
             <div class="col-md-auto text-center">                
                 <div class="table-responsive">
-                <table class="table table-condensed"> 
-                    <thead>
-                        <tr>
-                            <th scope="col" class = "m-1 p-1">
-                                Client #
-                            </th>
-                            <th scope="col" class = "m-1 p-1">
-                                ID Label
-                            </th>
-                            <th scope="col" class = "m-1 p-1">
-                                Name
-                            </th>
-                            <th scope="col" class = "m-1 p-1">
-                                Email
-                            </th>
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Student ID
-                            </th>
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Group Number
-                            </th>
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Color
-                            </th>  
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Active
-                            </th>                                                
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Shareable<br>Login Link
-                            </th> 
-                            <th scope="col" class = "text-center m-1 p-1">
-                                Connected
-                            </th>
-                            <th scope="col" class = "text-center m-1 p-1">
-                                History
-                            </th> 
-                            <th scope="col" class = "text-center m-1 p-1" v-show="session.current_experiment_phase == 'Instructions'">
-                                Instructions
-                            </th>                            
-                        </tr>
-                    </thead>
-                    <tbody id="player_list">
-                        <tr v-for="(p, index) in session.session_players" v-bind:key="p.id">
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[p.player_number]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[p.parameter_set_player.id_label]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[p.name=="" ? "---" : p.name]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[(!p.email || p.email=="") ? "---" : p.email]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[p.student_id=="" ? "---" : p.student_id]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                [[p.group_number]]
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-bind:style="{color:p.parameter_set_player.display_color}">
-                                [[p.parameter_set_player.display_color]]
-                            </td>      
-                            <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
-                                <span v-if="!p.disabled > 0" style="color: lightgreen;">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <span v-else style="color: crimson;">
-                                    <i class="fas fa-times"></i>
-                                </span>
-                            </td>                                                  
-                            <td class="player_table_cell text-nowrap">
-                                <a v-bind:href="p.login_link">Login Link</a>
-                            </td>
-                            <td class="player_table_cell text-nowrap">
-                                <span v-if="p.connected_count > 0" style="color: lightgreen;">
-                                    <i class="fas fa-check"></i>
-                                </span>
-                                <span v-else style="color: crimson;">
-                                    <i class="fas fa-times"></i>
-                                </span>
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index)">
-                                <i class="fas fa-history"></i>
-                            </td>
-                            <td class="player_table_cell text-nowrap" v-show="session.current_experiment_phase == 'Instructions'">
-                                [[p.instructions_finished ? "Finished" : "Page " + p.current_instruction.toString()]]
-                            </td>                           
-                        </tr>
-                    </tbody>
-                    
-                </table>
+                    <table class="table table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th scope="col" class = "m-1 p-1">
+                                    Client #
+                                </th>
+                                <th scope="col" class = "m-1 p-1">
+                                    ID Label
+                                </th>
+                                <th scope="col" class = "m-1 p-1">
+                                    Name
+                                </th>
+                                <th scope="col" class = "m-1 p-1">
+                                    Email
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Student ID
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Group Number
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Color
+                                </th>  
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Active
+                                </th>                                                
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Shareable<br>Login Link
+                                </th> 
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Connected
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    History
+                                </th> 
+                                <th scope="col" class = "text-center m-1 p-1" v-show="session.parameter_set.enable_chat">
+                                    Chat
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1" v-show="session.current_experiment_phase == 'Instructions'">
+                                    Instructions
+                                </th>                            
+                            </tr>
+                        </thead>
+                        <tbody id="player_list">
+                            <tr v-for="(p, index) in session.session_players" v-bind:key="p.id">
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[p.player_number]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[p.parameter_set_player.id_label]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[p.name=="" ? "---" : p.name]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[(!p.email || p.email=="") ? "---" : p.email]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[p.student_id=="" ? "---" : p.student_id]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    [[p.group_number]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-bind:style="{color:p.parameter_set_player.display_color}">
+                                    [[p.parameter_set_player.display_color]]
+                                </td>      
+                                <td class="player_table_cell text-nowrap" v-on:click="showEditSubject(p.id)">
+                                    <span v-if="!p.disabled > 0" style="color: lightgreen;">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span v-else style="color: crimson;">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </td>                                                  
+                                <td class="player_table_cell text-nowrap">
+                                    <a v-bind:href="p.login_link">Login Link</a>
+                                </td>
+                                <td class="player_table_cell text-nowrap">
+                                    <span v-if="p.connected_count > 0" style="color: lightgreen;">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span v-else style="color: crimson;">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index)">
+                                    <i class="fas fa-history"></i>
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubjectChat(index)" v-show="session.parameter_set.enable_chat">
+                                    <i class="far fa-comment"></i>
+                                </td>
+                                <td class="player_table_cell text-nowrap" v-show="session.current_experiment_phase == 'Instructions'">
+                                    [[p.instructions_finished ? "Finished" : "Page " + p.current_instruction.toString()]]
+                                </td>                           
+                            </tr>
+                        </tbody>
+                        
+                    </table>
                 </div>
             </div>
         </div>  
         
-        <!-- private links -->
-        <div class="row justify-content-center">            
-            <div class="col-md-auto text-center">
-                Private Login Links (do not share with subjects)
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-auto text-center">
-                Next available connection:
-            </div>
-            <div class="col-md-auto text-center">
-                <a href='{%url "subject_home_auto_connect" session.session_key%}' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}</a>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-auto text-center">
-                Login by client number:
-            </div>
-            <div class="col-md-auto text-center">
-                <a href='{%url "subject_home_auto_connect" session.session_key%}[client_number]' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}[client_number]</a>
-            </div>
-        </div>
     </div>                    
 </div> 

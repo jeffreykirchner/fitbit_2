@@ -228,20 +228,24 @@ class Session(models.Model):
 
         return output.getvalue()
     
-    def get_download_payment_csv(self):
+    def get_download_chat_csv(self):
         '''
-        return data payments in csv format
+        return chat data in csv format
         '''
         output = io.StringIO()
 
-        writer = csv.writer(output)
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(['Name', 'Student ID', 'Earnings'])
+        v = ["Session ID", "Period", "Player", "Group", "Chat", "Timestamp"]
+   
+        writer.writerow(v)
 
-        session_players = self.session_players.all()
+        chat_list = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all()) \
+                                             .select_related('session_period', 'session_player') \
+                                             .order_by('session_player__group_number', 'timestamp')
 
-        for p in session_players:
-            writer.writerow([p.name, p.student_id, p.earnings/100, p.avatar.label if p.avatar else 'None'])
+        for c in chat_list:
+            c.write_action_download_csv(writer)
 
         return output.getvalue()
     

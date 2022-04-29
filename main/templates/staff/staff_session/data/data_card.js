@@ -53,7 +53,7 @@ takeDownloadHeartRateData(messageData){
 /**send download recruiter data
 */
 downloadActivityData(){
-    app.$data.working = true;
+    app.working = true;
     this.data_downloading = true;
     app.sendMessage("download_activities_data", {});
 },
@@ -78,16 +78,16 @@ takedownloadActivityData(messageData){
 
 /**send download payment data
 */
-downloadPaymentData(){
-    app.$data.working = true;
+downloadChatData(){
+    app.working = true;
     this.data_downloading = true;
-    app.sendMessage("download_payment_data", {});
+    app.sendMessage("download_chat_data", {});
 },
 
 /** take download payment data
  * @param messageData {json}
 */
-takeDownloadPaymentData(messageData){
+takeDownloadChatData(messageData){
 
     var downloadLink = document.createElement("a");
     var blob = new Blob(["\ufeff", messageData.status.result]);

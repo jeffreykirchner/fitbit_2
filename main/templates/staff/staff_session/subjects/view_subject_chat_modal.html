@@ -1,0 +1,35 @@
+{% load crispy_forms_tags %}
+
+<!-- view subject chat Modal -->
+<div class="modal fade" id="viewSubjectChatModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View Subject Chat: [[session.session_players[current_subject].name]]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class = "chat">
+                    <div class="p-1"
+                        v-for="(c, index) in chat_list_to_display.slice().reverse()" v-bind:key="c.id">
+
+                        <div class="text-center text-muted" v-if="c.show_time_stamp">[[c.time_stamp_text]]</div>
+
+                        <div v-if="c.sender_id==session.session_players[current_subject].id" 
+                                class="text-end ps-5 pe-2" 
+                                v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"
+                                v-bind:id="'chat_id_' + c.id">
+                            [[c.text]]
+                        </div>
+
+                        <div v-else class="pe-5 ps-2" v-bind:id="'chat_id_' + c.id">
+                            <span class="fw-bold">Partner:</span> [[c.text]]
+                        </div>
+                    </div>
+                </div>            
+
+            </div>    
+        </div>
+    </div>
+</div>

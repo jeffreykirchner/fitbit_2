@@ -2,7 +2,7 @@ sendChat(){
 
     if(this.working) return;
     if(this.chat_text.trim() == "") return;
-    if(this.chat_text.trim().length > 200) return;
+    if(this.chat_text.trim().length > 500) return;
     
     this.working = true;
     app.sendMessage("chat", {"text" : this.chat_text.trim(),
@@ -57,20 +57,5 @@ updateChatDisplay(){
     {
         this.chat_list_to_display.unshift({id:i*-1, text:"|", sender_id:this.session_player.id})
     }
-
-    //scroll to view
-    if(this.chat_list_to_display.length>0)
-    {
-        Vue.nextTick(() => {app.updateChatDisplayScroll()});        
-    }
-},
-
-updateChatDisplayScroll(){
-    return;
-    if(!app.session.enable_chat) return;
-    
-    var elmnt = document.getElementById("chat_id_" + app.chat_list_to_display[this.chat_list_to_display.length-1].id.toString());
-
-    if (elmnt) elmnt.scrollIntoView(); 
 },
 

@@ -267,6 +267,34 @@ showViewSubject:function(id){
     myModal.toggle();
 },
 
+/** show view subject modal
+*/
+showViewSubjectChat:function(id){
+    
+    app.current_subject = id;
+
+    var myModal = new bootstrap.Modal(document.getElementById('viewSubjectChatModal'), {
+        keyboard: false
+        })
+
+    myModal.toggle();
+    app.updateChatDisplay();
+},
+
+/**
+ * update chat
+ */
+updateChatDisplay(){
+            
+    this.chat_list_to_display=this.session.session_players[app.current_subject].chat;
+
+    //add spacers
+    for(let i=this.chat_list_to_display.length;i<18;i++)
+    {
+        this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0})
+    }
+},
+
 /** hide view subject modal
 */
 hideViewSubject:function(){
