@@ -6,7 +6,7 @@
         <span class = "float-end">
             <span class="text-success" v-if="session_player.checked_in_today">You are checked in for [[session.current_period_day_of_week]] <i class="fas fa-check"></i></span>
 
-            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('{{subject_check_in_help_doc}}')">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDocSubject('{{subject_check_in_help_doc}}')">
                 <i class="far fa-question-circle"></i> 
             </button>
         </span>        

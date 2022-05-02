@@ -449,6 +449,84 @@ class SessionPlayer(models.Model):
         #session in progress
         return self.session_player_periods_b.filter(check_in=False, session_period__period_number__lt=todays_session_player_period.session_period.period_number).count()
 
+    def get_help_doc(self, help_doc_title):
+        '''
+        return a processed help doc with help_doc_title
+        '''
+
+        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
+
+        help_doc_json = main.models.HelpDocs.objects.get(title=help_doc_title).json()
+
+        help_doc_json["text"] = help_doc_json["text"].replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
+        help_doc_json["text"] = help_doc_json["text"].replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
+        help_doc_json["text"] = help_doc_json["text"].replace('#my_label#', self.parameter_set_player.label_html())
+
+        if partner:
+            help_doc_json["text"] = help_doc_json["text"].replace('#partner_label#', partner.parameter_set_player.label_html())
+
+        return help_doc_json
+
+    def individual_zone_mintutes_html(self):
+        '''
+        return html table of individual zone minutes
+        '''
+
+        p = self.session.get_current_session_period()
+
+        if not p:
+            return "Table not available"
+
+        p = p.parameter_set_period.json()
+
+        html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
+                        <thead>
+                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Payment</th>                            
+                        </thead>
+                        <tbody>"""
+
+        for i in p["parameter_set_period_payments"]:
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
+                             <td class='text-center w-auto'>${i['payment']}</td>
+                          </tr>"""
+                
+        html = html + """</tbody></table></center>"""
+        
+
+        return html
+    
+    def group_zone_mintutes_html(self):
+        '''
+        return html table of individual zone minutes
+        '''
+
+        p = self.session.get_current_session_period()
+
+        if not p:
+            return "Table not available"
+
+        p = p.parameter_set_period.json()
+
+        html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
+                        <thead>
+                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Payment</th>                            
+                        </thead>
+                        <tbody>"""
+
+        for i in p["parameter_set_period_payments"]:
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
+                             <td class='text-center w-auto'>${i['group_bonus']}</td>
+                          </tr>"""
+                
+        html = html + """</tbody></table></center>"""
+        
+
+        return html
+
     def json(self, get_chat=True):
         '''
         json object of model

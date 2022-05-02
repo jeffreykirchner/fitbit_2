@@ -198,6 +198,22 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def help_doc_subject(self, event):
+        '''
+        help doc request
+        '''
+        result = await sync_to_async(take_help_doc_subject)(self.session_id, self.session_player_id, event["message_text"])
+
+        message_data = {}
+        message_data["status"] = result
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        # Send reply to sending channel
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -673,3 +689,22 @@ def take_survey_complete(session_id, session_player_id, data):
     
     return {"value" : status,
             "result" : {"session_player" : session_player.json()}}
+
+def take_help_doc_subject(session_id, session_player_id, data):
+    '''
+    help doc text request
+    '''
+
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Take help doc subject: {data}")
+
+    try:
+        session = Session.objects.get(id=session_id)
+        session_player = session.session_players.get(id=session_player_id)
+        help_doc = session_player.get_help_doc(data["title"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_help_doc not found : {data}")
+        return {"value" : "fail", "message" : "Document Not Found."}
+
+    return {"value" : "success",
+            "result" : {"help_doc" : help_doc}}

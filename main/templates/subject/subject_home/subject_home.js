@@ -103,7 +103,7 @@ var app = Vue.createApp({
                 case "survey_complete":
                     app.takeSurveyComplete(messageData);
                     break;
-                case "help_doc":
+                case "help_doc_subject":
                     app.takeLoadHelpDoc(messageData);
                     break;
                 
@@ -174,6 +174,23 @@ var app = Vue.createApp({
                 setTimeout(this.processInstructionPage, 1000);
                 this.instructionDisplayScroll();
             }
+        },
+
+        /**
+         * send request for help doc
+         * @param title : string
+         */
+        sendLoadHelpDocSubject(title){
+            this.working = true;
+            this.helpText = "Loading ...";
+
+            var myModal = new bootstrap.Modal(document.getElementById('helpModal'), {
+                keyboard: false
+                })
+
+            myModal.toggle();
+
+            app.sendMessage("help_doc_subject", {title : title});
         },
 
         /** update start status

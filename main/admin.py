@@ -43,7 +43,28 @@ class ParametersAdmin(admin.ModelAdmin):
 
     actions = []
 
-admin.site.register(ParameterSetPlayer)
+@admin.register(ParameterSetPlayer)
+class ParameterSetPlayerAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['parameter_set']
+
+class ParameterSetPlayerInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = ParameterSetPlayer
+    fields = ['id_label', 'display_color']
+    readonly_fields = ['id_label', 'display_color']
 
 @admin.register(ParameterSetPeriod)
 class ParameterSetPeriodAdmin(admin.ModelAdmin):
@@ -77,7 +98,7 @@ class ParameterSetAdmin(admin.ModelAdmin):
         return False
     
     readonly_fields = []
-    inlines = [ParameterSetPeriodInline, ]
+    inlines = [ParameterSetPeriodInline, ParameterSetPlayerInline]
     
 class SessionPlayerPeriodInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
