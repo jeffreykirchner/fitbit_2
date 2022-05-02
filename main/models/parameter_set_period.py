@@ -187,6 +187,8 @@ class ParameterSetPeriod(models.Model):
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
             "pay_block" : self.pay_block,
+
+            "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }
 
 

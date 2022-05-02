@@ -454,18 +454,27 @@ class SessionPlayer(models.Model):
         return a processed help doc with help_doc_title
         '''
 
-        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
-
         help_doc_json = main.models.HelpDocs.objects.get(title=help_doc_title).json()
 
-        help_doc_json["text"] = help_doc_json["text"].replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
-        help_doc_json["text"] = help_doc_json["text"].replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
-        help_doc_json["text"] = help_doc_json["text"].replace('#my_label#', self.parameter_set_player.label_html())
-
-        if partner:
-            help_doc_json["text"] = help_doc_json["text"].replace('#partner_label#', partner.parameter_set_player.label_html())
+        help_doc_json["text"] = self.process_help_doc(help_doc_json["text"])
 
         return help_doc_json
+    
+    def process_help_doc(self, text):
+        '''
+        take raw text and return processed version of it
+        '''
+
+        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
+
+        text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
+        text = text.replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
+        text = text.replace('#my_label#', self.parameter_set_player.label_html())
+
+        if partner:
+            text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
+        
+        return text
 
     def individual_zone_mintutes_html(self):
         '''
