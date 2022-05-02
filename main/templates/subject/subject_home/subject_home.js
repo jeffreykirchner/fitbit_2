@@ -97,6 +97,9 @@ var app = Vue.createApp({
                 case "check_in":
                     app.takeCheckIn(messageData);
                     break;
+                case "update_check_in":
+                    app.takeCheckInUpdate(messageData);
+                    break;
                 case "survey_complete":
                     app.takeSurveyComplete(messageData);
                     break;

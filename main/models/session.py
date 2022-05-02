@@ -369,6 +369,12 @@ class Session(models.Model):
                 else:
                     p.pull_secondary_metrics(False)
 
+    def get_group_channel_list(self, group_number):
+        '''
+        return list of channels ids for specified group
+        '''
+        return [p.channel_name for p in self.session_players.filter(group_number=group_number)]
+
     def json(self):
         '''
         return json object of model

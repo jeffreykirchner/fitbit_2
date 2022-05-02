@@ -110,29 +110,6 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
                     "sender_channel_name": self.channel_name}
                 )
 
-
-    async def name(self, event):
-        '''
-        take name and id number
-        '''
-        result = await sync_to_async(take_name)(self.session_id, self.session_player_id, event["message_text"])
-        message_data = {}
-        message_data["status"] = result
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
-        if result["value"] == "success":
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {"type": "update_name",
-                 "data": result,
-                 "sender_channel_name": self.channel_name},
-            )
-
     async def next_instruction(self, event):
         '''
         advance instruction page
@@ -181,15 +158,30 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         fisish instructions
         '''
-        result = await sync_to_async(take_check_in)(self.session_id, self.session_player_id, event["message_text"])
+        r = await sync_to_async(take_check_in)(self.session_id, self.session_player_id, event["message_text"])
         message_data = {}
-        message_data["status"] = result
+        message_data["status"] = r
 
         message = {}
         message["messageType"] = event["type"]
         message["messageData"] = message_data
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+        event_result = r["result"]
+
+        if r["value"] == "success":
+
+            subject_result = {"session":r["session"]}
+
+            for p in event_result["recipients"]:
+
+                await self.channel_layer.send(
+                    p,
+                    {"type": "update_check_in",
+                     "result" : subject_result,
+                     "sender_channel_name": self.channel_name}
+                )
     
     async def survey_complete(self, event):
         '''
@@ -263,6 +255,23 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
             return
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_check_in(self, event):
+        '''
+        send chat to clients, if clients can view it
+        '''
+
+        message_data = {}
+        message_data["status"] =  event["result"]
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        if self.channel_name == event['sender_channel_name']:
+            return
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     async def update_local_info(self, event):
         '''
@@ -278,11 +287,6 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     async def update_connection_status(self, event):
         '''
         handle connection status update from group member
-        '''
-
-    async def update_name(self, event):
-        '''
-        no group broadcast of name to subjects
         '''
     
     async def update_next_phase(self, event):
@@ -404,7 +408,7 @@ def take_chat(session_id, session_player_id, data):
             return {"value" : "fail", "result" : {"message" : "Session not running."}}
 
     #return group channel ids
-    result["recipients"] = [p.channel_name for p in session.session_players.filter(group_number=session_player.group_number)]
+    result["recipients"] = session.get_group_channel_list(session_player.group_number)
 
     #if more than one hour since last chat message then show date
 
@@ -440,55 +444,6 @@ def take_update_local_info(session_id, player_key, channel_name, data):
         return {"session_player_id" : session_player.id}
     except ObjectDoesNotExist:      
         return {"session_player_id" : None}
-
-def take_name(session_id, session_player_id, data):
-    '''
-    take name and student id at end of game
-    '''
-
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Take name: {session_id} {session_player_id} {data}")
-
-    form_data_dict = {}
-
-    try:
-        form_data = data["formData"]
-
-        for field in form_data:            
-            form_data_dict[field["name"]] = field["value"]
-
-    except KeyError:
-        logger.warning(f"take_name , setup form: {session_player_id}")
-        return {"value" : "fail", "errors" : {f"name":["Invalid Entry."]}}
-    
-    session = Session.objects.get(id=session_id)
-    session_player = session.session_players.get(id=session_player_id)
-
-    if not session.finished:
-        return {"value" : "fail", "errors" : {f"name":["Session not complete."]},
-                "message" : "Session not complete."}
-
-    logger.info(f'form_data_dict : {form_data_dict}')       
-
-    form = EndGameForm(form_data_dict)
-        
-    if form.is_valid():
-        #print("valid form") 
-
-        session_player.name = form.cleaned_data["name"]
-        session_player.student_id = form.cleaned_data["student_id"]
-
-        session_player.name = string.capwords(session_player.name)
-
-        session_player.save()    
-        
-        return {"value" : "success",
-                "result" : {"id" : session_player_id,
-                            "name" : session_player.name, 
-                            "student_id" : session_player.student_id}}                      
-                                
-    logger.info("Invalid session form")
-    return {"value" : "fail", "errors" : dict(form.errors.items()), "message" : ""}
 
 def take_update_next_phase(session_id, session_player_id):
     '''
@@ -664,7 +619,8 @@ def take_check_in(session_id, session_player_id, data):
        
     if status == "success":
         result = {"session_player" : session_player.json(),
-                  "session" : session.json_for_subject(session_player)}
+                  "session" : session.json_for_subject(session_player),
+                  "recipients" :  session.get_group_channel_list(session_player.group_number)}
     else:
         result = { "error_message" : error_message,
                  }
