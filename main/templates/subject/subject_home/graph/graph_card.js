@@ -636,6 +636,8 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         }
     }
 
+    let show_team_pay_label = false;
+    
     for(let i=0; i<=xTickCount; i++)
     {                                       
         let text1 = "";
@@ -653,8 +655,6 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         {
             ctx.textAlign = "center";
         }
-        
-        let show_team_pay_label = false;
 
         if(app.session_player.session_player_periods_2[i].period_number>app.session.current_parameter_set_period.period_number)
         {
@@ -721,7 +721,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.fillText("My Pay", marginY-25, h-marginX+40);
 
-    if(app.session_player.session_player_periods_2[i].period_type == "Group Pay")
+    if(show_team_pay_label)
     {
         ctx.fillStyle = "green";
         ctx.fillText("Group", marginY-25, h-marginX+57);
@@ -737,7 +737,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.textAlign = "right";
     ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
 
-    if(app.session_player.session_player_periods_2[i].period_type == "Group Pay")
+    if(show_team_pay_label)
     {
         ctx.fillStyle = "green";
         ctx.textAlign = "right";

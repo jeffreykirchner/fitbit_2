@@ -172,14 +172,15 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         if r["value"] == "success":
 
-            subject_result = {"session":r["session"]}
+            subject_result = {"status" : "success",
+                              "result" :  {"session": event_result["session"]}}
 
             for p in event_result["recipients"]:
 
                 await self.channel_layer.send(
                     p,
                     {"type": "update_check_in",
-                     "result" : subject_result,
+                     "result" : json.dumps(subject_result, cls=DjangoJSONEncoder),
                      "sender_channel_name": self.channel_name}
                 )
     
@@ -262,7 +263,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
 
         message_data = {}
-        message_data["status"] =  event["result"]
+        message_data["status"] =  json.loads(event["result"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -270,6 +271,13 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         if self.channel_name == event['sender_channel_name']:
             return
+
+        session_player_json = result = await sync_to_async(take_get_session_player_json)(self.session_player_id)
+
+        if not session_player_json:
+            return
+
+        message_data["status"]["result"]["session_player"] = session_player_json
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
@@ -363,6 +371,17 @@ def take_get_session_subject(session_player_id, data):
     except ObjectDoesNotExist:
         return {"session" : None, 
                 "session_player" : None}
+
+def take_get_session_player_json(session_player_id):
+    '''
+    return session player with specified id
+    '''
+    try:
+        session_player = SessionPlayer.objects.get(id=session_player_id)
+    except ObjectDoesNotExist:
+        return None
+
+    return session_player.json()
 
 def take_get_session_id(player_key):
     '''

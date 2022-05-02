@@ -89,8 +89,8 @@ class SessionPlayerPeriodInline(admin.TabularInline):
     show_change_link = True
 
     model = SessionPlayerPeriod
-    fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
-    readonly_fields = ['check_in', 'zone_minutes', 'earnings_individual', 'earnings_group']
+    fields = ['check_in', 'survey_complete', 'zone_minutes', 'earnings_individual', 'earnings_group']
+    readonly_fields = ['check_in', 'survey_complete', 'zone_minutes', 'earnings_individual', 'earnings_group']
 
 @admin.register(SessionPlayerPeriod)
 class SessionPlayerPeriodAdmin(admin.ModelAdmin):

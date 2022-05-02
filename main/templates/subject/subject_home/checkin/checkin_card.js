@@ -29,5 +29,6 @@ takeCheckIn(messageData){
  */
 takeCheckInUpdate(messageData){
     app.session =  messageData.status.result.session;
+    app.session_player = messageData.status.result.session_player;
     app.updateGraph();
 },
