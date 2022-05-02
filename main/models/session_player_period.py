@@ -18,6 +18,7 @@ from django.conf import settings
 
 from main.models import SessionPlayer
 from main.models import SessionPeriod
+from main.models import Parameters
 
 from main.globals import get_fitbit_metrics
 from main.globals import format_minutes
@@ -417,6 +418,8 @@ class SessionPlayerPeriod(models.Model):
 
         if self.survey_complete:
             return ""
+        
+        p = Parameters.objects.first()
 
         #https://chapmanu.co1.qualtrics.com/jfe/form/SV_9BJPiWNYT9hZ6tM?student_id=[student%20id]&session_id=10786&first_name=[first%20name]&last_name=[last%20name]&email=[email]&recruiter_id=[recruiter%20id]
         link_string = f'{self.session_period.parameter_set_period.survey_link}?'
@@ -427,6 +430,7 @@ class SessionPlayerPeriod(models.Model):
         link_string += f'period={self.session_period.period_number}&'
         link_string += f'activity_key={self.activity_key}&'
         link_string += f'session_name={self.session_period.session.title}&'
+        link_string += f'return_link={p.site_url}&'
 
         return link_string
 
