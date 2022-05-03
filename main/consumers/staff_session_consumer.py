@@ -716,10 +716,10 @@ def take_send_invitations(session_id, data):
 
     session.invitation_text =  message["text"]
     session.invitation_subject =  message["subject"]
-    session.save()
+    
+    session.invitation_text  =  session.invitation_text .replace("[contact email]", p.contact_email)
 
-    message_text = message["text"]
-    message_text = message_text.replace("[contact email]", p.contact_email)
+    session.save()
 
     user_list = []
     for session_subject in session.session_players.exclude(email=None).exclude(email=""):
