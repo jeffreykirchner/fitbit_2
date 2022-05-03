@@ -37,9 +37,9 @@ var app = Vue.createApp({
                     fitbit_error_message : "",
 
                     //graph globals
-                    marginY : 40,
-                    marginX : 40,
-                    margin2 : 5,
+                    marginY : 80,
+                    marginX : 75,
+                    margin2 : 35,
                     sizeW : 0,
                     sizeH : 0,
                 }},
