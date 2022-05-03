@@ -1,0 +1,22 @@
+
+<!-- Help Modal -->
+<div class="modal fade" id="consentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="consentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Informed Consent to Participate in Research</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <object class="conset_form" id="consent_pdf_id" data="/static/IRB/IRB-20-142_12-18-2020.pdf" type="text/html" target="_parent"></object>
+            </div>
+            <div class="modal-footer">
+                <b>I certify that I am at least 18 years of age and I agree to the statement above.</b>             
+                <button type="button" class="btn btn-outline-primary" v-on:click = "acceptConsentForm()">
+                    Submit <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </div>
+        
+        </div>
+    </div>
+</div>

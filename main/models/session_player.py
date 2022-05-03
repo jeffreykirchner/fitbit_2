@@ -51,6 +51,8 @@ class SessionPlayer(models.Model):
     fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')      #time when the fitbit was last synced to user's phone
     fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                  #last fitbit device to sync
     
+    consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
+
     disabled =  models.BooleanField(default=False)                                                               #if true disable subject's screen
 
     timestamp = models.DateTimeField(auto_now_add=True)

@@ -28,6 +28,15 @@ class ParameterSetForm(forms.ModelForm):
                                        choices=((True, 'Yes'), (False,'No' )),
                                        widget=forms.Select(attrs={"v-model":"session.parameter_set.enable_chat",}))
 
+    consent_form_required = forms.ChoiceField(label='Consent Form Required',
+                                       choices=((True, 'Yes'), (False,'No' )),
+                                       widget=forms.Select(attrs={"v-model":"session.parameter_set.consent_form_required",}))
+
+    consent_form = forms.CharField(label='Consent Form File Name',
+                                   widget=forms.TextInput(attrs={"v-model":"session.parameter_set.consent_form",
+                                                          }))
+
+
     show_instructions = forms.ChoiceField(label='Show Instructions',
                                        choices=((True, 'Yes'), (False,'No' )),
                                        widget=forms.Select(attrs={"v-model":"session.parameter_set.show_instructions",}))
@@ -43,4 +52,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['display_block', 'graph_y_max', 'enable_chat', 'show_instructions', 'instruction_set', 'test_mode']
+        fields =['display_block', 'graph_y_max', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']

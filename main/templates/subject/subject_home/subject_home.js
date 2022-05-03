@@ -79,9 +79,6 @@ var app = Vue.createApp({
                 case "update_chat":
                     app.takeUpdateChat(messageData);
                     break;
-                case "update_end_game":
-                    app.takeEndGame(messageData);
-                    break;
                 case "name":
                     app.takeName(messageData);
                     break;
@@ -215,11 +212,13 @@ var app = Vue.createApp({
             $('#endGameModal').modal('hide');
         },
 
-         /**
-         * take end of game notice
-         */
-        takeEndGame(messageData){
-
+        showConsentForm(){
+           
+            var myModal = new bootstrap.Modal(document.getElementById('consentModal'), {
+                keyboard: false
+                })
+        
+            myModal.toggle();
         },
 
         takeSurveyComplete(messageData){
