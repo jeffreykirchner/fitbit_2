@@ -284,8 +284,7 @@ showViewSubjectChat:function(id){
 /**
  * update chat
  */
-updateChatDisplay(){
-            
+updateChatDisplay(){            
     this.chat_list_to_display=this.session.session_players[app.current_subject].chat;
 },
 

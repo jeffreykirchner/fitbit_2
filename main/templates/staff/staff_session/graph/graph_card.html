@@ -1,20 +1,21 @@
-<div class="card" id="graph_card_id">                  
-    <div class="card-header fw-bold">                
-        <span class="align-middle">Graph</span>           
-        
-        <span class="float-end">
-            <span v-show="reconnecting" class="me-1">
-                Connecting <i class="fas fa-cog fa-spin fa-1x"></i>
-            </span>
-            
-            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Graph')">
-                <i class="far fa-question-circle"></i> 
-            </button>
-        </span>
 
+<div class="card" id="id_graph_card">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+            Graph
+        </span>        
+
+        <span class="float-end">
+           
+        </span>
     </div>
     <div class="card-body">
         
-               
+        <!-- graph -->
+        <div class="row" >
+            <div class="col">
+                <canvas class="graph" id="graph_id"></canvas>
+            </div>
+        </div>       
     </div>                    
 </div> 

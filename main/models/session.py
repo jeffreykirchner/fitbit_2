@@ -397,7 +397,7 @@ class Session(models.Model):
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
 
-            # "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
             "current_period" : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
 

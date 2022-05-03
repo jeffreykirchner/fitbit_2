@@ -38,6 +38,13 @@ var app = Vue.createApp({
                     csv_email_list : "",           //csv email list
                     
                     current_subject : 0,   //subject being viewed
+
+                    //graph globals
+                    marginY : 55,
+                    marginX : 35,
+                    margin2 : 10,
+                    sizeW : 0,
+                    sizeH : 0,
                 }},
     methods: {
 
@@ -175,14 +182,12 @@ var app = Vue.createApp({
 
             if(app.session.started)
             {
-                
+                setTimeout(app.updateGraph, 250);
             }
             else
             {
                 
             }
-            
-            if(app.session.enable_chat) app.updateChatDisplay(true);
             
             app.updatePhaseButtonText();    
         },
@@ -232,6 +237,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session/subjects/subjects_card.js"%}
         {%include "staff/staff_session/summary/summary_card.js"%}
         {%include "staff/staff_session/data/data_card.js"%}
+        {%include "staff/staff_session/graph/graph_card.js"%}
         {%include "staff/staff_session/payments/payments_card.js"%}
         {%include "js/help_doc.js"%}
     
