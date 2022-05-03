@@ -2,6 +2,10 @@
  * setup canvas
  */
 drawSetup(chartID){
+
+    if(!app.session) return;
+    if(!app.session_player) return;
+
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');     
 
@@ -761,6 +765,9 @@ drawLoadingScreen(chartID){
  * re-draw graph
  */
 updateGraph(){
+
+    if(!app.session) return;
+    if(!app.session_player) return;
 
     //show loading screen
     if(!app.first_load_done)

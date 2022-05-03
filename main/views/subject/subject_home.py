@@ -72,13 +72,14 @@ class SubjectHomeView(View):
                                "page_key" : f'session-{session.id}',
                                "instruction_pages" : json.dumps(session_player.get_instruction_set(), cls=DjangoJSONEncoder),
                                "session_player" : session_player,
-                               "session_player_json" : json.dumps(session_player.json(), cls=DjangoJSONEncoder),
+                               "session_player_json" : {},
                                "session" : session,
                                "parameters" : parameters,
                                "subject_graph_help_doc" : subject_graph_help_doc,   
                                "subject_check_in_help_doc" : subject_check_in_help_doc,                            
                                "fitbit_registration_link" : get_registration_link(session_player.player_key),
-                               "session_json":json.dumps(session.json_for_subject(session_player), cls=DjangoJSONEncoder)})
+                               "session_json":{}
+                               })
     
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):

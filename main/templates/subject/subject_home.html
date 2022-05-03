@@ -57,7 +57,7 @@
     </div>
 </div>
 <!-- hide on vertical phone -->
-<div class="d-none d-sm-block">
+<div class="d-none d-sm-block" v-if="session && session_player">
     <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
         <div class="col-md">
             {%include "subject/subject_home/instructions/instructions_card.html"%}
@@ -138,6 +138,13 @@
 
     </div>
    
+</div>
+
+<!-- show when loading -->
+<div class="row justify-content-lg-center mt-4" v-else>
+    <div class = "col mt-4 text-center">
+        <i class="fas fa-cog fa-spin fa-2x"></i>
+    </div>
 </div>
 <!-- instructions -->
 

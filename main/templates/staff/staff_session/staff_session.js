@@ -17,7 +17,7 @@ var app = Vue.createApp({
                     sessionID : {{session.id}},
                     sessionKey : "{{session.session_key}}",
                     other_color : 0xD3D3D3,
-                    session : {{session_json|safe}},
+                    session : null,
 
                     staff_edit_name_etc_form_ids: {{staff_edit_name_etc_form_ids|safe}},
 
@@ -163,7 +163,7 @@ var app = Vue.createApp({
         /** send winsock request to get session info
         */
         sendGetSession(){
-            app.sendMessage("get_session",{"sessionKey" : app.$data.sessionKey});
+            app.sendMessage("get_session",{"sessionKey" : app.sessionKey});
         },
 
         /** take create new session
@@ -171,9 +171,9 @@ var app = Vue.createApp({
         */
         takeGetSession(messageData){
 
-            app.$data.session = messageData.session;
+            app.session = messageData.session;
 
-            if(app.$data.session.started)
+            if(app.session.started)
             {
                 
             }
