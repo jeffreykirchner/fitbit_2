@@ -35,23 +35,6 @@ class SessionPeriod(models.Model):
         verbose_name = 'Session Period'
         verbose_name_plural = 'Session Periods'
         ordering = ['period_number']
-
-    #return json object of class
-    def json(self):
-        '''
-        json object of model
-        '''
-        #current_best_bid = self.get_current_best_bid()
-        #current_best_offer = self.get_current_best_offer()
-
-        #current_trade = self.get_current_trade()
-
-        return{
-            "id" : self.id,
-            "period_number" : self.period_number,
-            "period_date" : self.get_formatted_date(),
-            "period_day_of_week" : self.get_formatted_day_of_week()
-        }
     
     def get_formatted_date(self):
         '''
@@ -81,3 +64,18 @@ class SessionPeriod(models.Model):
 
         return self.period_date.strftime("%Y-%m-%d")
         
+    def json(self):
+        '''
+        json object of model
+        '''
+        #current_best_bid = self.get_current_best_bid()
+        #current_best_offer = self.get_current_best_offer()
+
+        #current_trade = self.get_current_trade()
+
+        return{
+            "id" : self.id,
+            "period_number" : self.period_number,
+            "period_date" : self.get_formatted_date(),
+            "period_day_of_week" : self.get_formatted_day_of_week()
+        }
