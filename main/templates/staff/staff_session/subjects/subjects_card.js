@@ -152,18 +152,11 @@ takeUpdateEmailList(messageData){
     {            
         $('#uploadEmailModal').modal('hide');    
 
-        result = messageData.status.result;
-
-        for(i=0; i<result.length; i++)
-        {
-            let session_player = app.findSessionPlayer(result[i].id);
-            session_player.email = (result[i].email);
-        }
+        app.session = messageData.status.result.session;
     } 
     else
     {
-        app.$data.cancelModal=true;                           
-        app.displayErrors(messageData.status.errors);
+        
     } 
 },
 
@@ -272,6 +265,27 @@ showViewSubject:function(id){
         })
 
     myModal.toggle();
+},
+
+/** show view subject modal
+*/
+showViewSubjectChat:function(id){
+    
+    app.current_subject = id;
+
+    var myModal = new bootstrap.Modal(document.getElementById('viewSubjectChatModal'), {
+        keyboard: false
+        })
+
+    myModal.toggle();
+    app.updateChatDisplay();
+},
+
+/**
+ * update chat
+ */
+updateChatDisplay(){            
+    this.chat_list_to_display=this.session.session_players[app.current_subject].chat;
 },
 
 /** hide view subject modal

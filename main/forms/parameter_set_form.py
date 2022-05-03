@@ -24,9 +24,9 @@ class ParameterSetForm(forms.ModelForm):
                                                                       "step":"1",
                                                                       "min":"1"}))
                                        
-    # enable_chat = forms.ChoiceField(label='Enable Chat',
-    #                                    choices=((True, 'Yes'), (False,'No' )),
-    #                                    widget=forms.Select(attrs={"v-model":"session.parameter_set.enable_chat",}))
+    enable_chat = forms.ChoiceField(label='Enable Chat',
+                                       choices=((True, 'Yes'), (False,'No' )),
+                                       widget=forms.Select(attrs={"v-model":"session.parameter_set.enable_chat",}))
 
     show_instructions = forms.ChoiceField(label='Show Instructions',
                                        choices=((True, 'Yes'), (False,'No' )),
@@ -43,4 +43,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['display_block', 'graph_y_max', 'show_instructions', 'instruction_set', 'test_mode'] #, 'enable_chat'
+        fields =['display_block', 'graph_y_max', 'enable_chat', 'show_instructions', 'instruction_set', 'test_mode']

@@ -179,62 +179,73 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Period", "Client #", "Label", "Earnings ¢"])
+        writer.writerow(["Session ID", "Period", "Player", "Group", 
+                         "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Wrist Time", 
+                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])
 
-        session_player_periods = main.models.SessionPlayerPeriod.objects.filter(session_player__in=self.session_players.all()) \
-                                                                        .order_by('session_period__period_number')
-
-        for p in session_player_periods.all():
-            p.write_summary_download_csv(writer)
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+                s_p.write_summary_download_csv(writer)
 
         return output.getvalue()
     
-    def get_download_action_csv(self):
+    def get_download_heart_rate_csv(self):
         '''
-        return data actions in csv format
+        return heart rate data in csv format
         '''
         output = io.StringIO()
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Period", "Time", "Client #", "Action", "Info", "Info (JSON)", "Timestamp"])
+        v = ["Session ID", "Period", "Player", "Group"]
 
-        session_player_chats = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all())
+        for i in range(1440):
+            v.append(str(timedelta(minutes=i)))
 
-        for p in session_player_chats.all():
-            p.write_action_download_csv(writer)
+        writer.writerow(v)
 
-        return output.getvalue()
-    
-    def get_download_recruiter_csv(self):
-        '''
-        return data recruiter in csv format
-        '''
-        output = io.StringIO()
-
-        writer = csv.writer(output)
-
-        session_players = self.session_players.all()
-
-        for p in session_players:
-            writer.writerow([p.student_id, p.earnings/100])
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+                s_p.write_heart_rate_download_csv(writer)
 
         return output.getvalue()
     
-    def get_download_payment_csv(self):
+    def get_download_activities_csv(self):
         '''
-        return data payments in csv format
+        return activities data recruiter in csv format
         '''
         output = io.StringIO()
 
-        writer = csv.writer(output)
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(['Name', 'Student ID', 'Earnings'])
+        v = ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
 
-        session_players = self.session_players.all()
+        writer.writerow(v)
 
-        for p in session_players:
-            writer.writerow([p.name, p.student_id, p.earnings/100, p.avatar.label if p.avatar else 'None'])
+        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+                s_p.write_activities_download_csv(writer)
+
+        return output.getvalue()
+    
+    def get_download_chat_csv(self):
+        '''
+        return chat data in csv format
+        '''
+        output = io.StringIO()
+
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+
+        v = ["Session ID", "Period", "Player", "Group", "Chat", "Timestamp"]
+   
+        writer.writerow(v)
+
+        chat_list = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all()) \
+                                             .select_related('session_period', 'session_player') \
+                                             .order_by('session_player__group_number', 'timestamp')
+
+        for c in chat_list:
+            c.write_action_download_csv(writer)
 
         return output.getvalue()
     
@@ -296,7 +307,6 @@ class Session(models.Model):
             return {"start_day" : {},
                     "end_day" : {}}
 
-
     def get_pay_block(self, pay_block_number):
         '''
         return dict of payblocks
@@ -309,7 +319,6 @@ class Session(models.Model):
         for p in self.session_players.all():
 
             payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block_number)}
-
             pay_block["payments"].append(payment)
 
         return pay_block
@@ -340,20 +349,36 @@ class Session(models.Model):
                 pay_blocks[str(p.pay_block)] = self.get_pay_block(p.pay_block)
 
         return pay_blocks
+    
+    def back_fill_for_pay_block(self, pay_block_number):
+        '''
+        back fill last day of a pay block
+        '''
+        
+        for i in self.session_players.all():
+
+            p = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number).last()
+
+            if not p.back_pull:
+
+                p.back_pull=True
+                p.save()
+
+                if p.check_in:
+                    p.take_check_in(False)
+                else:
+                    p.pull_secondary_metrics(False)
+
+    def get_group_channel_list(self, group_number):
+        '''
+        return list of channels ids for specified group
+        '''
+        return [p.channel_name for p in self.session_players.filter(group_number=group_number)]
 
     def json(self):
         '''
         return json object of model
         '''
-
-        chat = []
-        if self.parameter_set.enable_chat: 
-            chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
-                                                    .filter(session_player__in=self.session_players.all())\
-                                                    .prefetch_related('session_player_recipients')
-                                                    .select_related('session_player__parameter_set_player')
-                                                    .order_by('-timestamp')[:100:-1]
-               ]
 
         current_session_period = self.get_current_session_period()
 
@@ -376,10 +401,11 @@ class Session(models.Model):
             "current_period" : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
 
+            "median_zone_minutes" : [i.get_median_zone_minutes() for i in self.session_periods.all()],
+
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
-            "session_players":[i.json_for_staff() for i in self.session_players.all()],
-            "chat_all" : chat,
+            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related('session_player_periods_b', 'session_player_chats_b')],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
@@ -401,13 +427,21 @@ class Session(models.Model):
             if current_session_period == self.session_periods.last():
                 is_last_period = True
 
+        current_parameter_set_period = current_session_period.parameter_set_period.json_for_subject() if current_session_period else None
+
+        if(current_parameter_set_period):
+            current_parameter_set_period["notice_text"] = session_player.process_help_doc(current_parameter_set_period["notice_text"])
+
         return{
+            "id":self.id,
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
             
-            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            "current_parameter_set_period": current_parameter_set_period,
             "current_period"  : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+
+            "enable_chat" : self.parameter_set.enable_chat,
 
             "finished":self.finished,
 

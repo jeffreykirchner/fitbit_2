@@ -30,10 +30,11 @@
 
 <style>
 
-    canvas {
-        background-color: white; 
-        width: 100%;
-        height: 600px;
+    .graph {
+
+    background-color: white; 
+    border-style: solid;
+    border-width: 1px;
     }
 
     .player_table_row {
@@ -48,6 +49,16 @@
         background-color:#ececec;
     }
 
+    .chat {       
+        width: 100%;
+        height: 600px;
+        word-breaK:break-word;
+        overflow-y:scroll;
+        background-color: ghostwhite;
+        display:flex; 
+        flex-direction:column-reverse;
+    }
+
 </style>
 
 {{ form.media }}
@@ -57,29 +68,29 @@
 {% block content %}
 
 <!-- modals -->
+<div v-if="session">
 {%include "help_modal.html"%}
 {%include "staff/staff_session/session/edit_session_modal.html"%}
 {%include "staff/staff_session/subjects/edit_subject_modal.html"%}
 {%include "staff/staff_session/subjects/view_subject_modal.html"%}
+{%include "staff/staff_session/subjects/view_subject_chat_modal.html"%}
 {%include "staff/staff_session/subjects/upload_email_list.html"%}
+</div>
 {%include "staff/staff_session/control/sendInvitationModal.html"%}
-
 <!-- cards -->
 
-<div class="row justify-content-lg-center mt-4" v-cloak>
+<div class="row justify-content-lg-center mt-4" v-cloak v-if="session">
     <div class="col-md-9">
         <div class="row">
             <div class="col mb-2">
                 {%include "staff/staff_session/subjects/subjects_card.html"%} 
             </div>               
-        </div>        
-        {%if session.parameter_set.enable_chat%}
+        </div>       
         <div class="row">
             <div class="col">
                {%include "staff/staff_session/graph/graph_card.html"%} 
             </div>            
         </div>   
-        {%endif%}         
     </div>
     <div class="col-md-3">
         <div class="row">
@@ -100,7 +111,7 @@
             </div>                
         </div>
 
-        <div class="row mt-2">
+        <div class="row mt-2" v-show="session.started">
             <div class="col">
                 {%include "staff/staff_session/payments/payments_card.html"%}
             </div>                
@@ -112,6 +123,12 @@
             </div>                
         </div>
                                            
+    </div>
+</div>
+
+<div class="row justify-content-lg-center mt-4" v-else>
+    <div class = "col mt-4 text-center">
+        <i class="fas fa-cog fa-spin fa-2x"></i>
     </div>
 </div>
 

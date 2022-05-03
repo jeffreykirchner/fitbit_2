@@ -46,7 +46,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = '_fitbit_2.urls'
-ADMIN_SITE_HEADER = 'Multi User Socket Template Administration'
+ADMIN_SITE_HEADER = 'Fitbit 2 Administration'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 TEMPLATES = [

@@ -18,14 +18,12 @@ var app = Vue.createApp({
                     playerKey : "{{session_player.player_key}}",
                     owner_color : 0xA9DFBF,
                     other_color : 0xD3D3D3,
-                    session_player : {{session_player_json|safe}}, 
-                    session : {{session_json|safe}},
+                    session_player : null, 
+                    session : null,
 
                     end_game_form_ids: {{end_game_form_ids|safe}},
 
                     chat_text : "",
-                    chat_recipients : "all",
-                    chat_recipients_index : 0,
                     chat_button_label : "Everyone",
                     chat_list_to_display : [],                //list of chats to display on screen
 
@@ -39,9 +37,9 @@ var app = Vue.createApp({
                     fitbit_error_message : "",
 
                     //graph globals
-                    marginY : 80,
-                    marginX : 75,
-                    margin2 : 35,
+                    marginY : 40,
+                    marginX : 40,
+                    margin2 : 5,
                     sizeW : 0,
                     sizeH : 0,
                 }},
@@ -99,10 +97,13 @@ var app = Vue.createApp({
                 case "check_in":
                     app.takeCheckIn(messageData);
                     break;
-                case "survey_complete":
-                    app.takeCheckIn(messageData);
+                case "update_check_in":
+                    app.takeCheckInUpdate(messageData);
                     break;
-                case "help_doc":
+                case "survey_complete":
+                    app.takeSurveyComplete(messageData);
+                    break;
+                case "help_doc_subject":
                     app.takeLoadHelpDoc(messageData);
                     break;
                 
@@ -158,12 +159,14 @@ var app = Vue.createApp({
                     app.updateChatDisplay();               
                 }
 
+            }
 
-                // if game is finished show modal
-                if(app.$data.session.finished)
-                {
-                    this.showEndGameModal();
-                }
+            if(!app.first_load_done)
+            {
+                // setTimeout(function(){
+                //             document.getElementById("id_graph_card").scrollIntoView();
+                //            }, 
+                //            500);
             }
 
             if(this.session.current_experiment_phase == 'Instructions')
@@ -171,6 +174,23 @@ var app = Vue.createApp({
                 setTimeout(this.processInstructionPage, 1000);
                 this.instructionDisplayScroll();
             }
+        },
+
+        /**
+         * send request for help doc
+         * @param title : string
+         */
+        sendLoadHelpDocSubject(title){
+            this.working = true;
+            this.helpText = "Loading ...";
+
+            var myModal = new bootstrap.Modal(document.getElementById('helpModal'), {
+                keyboard: false
+                })
+
+            myModal.toggle();
+
+            app.sendMessage("help_doc_subject", {title : title});
         },
 
         /** update start status
@@ -193,22 +213,6 @@ var app = Vue.createApp({
             this.avatar_choice_grid_selected_col = 0;
 
             $('#endGameModal').modal('hide');
-        },
-
-        /**
-         * show the end game modal
-         */
-        showEndGameModal(){
-            if(this.end_game_modal_visible) return;
-
-            //show endgame modal
-            var myModal = new bootstrap.Modal(document.getElementById('endGameModal'), {
-                keyboard: false
-                })
-            
-            myModal.toggle();
-
-            this.end_game_modal_visible = true;
         },
 
          /**
@@ -363,6 +367,8 @@ var app = Vue.createApp({
         {%if session.parameter_set.test_mode%} setTimeout(this.doTestMode, this.randomNumber(1000 , 10000)); {%endif%}
 
         window.addEventListener('resize', this.updateGraph);
+
+        setTimeout(this.updateGraph, 250);
 
     },
 

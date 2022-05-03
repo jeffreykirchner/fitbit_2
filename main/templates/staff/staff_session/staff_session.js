@@ -17,7 +17,7 @@ var app = Vue.createApp({
                     sessionID : {{session.id}},
                     sessionKey : "{{session.session_key}}",
                     other_color : 0xD3D3D3,
-                    session : {{session_json|safe}},
+                    session : null,
 
                     staff_edit_name_etc_form_ids: {{staff_edit_name_etc_form_ids|safe}},
 
@@ -38,6 +38,13 @@ var app = Vue.createApp({
                     csv_email_list : "",           //csv email list
                     
                     current_subject : 0,   //subject being viewed
+
+                    //graph globals
+                    marginY : 55,
+                    marginX : 35,
+                    margin2 : 10,
+                    sizeW : 0,
+                    sizeH : 0,
                 }},
     methods: {
 
@@ -87,9 +94,6 @@ var app = Vue.createApp({
                 case "update_reset_experiment":
                     app.takeUpdateResetExperiment(messageData);
                     break;
-                case "update_chat":
-                    app.takeUpdateChat(messageData);
-                    break;
                 case "update_connection_status":
                     app.takeUpdateConnectionStatus(messageData);
                     break;   
@@ -105,14 +109,14 @@ var app = Vue.createApp({
                 case "download_summary_data":
                     app.takeDownloadSummaryData(messageData);
                     break;
-                case "download_action_data":
-                    app.takeDownloadActionData(messageData);
+                case "download_heart_rate_data":
+                    app.takeDownloadHeartRateData(messageData);
                     break;
-                case "download_recruiter_data":
-                    app.takeDownloadRecruiterData(messageData);
+                case "download_activities_data":
+                    app.takedownloadActivityData(messageData);
                     break;
-                case "download_payment_data":
-                    app.takeDownloadPaymentData(messageData);
+                case "download_chat_data":
+                    app.takeDownloadChatData(messageData);
                     break;
                 case "update_next_instruction":
                     app.takeNextInstruction(messageData);
@@ -166,28 +170,24 @@ var app = Vue.createApp({
         /** send winsock request to get session info
         */
         sendGetSession(){
-            app.sendMessage("get_session",{"sessionKey" : app.$data.sessionKey});
+            app.sendMessage("get_session",{"sessionKey" : app.sessionKey});
         },
 
         /** take create new session
         *    @param messageData {json} session day in json format
         */
         takeGetSession(messageData){
-            
-           
 
-            app.$data.session = messageData.session;
+            app.session = messageData.session;
 
-            if(app.$data.session.started)
+            if(app.session.started)
             {
-                
+                setTimeout(app.updateGraph, 250);
             }
             else
             {
                 
             }
-            
-            if(app.session.enable_chat) app.updateChatDisplay(true);
             
             app.updatePhaseButtonText();    
         },
@@ -220,63 +220,13 @@ var app = Vue.createApp({
             }
         },
 
-        /** take updated data from goods being moved by another player
-        *    @param messageData {json} session day in json format
-        */
-        takeUpdateChat(messageData){
-            
-            let result = messageData.status;
-            let chat = result.chat;
-
-            if(this.session.chat_all.length>=100)
-                this.session.chat_all.shift();
-            
-            this.session.chat_all.push(chat);
-            app.updateChatDisplay(false);
-        },
-
-        /**
-         * update chat
-         */
-        updateChatDisplay(force_scroll){
-            
-            this.chat_list_to_display=this.session.chat_all;
-
-            //add spacers
-            for(let i=this.chat_list_to_display.length;i<18;i++)
-            {
-                this.chat_list_to_display.unshift({id:i*-1,sender_label:"", text:"|", sender_id:0, chat_type:'All'})
-            }
-
-            //scroll to view
-            if(this.chat_list_to_display.length>0)
-            {
-                Vue.nextTick(() => {app.updateChatDisplayScroll(force_scroll)});        
-            }
-        },
-
-        /**
-         * scroll to newest chat element
-         */
-        updateChatDisplayScroll(force_scroll){
-
-            if(!app.session.enable_chat) return;
-
-            if(window.innerHeight + window.pageYOffset >= document.body.offsetHeight || force_scroll)
-            {
-                var elmnt = document.getElementById("chat_id_" + app.$data.chat_list_to_display[app.$data.chat_list_to_display.length-1].id.toString());
-                elmnt.scrollIntoView(); 
-            }
-        },
-
         /**
          * take update end game
          */
-         takeUpdateEndGame(messageData){
+        takeUpdateEndGame(messageData){
 
-         },
+        },
 
-       
         //do nothing on when enter pressed for post
         onSubmit(){
             //do nothing
@@ -287,6 +237,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session/subjects/subjects_card.js"%}
         {%include "staff/staff_session/summary/summary_card.js"%}
         {%include "staff/staff_session/data/data_card.js"%}
+        {%include "staff/staff_session/graph/graph_card.js"%}
         {%include "staff/staff_session/payments/payments_card.js"%}
         {%include "js/help_doc.js"%}
     

@@ -5,7 +5,7 @@
 <div class="modal-dialog modal-xl">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">View Subject</h5>
+            <h5 class="modal-title">View Subject: [[session.session_players[current_subject].name]]</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -38,7 +38,8 @@
                             Wrist Time
                         </th> 
                         <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Check In
+                            Check In<br>
+                            Missed: [[session.session_players[current_subject].missed_check_ins]]
                         </th>   
                         <th scope="col" class = "text-center m-1 p-1 w-auto">
                             Force Check In

@@ -24,7 +24,7 @@
                 <div class="row">
                     <div class="col">
                         Email list: 
-                        <span v-for="(p, index) in session.session_players" v-bind:key="p.id">
+                        <span v-for="(p, index) in session.session_players" v-bind:key="p.id" v-if="session">
                             <span v-if="p.email != ''">[[p.email]][[(session.session_players.length-1>index) ? ', ':'']]</span>
                         </span>
                     </div>

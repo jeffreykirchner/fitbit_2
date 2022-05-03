@@ -22,6 +22,8 @@ from main.forms import SessionForm
 from main.forms import SessionInvitationForm
 from main.forms import StaffEditNameEtcForm
 
+import main
+
 class StaffSessionView(SingleObjectMixin, View):
     '''
     class based staff view
@@ -58,7 +60,7 @@ class StaffSessionView(SingleObjectMixin, View):
                                "page_key" : f'session-{session.id}',
                                "parameters" : parameters,
                                "session" : session,
-                               "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder),
+                               "session_json":{},
                                })
     
     @method_decorator(login_required)

@@ -240,31 +240,36 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
         data = {}
 
-        #last synced
-        data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+        todays_session_player_period = self.get_todays_session_player_period()   
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()     
 
-        todays_session_player_period = self.get_todays_session_player_period()        
-
-        #todays heart rate
+        #if during session
         if todays_session_player_period:
-            temp_s = todays_session_player_period.session_period.get_fitbit_formatted_date()
-            data['fitbit_heart_time_series_td'] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
-               
-        r = get_fitbit_metrics(self.fitbit_user_id, data)
+            r = todays_session_player_period.pull_secondary_metrics(True)
+        else:
+            data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+            r = get_fitbit_metrics(self.fitbit_user_id, data)
+            if r["status"] != "fail":
+                self.process_fitbit_last_synced(r["devices"]["result"])
 
         if r["status"] == "fail" :
             return r
-        else:
-            r = r["result"]
-            self.process_fitbit_last_synced(r["devices"]["result"])
-        
+                    
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
+        
+        #do back pull if needed
+        if yesterdays_session_player_period:
+            if not yesterdays_session_player_period.back_pull:
+                yesterdays_session_player_period.back_pull=True
+                yesterdays_session_player_period.save()
 
-        if todays_session_player_period and r["fitbit_heart_time_series_td"]["status"] != "fail":              
-            todays_session_player_period.process_fitbit_heart_time_series(r["fitbit_heart_time_series_td"]["result"])
-
+            if yesterdays_session_player_period.check_in:
+                yesterdays_session_player_period.take_check_in(False)
+            else:
+                yesterdays_session_player_period.pull_secondary_metrics(False)
+                
         return {"status" : "success", "message" : ""}
     
     def pull_fitbit_last_synced(self):
@@ -403,7 +408,7 @@ class SessionPlayer(models.Model):
         logger.info(f"pull_missing_metrics: player {self.id}, period {missing_player_period.session_period.period_number}")
         
         #missing_player_period.pull_fitbit_heart_time_series()
-        missing_player_period.pull_secondary_metrics()
+        missing_player_period.pull_secondary_metrics(False)
     
     def get_current_survey_link(self):
         '''
@@ -422,6 +427,114 @@ class SessionPlayer(models.Model):
                 survey_link = survey_session_period.get_survey_link()
         
         return survey_link
+    
+    def get_current_missed_check_ins(self):
+        '''
+        return the number of missed check in up to now
+        '''
+
+        #session not started for before first period
+        if not self.session.started or self.session.is_before_first_period():
+            return 0
+        
+        #session is complete
+        if self.session.is_after_last_period():
+            return self.session_player_periods_b.filter(check_in=False).count()
+
+        todays_session_player_period = self.get_todays_session_player_period()
+
+        if not todays_session_player_period:
+            return 0
+
+        #session in progress
+        return self.session_player_periods_b.filter(check_in=False, session_period__period_number__lt=todays_session_player_period.session_period.period_number).count()
+
+    def get_help_doc(self, help_doc_title):
+        '''
+        return a processed help doc with help_doc_title
+        '''
+
+        help_doc_json = main.models.HelpDocs.objects.get(title=help_doc_title).json()
+
+        help_doc_json["text"] = self.process_help_doc(help_doc_json["text"])
+
+        return help_doc_json
+    
+    def process_help_doc(self, text):
+        '''
+        take raw text and return processed version of it
+        '''
+
+        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
+
+        text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
+        text = text.replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
+        text = text.replace('#my_label#', self.parameter_set_player.label_html())
+
+        if partner:
+            text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
+        
+        return text
+
+    def individual_zone_mintutes_html(self):
+        '''
+        return html table of individual zone minutes
+        '''
+
+        p = self.session.get_current_session_period()
+
+        if not p:
+            return "Table not available"
+
+        p = p.parameter_set_period.json()
+
+        html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
+                        <thead>
+                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Payment</th>                            
+                        </thead>
+                        <tbody>"""
+
+        for i in p["parameter_set_period_payments"]:
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
+                             <td class='text-center w-auto'>${i['payment']}</td>
+                          </tr>"""
+                
+        html = html + """</tbody></table></center>"""
+        
+
+        return html
+    
+    def group_zone_mintutes_html(self):
+        '''
+        return html table of individual zone minutes
+        '''
+
+        p = self.session.get_current_session_period()
+
+        if not p:
+            return "Table not available"
+
+        p = p.parameter_set_period.json()
+
+        html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
+                        <thead>
+                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Payment</th>                            
+                        </thead>
+                        <tbody>"""
+
+        for i in p["parameter_set_period_payments"]:
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
+                             <td class='text-center w-auto'>${i['group_bonus']}</td>
+                          </tr>"""
+                
+        html = html + """</tbody></table></center>"""
+        
+
+        return html
 
     def json(self, get_chat=True):
         '''
@@ -429,11 +542,13 @@ class SessionPlayer(models.Model):
         '''
         todays_session_player_period = self.get_todays_session_player_period()
 
-        chat_all = []
+        chat = []
+
         if self.session.parameter_set.enable_chat:
-            chat_all = [c.json_for_subject() for c in self.session_player_chats_c.filter(chat_type=main.globals.ChatTypes.ALL)
-                                                                                   .order_by('-timestamp')[:100:-1]
-                       ] if get_chat else [],
+            chat = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects.filter(session_player__in=self.session.session_players.all())
+                                                                                        .filter(session_player__group_number=self.group_number)     
+                                                                                .order_by('-timestamp')[:100:-1]
+                    ]
         
         session_player_periods_group_1_json = []
 
@@ -462,8 +577,7 @@ class SessionPlayer(models.Model):
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
-            "chat_all" : chat_all,
-            "new_chat_message" : False,           #true on client side when a new un read message comes in
+            "chat" : chat,
 
             "current_instruction" : self.current_instruction,
             "current_instruction_complete" : self.current_instruction_complete,
@@ -500,6 +614,14 @@ class SessionPlayer(models.Model):
         return json for staff screen
         '''
 
+        chat = []
+
+        if self.session.parameter_set.enable_chat:
+            chat = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects.filter(session_player__in=self.session.session_players.all())
+                                                                                        .filter(session_player__group_number=self.group_number)     
+                                                                                .order_by('-timestamp')[:100:-1]
+                    ]
+
         todays_session_player_period = self.get_todays_session_player_period()
         
         session_player_periods_group_1_json = []
@@ -531,11 +653,11 @@ class SessionPlayer(models.Model):
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
-            "new_chat_message" : False,           #true on client side when a new un read message comes in
-
             "current_instruction" : self.current_instruction,
             "current_instruction_complete" : self.current_instruction_complete,
             "instructions_finished" : self.instructions_finished,
+
+            "chat" : chat,
 
             "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.filter(session_period__period_number__lte=period_number)],
 
@@ -543,6 +665,7 @@ class SessionPlayer(models.Model):
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+            "missed_check_ins" : self.get_current_missed_check_ins(),
 
             "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
             "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
@@ -567,22 +690,10 @@ class SessionPlayer(models.Model):
 
         todays_session_player_period = self.get_todays_session_player_period()
 
-        chat_individual = []
-
-        if self.session.parameter_set.enable_chat:
-            chat_individual = [c.json_for_subject() for c in  main.models.SessionPlayerChat.objects \
-                                                                            .filter(chat_type=main.globals.ChatTypes.INDIVIDUAL) \
-                                                                            .filter(Q(Q(session_player_recipients=session_player) & Q(session_player=self)) |
-                                                                                    Q(Q(session_player_recipients=self) & Q(session_player=session_player)))
-                                                                            .order_by('-timestamp')[:100:-1]
-                                ],
-
         return{
             "id" : self.id,  
 
             "player_number" : self.player_number,
-            "chat_individual" :chat_individual,
-            "new_chat_message" : False,
             "parameter_set_player" : self.parameter_set_player.json_for_subject(),
             "session_player_periods_1" : self.get_session_player_periods_1_json(),
             "session_player_periods_2" : self.get_session_player_periods_2_json(),

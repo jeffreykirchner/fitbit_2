@@ -6,7 +6,7 @@
         <span class = "float-end">
             <span class="text-success" v-if="session_player.checked_in_today">You are checked in for [[session.current_period_day_of_week]] <i class="fas fa-check"></i></span>
 
-            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('{{subject_check_in_help_doc}}')">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDocSubject('{{subject_check_in_help_doc}}')">
                 <i class="far fa-question-circle"></i> 
             </button>
         </span>        
@@ -91,8 +91,7 @@
             </div>
         </div>       
         <div class="row text-end fw-bold" v-if="session_player.survey_link != ''">            
-
-            <div class="col mt-2" v-if="fitbit_error_message ==''">              
+            <div class="col mt-2">              
                 Complete the survey before check in: <a v-bind:href="session_player.survey_link" target="_blank">Open Survey</a>
             </div>                                 
         </div>
@@ -107,7 +106,10 @@
                         v-on:click = "checkIn()" 
                         v-bind:disabled="reconnecting || working"> 
                     
-                    <span v-if="session_player.checked_in_today">
+                    <span v-if="working">
+                        <i class="fas fa-cog fa-spin fa-1x"></i>
+                    </span>
+                    <span v-else-if="session_player.checked_in_today">
                         Check In Again <i class="fas fa-check"></i>
                     </span>
                     <span v-else>

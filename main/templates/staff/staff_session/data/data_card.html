@@ -22,15 +22,15 @@
             </div>
         </div>
 
-        <!-- actions data -->
+        <!-- heart rate data -->
         <div class="row mt-2">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "downloadActionsData()"
-                        title="Download Action Data"
+                        v-on:click = "downloadHeartRateData()"
+                        title="Download Heart Rate Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Actions <i class="fas fa-scroll"></i>
+                    Download Heart Rate <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>
@@ -40,10 +40,10 @@
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "downloadRecruiterData()"
-                        title="Download Recruiter Data"
+                        v-on:click = "downloadActivityData()"
+                        title="Download activities"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Recruiter Payments <i class="fas fa-scroll"></i>
+                    Download activities <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>
@@ -53,10 +53,10 @@
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "downloadPaymentData()"
+                        v-on:click = "downloadChatData()"
                         title="Download Recruiter Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Earnings <i class="fas fa-scroll"></i>
+                    Download Chat <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>

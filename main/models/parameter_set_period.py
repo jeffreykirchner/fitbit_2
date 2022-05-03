@@ -23,7 +23,7 @@ class ParameterSetPeriod(models.Model):
     period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY)              #type of payment system used
 
     survey_required = models.BooleanField(default=False, verbose_name="Survey Required")                               #if true show the survey below
-    survey_link = models.CharField(max_length = 1000, default = '', verbose_name = 'Survey Link')
+    survey_link = models.CharField(max_length = 1000, default = '', verbose_name = 'Survey Link', blank=True)
 
     show_notice = models.BooleanField(default=False, verbose_name="Show Notice")                                       #if true show notice below
     notice_text = HTMLField(default="Notice Text Here", verbose_name="Notice Text", blank=True)
@@ -187,6 +187,8 @@ class ParameterSetPeriod(models.Model):
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
             "pay_block" : self.pay_block,
+
+            "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }
 
 

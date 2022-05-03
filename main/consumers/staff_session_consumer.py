@@ -6,8 +6,7 @@ from asgiref.sync import async_to_sync
 
 import json
 import logging
-import asyncio
-import time
+import re
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
@@ -182,13 +181,13 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def download_action_data(self, event):
+    async def download_heart_rate_data(self, event):
         '''
-        download summary data
+        download heart rate data
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_action_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_heart_rate_data)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -196,13 +195,13 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def download_recruiter_data(self, event):
+    async def download_activities_data(self, event):
         '''
-        download summary data
+        download activties data
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_recruiter_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_activities_data)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -210,13 +209,13 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def download_payment_data(self, event):
+    async def download_chat_data(self, event):
         '''
-        download payment data
+        download chat data
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_payment_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_chat_data)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -594,32 +593,32 @@ def take_download_summary_data(session_id):
 
     return {"value" : "success", "result" : session.get_download_summary_csv()}
 
-def take_download_action_data(session_id):
+def take_download_heart_rate_data(session_id):
     '''
-    download action data for session
-    '''
-
-    session = Session.objects.get(id=session_id)
-
-    return {"value" : "success", "result" : session.get_download_action_csv()}
-
-def take_download_recruiter_data(session_id):
-    '''
-    download recruiter data for session
+    download heart rate data for session
     '''
 
     session = Session.objects.get(id=session_id)
 
-    return {"value" : "success", "result" : session.get_download_recruiter_csv()}
+    return {"value" : "success", "result" : session.get_download_heart_rate_csv()}
 
-def take_download_payment_data(session_id):
+def take_download_activities_data(session_id):
     '''
-    download payment data for session
+    download activities data for session
     '''
 
     session = Session.objects.get(id=session_id)
 
-    return {"value" : "success", "result" : session.get_download_payment_csv()}
+    return {"value" : "success", "result" : session.get_download_activities_csv()}
+
+def take_download_chat_data(session_id):
+    '''
+    download chat data for session
+    '''
+
+    session = Session.objects.get(id=session_id)
+
+    return {"value" : "success", "result" : session.get_download_chat_csv()}
 
 def take_end_early(session_id):
     '''
@@ -741,7 +740,7 @@ def take_send_invitations(session_id, data):
 
 def take_email_list(session_id, data):
     '''
-    take uploaded csv server from list and load emails into session players
+    take recruiter formated user list
     '''
 
     logger = logging.getLogger(__name__)
@@ -757,34 +756,24 @@ def take_email_list(session_id, data):
 
     raw_list = raw_list.splitlines()
 
+    counter = 1
     for i in range(len(raw_list)):
-        raw_list[i] = raw_list[i].split(',')
-    
-    u_list = []
+        raw_list[i] = re.split(r',|\t', raw_list[i])
 
-    for i in raw_list:
-        for j in i:
-            if "@" in j:
-                u_list.append(j)
-    
-    session.session_players.update(email=None)
+        if raw_list[i][0] != "Last Name":
+            p = session.session_players.filter(player_number=counter).first()
 
-    for i in u_list:
-        p = session.session_players.filter(email=None).first()
+            if p:
+                p.name = raw_list[i][0] + " " + raw_list[i][1]
+                p.email = raw_list[i][2]
+                p.student_id = raw_list[i][3]
 
-        if(p):
-            p.email = i
-            p.save()
-        else:
-            break
+                p.save()
+            
+            counter+=1
     
-    result = []
-    for p in session.session_players.all():
-        result.append({"id" : p.id, "email" : p.email})
-    
-    return {"value" : "success",
-            "result" : result}
-
+    return {"value" : "success", "result" : {"session":session.json()}}
+            
 def take_fill_with_test_data(session_id, data):
     '''
     fill subjects with test data up to this point in the experiment
@@ -849,6 +838,8 @@ def take_get_pay_block(session_id, data):
     except ObjectDoesNotExist:
         logger.warning(f"take_get_pay_block session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
+    
+    session.back_fill_for_pay_block(pay_block)
 
     return {"value" : "success",
             "pay_block_csv" : session.get_pay_block_csv(pay_block),}
@@ -868,11 +859,11 @@ def take_force_check_in(session_id, data):
         logger.warning(f"take_force_check_in session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
 
-    session_player_period.take_check_in()
-    
     session_player_period.check_in_forced = True
     session_player_period.save()
 
+    session_player_period.take_check_in(False)
+    
     return {"value" : "success",
             "session_player_period" : session_player_period.json_for_staff(),}
 
