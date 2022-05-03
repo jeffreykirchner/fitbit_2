@@ -3,6 +3,7 @@ session period model
 '''
 
 #import logging
+import statistics
 
 from django.db import models
 from django.utils.timezone import now
@@ -63,15 +64,22 @@ class SessionPeriod(models.Model):
         '''
 
         return self.period_date.strftime("%Y-%m-%d")
+
+    def get_median_zone_minutes(self):
+        '''
+        return the median zone minutes for all players this period
+        '''
+        zone_min_list = self.session_player_periods_a.all().values_list('zone_minutes', flat=True)
+
+        if zone_min_list:
+            return statistics.median(list(zone_min_list))
         
+        return None
+
     def json(self):
         '''
         json object of model
         '''
-        #current_best_bid = self.get_current_best_bid()
-        #current_best_offer = self.get_current_best_offer()
-
-        #current_trade = self.get_current_trade()
 
         return{
             "id" : self.id,

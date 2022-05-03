@@ -380,15 +380,6 @@ class Session(models.Model):
         return json object of model
         '''
 
-        chat = []
-        # if self.parameter_set.enable_chat: 
-        #     chat = [c.json_for_staff() for c in main.models.SessionPlayerChat.objects \
-        #                                             .filter(session_player__in=self.session_players.all())\
-        #                                             .prefetch_related('session_player_recipients')
-        #                                             .select_related('session_player__parameter_set_player')
-        #                                             .order_by('-timestamp')[:100:-1]
-        #       ]
-
         current_session_period = self.get_current_session_period()
 
         is_last_period = False
@@ -406,14 +397,15 @@ class Session(models.Model):
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
 
-            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            # "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
             "current_period" : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
 
+            "median_zone_minutes" : [i.get_median_zone_minutes() for i in self.session_periods.all()],
+
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
-            "session_players":[i.json_for_staff() for i in self.session_players.all()],
-            "chat" : chat,
+            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related('session_player_periods_b', 'session_player_chats_b')],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
