@@ -18,7 +18,6 @@
 
                         <div v-if="c.sender_id==session.session_players[current_subject].id" 
                                 class="text-end ps-5 pe-2" 
-                                v-bind:style= "[(c.text=='|') ? {'opacity': '0'}:{}]"
                                 v-bind:id="'chat_id_' + c.id">
                             [[c.text]]
                         </div>
