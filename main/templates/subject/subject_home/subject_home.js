@@ -149,7 +149,12 @@ var app = Vue.createApp({
             else
             {
                 
-            }            
+            }     
+            
+            if(app.session_player.consent_form_required)
+            {
+                setTimeout(app.showConsentForm, 250);
+            }
             
             if(this.session.current_experiment_phase != 'Done')
             {
@@ -206,12 +211,6 @@ var app = Vue.createApp({
         takeUpdateResetExperiment(messageData){
             app.takeGetSession(messageData);
 
-            this.production_slider_one = 50;
-            this.production_slider_two = 50;
-            this.production_slider = 0;
-            this.avatar_choice_grid_selected_row = 0;
-            this.avatar_choice_grid_selected_col = 0;
-
             $('#endGameModal').modal('hide');
         },
 
@@ -236,7 +235,8 @@ var app = Vue.createApp({
         *    @param messageData {json} session day in json format
         */
         takeConsentForm(messageData){
-            app.session_player.consent_form_required = messageData.status.result.consent_form_required;            
+            app.session_player.consent_form_required = messageData.status.result.consent_form_required; 
+            $('#consentModal').modal('hide');   
         },
 
         takeSurveyComplete(messageData){

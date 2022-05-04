@@ -5,12 +5,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="helpModalLabel">Informed Consent to Participate in Research</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+
+                <button v-if="!session_player.consent_form_required" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <object class="conset_form" id="consent_pdf_id" v-bind:data="'/static/IRB/' + session.parameter_set.consent_form" type="text/html" target="_parent"></object>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" v-if="session_player.consent_form_required">
                 <b>I certify that I am at least 18 years of age and I agree to the statement above.</b>             
                 <button type="button" class="btn btn-outline-primary" v-on:click = "sendConsentForm()">
                     Submit <i class="fas fa-sign-in-alt"></i>

@@ -219,5 +219,6 @@ class ParameterSet(models.Model):
             "graph_y_max" : self.graph_y_max,
             "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
             "consent_form" : self.consent_form,
+            "consent_form_required" : self.consent_form_required,
         }
 

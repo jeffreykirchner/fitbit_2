@@ -79,6 +79,8 @@ class SessionPlayer(models.Model):
         self.student_id = ""
         self.email = None
         self.fitbit_user_id = ""
+        self.consent_form_required = False
+        self.disabled = False        
 
         self.save()
     
@@ -88,6 +90,9 @@ class SessionPlayer(models.Model):
         '''
 
         self.reset()
+
+        self.consent_form_required = self.parameter_set_player.parameter_set.consent_form_required
+        self.save()
 
         #session player periods
         session_player_periods = []

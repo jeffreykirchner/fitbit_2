@@ -145,7 +145,7 @@
                 </div>  
             </div>
             
-            <div class="row justify-content-center pt-0 mt-0">
+            <div class="row justify-content-center pt-0 mt-0" v-if="session.parameter_set.consent_form_required">
                 <div class="col-md text-end">
                     <button type="button" class="btn btn-link text-muted text-end m-0 p-0" title="Consent Form" v-on:click="showConsentForm()">
                         Consent Form 
