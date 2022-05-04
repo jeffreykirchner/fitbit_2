@@ -472,11 +472,17 @@ class SessionPlayer(models.Model):
         take raw text and return processed version of it
         '''
 
+        p = self.session.get_current_session_period()
+        fixed_pay = "---"
+        if p:
+            fixed_pay = round(p.parameter_set_period.parameter_set_period_pays_a.first().payment)
+
         partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
 
         text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
         text = text.replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
         text = text.replace('#my_label#', self.parameter_set_player.label_html())
+        text = text.replace('#fixed_pay#', str(fixed_pay))
 
         if partner:
             text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
