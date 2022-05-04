@@ -18,7 +18,6 @@
     }
 
     .graph {
-
         background-color: white; 
         border-style: solid;
         border-width: 1px;
@@ -33,6 +32,14 @@
         display:flex; 
         flex-direction:column-reverse;
     }
+
+    .conset_form{
+        width: 100%;
+        height: 600px;
+        background-color:black; 
+        border-style: solid;
+        border-width: 1px;
+    }
        
 </style>
 
@@ -42,6 +49,9 @@
 
 <!-- modals -->
 {%include "help_modal.html"%}
+<div v-if="session">
+{%include "subject/subject_home/consent_modal.html"%}
+</div>
 
 <!-- show only on virtical phone -->
 <div class="d-sm-none">
@@ -96,7 +106,7 @@
     </div>
     
     <div class="row justify-content-center mt-3">
-        <div class="col-lg-5" v-cloak v-if="session.enable_chat && first_load_done">
+        <div class="col-lg-5" v-cloak v-if="session.enable_chat && !session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
             <div class="row justify-content-center" >
                 <div class="col-lg mb-3 mb-lg-0">
                     {%include "subject/subject_home/chat/chat_card.html"%}   
@@ -134,6 +144,14 @@
                     <span class="align-middle">v[[software_version]]</span>
                 </div>  
             </div>
+            
+            <div class="row justify-content-center pt-0 mt-0" v-if="session.parameter_set.consent_form_required">
+                <div class="col-md text-end">
+                    <button type="button" class="btn btn-link text-muted text-end m-0 p-0" title="Consent Form" v-on:click="showConsentForm()">
+                        Consent Form 
+                     </button>
+                </div>  
+            </div>           
         </div>
 
     </div>

@@ -213,6 +213,33 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         # Send reply to sending channel
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def consent_form(self, event):
+        '''
+        agree to consent form
+        '''
+        r = await sync_to_async(take_consent_form)(self.session_id, self.session_player_id, event["message_text"])
+
+        message_data = {}
+        message_data["status"] = r
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        # Send reply to sending channel
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+        if r["value"] == "success":
+            update_result = {"value" : "success",
+                             "result" : {"player_id" : self.session_player_id, "consent_form_required":r["result"]["consent_form_required"]}}
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "update_consent_form",
+                 "data": update_result,
+                 "sender_channel_name": self.channel_name},
+            )
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -337,6 +364,11 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     async def update_finish_instructions(self, event):
         '''
         no group broadcast of avatar to current instruction
+        '''
+    
+    async def update_consent_form(self, event):
+        '''
+        no group broadcast consent form status
         '''
 
 #local sync functions  
@@ -708,3 +740,24 @@ def take_help_doc_subject(session_id, session_player_id, data):
 
     return {"value" : "success",
             "result" : {"help_doc" : help_doc}}
+
+def take_consent_form(session_id, session_player_id, data):
+    '''
+    agree to consent form
+    '''
+
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Take agree to consent form: {data}")
+
+    try:
+        session = Session.objects.get(id=session_id)
+        session_player = session.session_players.get(id=session_player_id)
+        
+        session_player.consent_form_required = False
+        session_player.save()
+    except ObjectDoesNotExist:
+        logger.warning(f"take_help_doc not found : {data}")
+        return {"value" : "fail", "reslut" : {}}
+
+    return {"value" : "success",
+            "result" : {"consent_form_required" : session_player.consent_form_required}}

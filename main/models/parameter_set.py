@@ -29,6 +29,9 @@ class ParameterSet(models.Model):
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 
+    consent_form = models.CharField(verbose_name='Consent Form File Name', max_length = 100, default="file_name.pdf")    #consent for file name
+    consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
+
     timestamp = models.DateTimeField(auto_now_add= True)
     updated= models.DateTimeField(auto_now= True)
 
@@ -54,9 +57,11 @@ class ParameterSet(models.Model):
             self.display_block = new_ps.get("display_block")
             self.graph_y_max = new_ps.get("graph_y_max")
 
+            self.consent_form = new_ps.get("consent_form")
+            self.consent_form_required = new_ps.get("consent_form_required")
+
             self.save()
 
-            
             #players
             new_parameter_set_players = new_ps.get("parameter_set_players")
             
@@ -195,6 +200,9 @@ class ParameterSet(models.Model):
             "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all()],
             "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
 
+            "consent_form" : self.consent_form,
+            "consent_form_required" : "True" if self.consent_form_required else "False",
+
             "test_mode" : "True" if self.test_mode else "False",
         }
     
@@ -210,5 +218,7 @@ class ParameterSet(models.Model):
             "test_mode" : self.test_mode,
             "graph_y_max" : self.graph_y_max,
             "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
+            "consent_form" : self.consent_form,
+            "consent_form_required" : self.consent_form_required,
         }
 

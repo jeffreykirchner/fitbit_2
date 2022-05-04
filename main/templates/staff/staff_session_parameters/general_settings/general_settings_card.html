@@ -39,6 +39,22 @@
         </div>
         <div class="row">
             <div class="col-7 text-end">
+                {{parameter_set_form.consent_form_required.label}}:                
+            </div>
+            <div class="col text-start">
+                <span v-if="session.parameter_set.consent_form_required=='True'">Yes</span><span v-else>No</span>                
+            </div>  
+        </div>
+        <div class="row">
+            <div class="col-7 text-end">
+                {{parameter_set_form.consent_form.label}}:                
+            </div>
+            <div class="col text-start">
+                [[session.parameter_set.consent_form]]             
+            </div>  
+        </div>
+        <div class="row">
+            <div class="col-7 text-end">
                 {{parameter_set_form.show_instructions.label}}:                
             </div>
             <div class="col text-start">

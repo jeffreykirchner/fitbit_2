@@ -79,9 +79,6 @@ var app = Vue.createApp({
                 case "update_chat":
                     app.takeUpdateChat(messageData);
                     break;
-                case "update_end_game":
-                    app.takeEndGame(messageData);
-                    break;
                 case "name":
                     app.takeName(messageData);
                     break;
@@ -105,6 +102,9 @@ var app = Vue.createApp({
                     break;
                 case "help_doc_subject":
                     app.takeLoadHelpDoc(messageData);
+                    break;
+                case "consent_form":
+                    app.takeConsentForm(messageData);
                     break;
                 
             }
@@ -149,7 +149,12 @@ var app = Vue.createApp({
             else
             {
                 
-            }            
+            }     
+            
+            if(app.session_player.consent_form_required)
+            {
+                setTimeout(app.showConsentForm, 250);
+            }
             
             if(this.session.current_experiment_phase != 'Done')
             {
@@ -206,20 +211,32 @@ var app = Vue.createApp({
         takeUpdateResetExperiment(messageData){
             app.takeGetSession(messageData);
 
-            this.production_slider_one = 50;
-            this.production_slider_two = 50;
-            this.production_slider = 0;
-            this.avatar_choice_grid_selected_row = 0;
-            this.avatar_choice_grid_selected_col = 0;
-
             $('#endGameModal').modal('hide');
         },
 
-         /**
-         * take end of game notice
-         */
-        takeEndGame(messageData){
+        showConsentForm(){
+           
+            var myModal = new bootstrap.Modal(document.getElementById('consentModal'), {
+                keyboard: false
+                })
+        
+            myModal.toggle();
+        },
 
+        /**
+        * send accept consent form
+        */
+        sendConsentForm(){
+            this.working = true;
+            app.sendMessage("consent_form", {});
+        },
+        
+        /** take result of consent form
+        *    @param messageData {json} session day in json format
+        */
+        takeConsentForm(messageData){
+            app.session_player.consent_form_required = messageData.status.result.consent_form_required; 
+            $('#consentModal').modal('hide');   
         },
 
         takeSurveyComplete(messageData){

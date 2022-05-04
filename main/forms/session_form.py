@@ -15,7 +15,7 @@ class SessionForm(forms.ModelForm):
     '''
     title = forms.CharField(label='Title',
                             widget=forms.TextInput(attrs={"v-model":"session.title",
-                                                           "v-on:keyup.enter":"sendUpdateSession()"}))
+                                                          }))
 
     start_date = forms.DateField(label="Start Date",
                                  error_messages={'invalid' : 'Format: M/D/YYYY'},
