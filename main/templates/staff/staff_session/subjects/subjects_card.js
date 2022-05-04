@@ -331,3 +331,24 @@ takeForceCheckIn(messageData){
         
     } 
 },
+
+/** take update consent form status
+ * @param messageData {json} result of update, either sucess or fail with errors
+*/
+takeUpdateConsentForm(messageData){
+
+    if(messageData.status.value == "success")
+    {             
+        let session_player = app.findSessionPlayer(messageData.status.result.player_id);
+
+        if(session_player)
+        {
+            session_player.consent_form_required = messageData.status.result.consent_form_required;
+        }
+        
+    } 
+    else
+    {
+        
+    } 
+},

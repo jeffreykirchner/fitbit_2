@@ -148,6 +148,9 @@ var app = Vue.createApp({
                 case "force_check_in":
                     app.takeForceCheckIn(messageData);
                     break;
+                case "update_consent_form":
+                    app.takeUpdateConsentForm(messageData);
+                    break;
             }
 
             this.first_load_done = true;

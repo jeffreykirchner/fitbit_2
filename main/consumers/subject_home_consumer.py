@@ -218,10 +218,10 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         agree to consent form
         '''
-        result = await sync_to_async(take_consent_form)(self.session_id, self.session_player_id, event["message_text"])
+        r = await sync_to_async(take_consent_form)(self.session_id, self.session_player_id, event["message_text"])
 
         message_data = {}
-        message_data["status"] = result
+        message_data["status"] = r
 
         message = {}
         message["messageType"] = event["type"]
@@ -229,6 +229,17 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         # Send reply to sending channel
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+        if r["value"] == "success":
+            update_result = {"value" : "success",
+                             "result" : {"player_id" : self.session_player_id, "consent_form_required":r["result"]["consent_form_required"]}}
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "update_consent_form",
+                 "data": update_result,
+                 "sender_channel_name": self.channel_name},
+            )
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -353,6 +364,11 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     async def update_finish_instructions(self, event):
         '''
         no group broadcast of avatar to current instruction
+        '''
+    
+    async def update_consent_form(self, event):
+        '''
+        no group broadcast consent form status
         '''
 
 #local sync functions  
