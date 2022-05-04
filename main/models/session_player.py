@@ -37,9 +37,9 @@ class SessionPlayer(models.Model):
     connected_count = models.IntegerField(verbose_name='Number of consumer connections', default=0)     #number of consumers connected to this subject
     channel_name = models.CharField(verbose_name='Django channels key', max_length = 1000, default="")  #key issued from django channels
 
-    name = models.CharField(verbose_name='Full Name', max_length = 100, default="")                     #subject's full name
-    student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="")              #subject's student ID number
-    email =  models.EmailField(verbose_name='Email Address', max_length = 100, blank=True, null=True)              #subject's email address
+    name = models.CharField(verbose_name='Full Name', max_length = 100, default="", blank=True, null=True)            #subject's full name
+    student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="", blank=True, null=True)     #subject's student ID number
+    email =  models.EmailField(verbose_name='Email Address', max_length = 100, blank=True, null=True)                 #subject's email address
                                          
     group_number = models.IntegerField(default = 1, verbose_name="Group Number")
 
@@ -47,9 +47,9 @@ class SessionPlayer(models.Model):
     current_instruction_complete = models.IntegerField(verbose_name='Current Instruction Complete', default=0)   #furthest complete page subject has done
     instructions_finished = models.BooleanField(verbose_name='Instructions Finished', default=False)             #true once subject has completed instructions
 
-    fitbit_user_id = models.CharField(max_length=100, default="",verbose_name = 'FitBit User ID')                #fitbit user id
-    fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')      #time when the fitbit was last synced to user's phone
-    fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                  #last fitbit device to sync
+    fitbit_user_id = models.CharField(max_length=100, default="",verbose_name = 'FitBit User ID', blank=True, null=True)     #fitbit user id
+    fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')                  #time when the fitbit was last synced to user's phone
+    fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                              #last fitbit device to sync
     
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
@@ -655,6 +655,7 @@ class SessionPlayer(models.Model):
             "player_key" : self.player_key,
 
             "disabled" : self.disabled,
+            "consent_form_required" : self.consent_form_required,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
             "connected_count" : self.connected_count,
