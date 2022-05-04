@@ -53,12 +53,17 @@ class SubjectHomeView(View):
 
         parameters = Parameters.objects.first()
 
-        subject_graph_help_doc = "Subject graph help individual"
-        subject_check_in_help_doc = "Subject check in help individual"
+        subject_graph_help_doc = "Subject graph help fixed"
+        subject_check_in_help_doc = "Subject check in help fixed"
         
-        if session_player_period_today and session_player_period_today.session_period.parameter_set_period.period_type == "Group Pay":
-            subject_graph_help_doc = "Subject graph help group"
-            subject_check_in_help_doc = "Subject check in help group"
+        if session_player_period_today:
+            if session_player_period_today.session_period.parameter_set_period.period_type == "Group Pay":
+                subject_graph_help_doc = "Subject graph help group"
+                subject_check_in_help_doc = "Subject check in help group"
+            elif session_player_period_today.session_period.parameter_set_period.period_type == "No Pay":
+                subject_graph_help_doc = "Subject graph help no pay"
+                subject_check_in_help_doc = "Subject check in help no pay"
+        
 
         return render(request=request,
                       template_name=self.template_name,
