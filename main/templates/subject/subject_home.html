@@ -49,7 +49,9 @@
 
 <!-- modals -->
 {%include "help_modal.html"%}
+<div v-if="session">
 {%include "subject/subject_home/consent_modal.html"%}
+</div>
 
 <!-- show only on virtical phone -->
 <div class="d-sm-none">

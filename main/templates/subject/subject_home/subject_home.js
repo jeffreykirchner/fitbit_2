@@ -103,6 +103,9 @@ var app = Vue.createApp({
                 case "help_doc_subject":
                     app.takeLoadHelpDoc(messageData);
                     break;
+                case "consent_form":
+                    app.takeConsentForm(messageData);
+                    break;
                 
             }
 
@@ -219,6 +222,21 @@ var app = Vue.createApp({
                 })
         
             myModal.toggle();
+        },
+
+        /**
+        * send accept consent form
+        */
+        sendConsentForm(){
+            this.working = true;
+            app.sendMessage("consent_form", {});
+        },
+        
+        /** take result of consent form
+        *    @param messageData {json} session day in json format
+        */
+        takeConsentForm(messageData){
+            app.session_player.consent_form_required = messageData.status.result.consent_form_required;            
         },
 
         takeSurveyComplete(messageData){

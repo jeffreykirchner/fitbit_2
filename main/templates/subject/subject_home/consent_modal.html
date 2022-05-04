@@ -8,11 +8,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <object class="conset_form" id="consent_pdf_id" data="/static/IRB/IRB-20-142_12-18-2020.pdf" type="text/html" target="_parent"></object>
+                <object class="conset_form" id="consent_pdf_id" v-bind:data="'/static/IRB/' + session.parameter_set.consent_form" type="text/html" target="_parent"></object>
             </div>
             <div class="modal-footer">
                 <b>I certify that I am at least 18 years of age and I agree to the statement above.</b>             
-                <button type="button" class="btn btn-outline-primary" v-on:click = "acceptConsentForm()">
+                <button type="button" class="btn btn-outline-primary" v-on:click = "sendConsentForm()">
                     Submit <i class="fas fa-sign-in-alt"></i>
                 </button>
             </div>

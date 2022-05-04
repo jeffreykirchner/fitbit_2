@@ -573,6 +573,7 @@ class SessionPlayer(models.Model):
             "player_key" : self.player_key,
 
             "disabled" : self.disabled,
+            "consent_form_required" : self.consent_form_required,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
             "connected_count" : self.connected_count,
