@@ -735,7 +735,7 @@ def take_send_invitations(session_id, data):
     session.save()
 
     user_list = []
-    for session_subject in session.session_players.exclude(email=None).exclude(email=""):
+    for session_subject in session.session_players.exclude(email=None).exclude(email="").exclude(disabled=True):
         user_list.append({"email" : session_subject.email,
                           "variables": [{"name" : "log in link",
                                          "text" : p.site_url + reverse('subject_home', kwargs={'player_key': session_subject.player_key})

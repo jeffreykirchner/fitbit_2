@@ -316,7 +316,7 @@ class Session(models.Model):
                      "range" : self.get_pay_block_range(pay_block_number),
                      "payments" : []} 
 
-        for p in self.session_players.all():
+        for p in self.session_players.exclude(disabled=True):
 
             payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block_number)}
             pay_block["payments"].append(payment)
@@ -355,7 +355,7 @@ class Session(models.Model):
         back fill last day of a pay block
         '''
         
-        for i in self.session_players.all():
+        for i in self.session_players.exclude(disabled=True):
 
             p = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number).last()
 
