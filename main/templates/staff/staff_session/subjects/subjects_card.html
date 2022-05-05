@@ -4,20 +4,24 @@
             Subjects ([[session.session_players.length]])
         </span>       
 
+        
+
         <span class="float-end"> 
             
             <a href='{%url "staff_session_parameters" session.id %}' class='link-primary' title='Open parameter set'>
                 [[session.started ? 'View': 'Edit']] Parameters                
             </a>
 
-            <button type="button" class="btn btn-outline-primary ms-4" title="Upload Email List" v-on:click="showSendEmailList()">
-                Upload Player List
-            </button>
-
-            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Subject List')">
+            <button type="button" class="btn btn-link ms-2" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Subject List')">
                 <i class="far fa-question-circle"></i> 
             </button>
-        </span>          
+        </span>
+
+        <span class="float-end d-none d-sm-block me-4">
+            <button type="button" class="btn btn-outline-primary" title="Upload Email List" v-on:click="showSendEmailList()">
+                Upload Player List
+            </button>
+        </span>        
     </div>
     <div class="card-body" >        
 

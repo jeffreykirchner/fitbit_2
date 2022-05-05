@@ -293,6 +293,8 @@ var app = Vue.createApp({
         $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
         $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
         $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
+
+        window.addEventListener('resize', this.updateGraph);
     },
 
 }).mount('#app');
