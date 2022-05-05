@@ -4,8 +4,11 @@
             Control
         </span>       
 
-        <span class="float-end">                        
+        <span class="float-end">                       
             <a href='{%url "staff_session" session.id %}' class='link-primary'>Return to session</a>
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Parameters Control')">
+                <i class="far fa-question-circle"></i> 
+            </button> 
         </span>
     </div>
     <div class="card-body">               
