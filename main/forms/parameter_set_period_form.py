@@ -76,7 +76,7 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                                                                    "step":"1",
                                                                                    "min":"1"}))
     
-    pay_block = forms.IntegerField(label="Payment Group",
+    pay_block = forms.IntegerField(label="Payment Block",
                                    min_value=1,
                                    widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.pay_block",
                                                                    "step":"1",
