@@ -69,7 +69,7 @@ class SessionPeriod(models.Model):
         '''
         return the median zone minutes for all players this period
         '''
-        zone_min_list = self.session_player_periods_a.all().values_list('zone_minutes', flat=True)
+        zone_min_list = self.session_player_periods_a.filter(session_player__disabled=False).values_list('zone_minutes', flat=True)
 
         if zone_min_list:
             return statistics.median(list(zone_min_list))

@@ -18,7 +18,7 @@
         </span>
 
         <span class="float-end d-none d-sm-block me-4">
-            <button type="button" class="btn btn-outline-primary" title="Upload Email List" v-on:click="showSendEmailList()">
+            <button type="button" class="btn btn-outline-primary" title="Upload Email List" v-on:click="showSendEmailList()" v-show="session.started">
                 Upload Player List
             </button>
         </span>        

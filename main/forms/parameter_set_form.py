@@ -11,13 +11,7 @@ import  main
 class ParameterSetForm(forms.ModelForm):
     '''
     Parameterset edit form
-    '''
-    display_block = forms.IntegerField(label='Number of Periods in Graph',
-                                      min_value=1,
-                                      widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.display_block",
-                                                                      "step":"1",
-                                                                      "min":"1"}))
-    
+    '''    
     graph_y_max = forms.IntegerField(label='Graph: Max Y Value',
                                       min_value=1,
                                       widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.graph_y_max",
@@ -52,4 +46,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['display_block', 'graph_y_max', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']
+        fields =['graph_y_max', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']

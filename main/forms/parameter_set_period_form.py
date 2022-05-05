@@ -14,7 +14,7 @@ class ParameterSetPeriodForm(forms.ModelForm):
     parameterset period edit form
     '''
 
-    survey_link = forms.CharField(label='Link',
+    survey_link = forms.CharField(label='Survey Link',
                                   required=False,
                                   widget=forms.TextInput(attrs={"v-model" : "current_parameter_set_period.survey_link"}))
 
@@ -84,10 +84,11 @@ class ParameterSetPeriodForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSetPeriod
-        fields =['survey_link', 'survey_required', 'period_type', 'minimum_wrist_minutes', 
+        fields =['period_type', 'minimum_wrist_minutes', 'survey_required', 'survey_link',  
+                 'show_notice', 'notice_text',  
                  'show_graph_1', 'graph_1_start_period_number', 'graph_1_end_period_number',
                  'show_graph_2', 'graph_2_start_period_number', 'graph_2_end_period_number', 
-                 'pay_block', 'show_notice', 'notice_text']
+                 'pay_block', ]
     
 
     def clean_survey_link(self):
