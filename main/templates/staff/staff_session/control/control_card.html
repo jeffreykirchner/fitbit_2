@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <!-- reset connection status -->
+        <!-- reset connection status -->        
         <div class="row mt-2" v-show="session.started == false">
             <div class="col-md text-center">
                 <button type="button"
@@ -51,6 +51,7 @@
         </div>
 
         <!-- end early -->
+        {%if user.is_staff%}
         <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
@@ -67,8 +68,10 @@
                 </button>
             </div>
         </div>
+        {%endif%}
 
         <!-- reset experiment -->
+        {%if user.is_staff%}
         <div class="row mt-2" v-show="session.started && !session.locked">
             <div class="col-md text-center">
                 <button type="button"
@@ -80,6 +83,7 @@
                 </button>
             </div>
         </div>
+        {%endif%}
         
         <!-- send invitations -->
         <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">

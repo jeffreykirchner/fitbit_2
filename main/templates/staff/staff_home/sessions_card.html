@@ -43,6 +43,7 @@
                         [[formatDate(s.start_date)]]                             
                     </td>
                     <td class="text-center">
+                        {%if user.is_staff%}
                         <div v-if="s.locked">
                             Locked
                         </div>
@@ -53,9 +54,10 @@
                                     v-on:click = "sendDeleteSession(s.id)"
                                     title = "Delete session and its data."
                                     v-bind:disabled = "reconnecting || working">
-                                Delete <i class="fas fa-user-minus fa-xs"></i>  
+                                Delete <i class="fas fa-minus"></i>  
                             </button>
-                        </div>                        
+                        </div>    
+                        {%endif%}                    
                     </td>
                 </tr>                                                    
             </tbody>
