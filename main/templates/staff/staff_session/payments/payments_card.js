@@ -3,6 +3,8 @@
  */
 get_pay_block(pay_block){
     this.working = true;
+    this.payments_downloading = true;
+    this.payments_copied = false;
     app.sendMessage("get_pay_block",{"pay_block" : pay_block});
 },
 
@@ -11,7 +13,8 @@ get_pay_block(pay_block){
  */
 take_get_pay_block(messageData){    
 
-    this.working = false;
+    this.payments_downloading = false;
+    this.payments_copied = true;
     if(messageData.status.value == "success")
     {
         app.copyToClipboard(messageData.status.pay_block_csv);      

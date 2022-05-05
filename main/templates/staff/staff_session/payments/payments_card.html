@@ -4,7 +4,10 @@
             Payments
         </span>       
 
-        <span class="float-end">            
+        <span class="float-end">       
+            <span v-if="payments_downloading"><i class="fas fa-spinner fa-spin"></i></span>
+            <span v-if="payments_copied">Payments Copied <i class="fas fa-check"></i></span>
+
             <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Payments')">
                 <i class="far fa-question-circle"></i> 
             </button>
