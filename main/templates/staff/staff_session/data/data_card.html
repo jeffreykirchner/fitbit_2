@@ -4,6 +4,10 @@
             
         <span class="float-end">
              <span v-if="data_downloading"><i class="fas fa-spinner fa-spin"></i></span>
+
+             <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Data')">
+                <i class="far fa-question-circle"></i> 
+            </button>
         </span>
         
     </div>
