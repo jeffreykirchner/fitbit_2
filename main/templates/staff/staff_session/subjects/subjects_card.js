@@ -223,6 +223,9 @@ takeUpdateSubject(messageData){
 /** show edit subject modal
 */
 showEditSubject:function(id){
+
+    if(!app.session.started) return;
+
     app.clearMainFormErrors();
     this.cancelModal=true;
 
