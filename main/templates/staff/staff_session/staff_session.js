@@ -27,6 +27,8 @@ var app = Vue.createApp({
                     notice_list_to_display : [],                //list of chats to display on screen
 
                     data_downloading : false,                   //show spinner when data downloading
+                    payments_downloading : false,               //show spinner when payments downloading
+                    payments_copied : false,                    //show after payments copied to clipboard
 
                     staffEditNameEtcForm : {name : "", student_id : "", email : "", id : -1},
                     sendMessageModalForm : {subject : "", text : ""},
@@ -291,6 +293,8 @@ var app = Vue.createApp({
         $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
         $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
         $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
+
+        window.addEventListener('resize', this.updateGraph);
     },
 
 }).mount('#app');

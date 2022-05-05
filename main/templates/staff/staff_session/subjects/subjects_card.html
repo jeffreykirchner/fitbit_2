@@ -4,20 +4,24 @@
             Subjects ([[session.session_players.length]])
         </span>       
 
+        
+
         <span class="float-end"> 
             
             <a href='{%url "staff_session_parameters" session.id %}' class='link-primary' title='Open parameter set'>
                 [[session.started ? 'View': 'Edit']] Parameters                
             </a>
 
-            <button type="button" class="btn btn-outline-primary ms-4" title="Upload Email List" v-on:click="showSendEmailList()">
-                Upload Player List
-            </button>
-
-            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Subject List')">
+            <button type="button" class="btn btn-link ms-2" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Subject List')">
                 <i class="far fa-question-circle"></i> 
             </button>
-        </span>          
+        </span>
+
+        <span class="float-end d-none d-sm-block me-4">
+            <button type="button" class="btn btn-outline-primary" title="Upload Email List" v-on:click="showSendEmailList()">
+                Upload Player List
+            </button>
+        </span>        
     </div>
     <div class="card-body" >        
 
@@ -139,5 +143,27 @@
             </div>
         </div>  
         
+        <!-- private links -->
+        <div class="row justify-content-center">            
+            <div class="col-md-auto text-center">
+                Private Login Links (do not share with subjects)
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-auto text-center">
+                Next available connection:
+            </div>
+            <div class="col-md-auto text-center">
+                <a href='{%url "subject_home_auto_connect" session.session_key%}' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}</a>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-auto text-center">
+                Login by client number:
+            </div>
+            <div class="col-md-auto text-center">
+                <a href='{%url "subject_home_auto_connect" session.session_key%}[client_number]' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}[client_number]</a>
+            </div>
+        </div>
     </div>                    
 </div> 

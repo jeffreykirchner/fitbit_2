@@ -9,96 +9,96 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            
-            <table class="table table-condensed"> 
-                <thead>
-                    <tr>
-                        <th scope="col" class = "m-1 p-1 w-auto">
-                            Period
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Type
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Pay Block
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Date
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Earnings Individual
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Earnings Group
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Zone Minutes
-                        </th>
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Wrist Time
-                        </th> 
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Check In<br>
-                            Missed: [[session.session_players[current_subject].missed_check_ins]]
-                        </th>   
-                        <th scope="col" class = "text-center m-1 p-1 w-auto">
-                            Force Check In
-                        </th>                   
-                    </tr>
-                </thead>
-                <tbody id="player_list">
-                    <tr v-for="(p, index) in session.session_players[current_subject].session_player_periods" v-bind:key="p.id">
-                        <td class="player_table_cell text-nowrap w-auto">
-                           [[p.period_number]]
-                        </td>
-                        <td class="player_table_cell text-center text-nowrap w-auto">
-                            [[p.period_type]]
-                         </td>
-                        <td class="player_table_cell text-center text-nowrap w-auto">
-                            [[p.pay_block]]
-                         </td>
-                        <td class="player_table_cell text-center text-nowrap w-auto">
-                           [[p.fitbit_formatted_date]]
-                        </td>
-                        <td class="player_table_cell text-center text-nowrap w-auto">
-                            $[[p.earnings_individual]]
-                         </td>
-                         <td class="player_table_cell text-center text-nowrap w-auto">
-                            $[[p.earnings_group]]
-                         </td>
-                         <td class="player_table_cell text-center text-nowrap w-auto">
-                            [[p.zone_minutes]]
-                         </td>
-                         <td class="player_table_cell text-center text-nowrap w-auto" v-bind:style="[p.wrist_time_met ? {} : {'color':'red'}]">
-                            [[p.fitbit_on_wrist_minutes]]
-                         </td> 
-                         <td class="player_table_cell text-center text-nowrap w-auto">
-                            <span v-if="p.check_in" style="color: lightgreen;">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span v-else style="color: crimson;">
-                                <i class="fas fa-times"></i>
-                            </span>
-                         </td>
-                         <td class="player_table_cell text-center text-nowrap w-auto">
-                            <span v-if="p.check_in_forced" style="color: lightgreen;">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span v-else-if="!p.check_in">                                
-                                <button type="button"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        v-on:click = "sendForceCheckIn(p.id)"
-                                        title="Force Check In"
-                                        v-bind:disabled="reconnecting || working">
-                                    <i class="far fa-arrow-alt-circle-left"></i>
-                                </button>
-                            </span>                            
-                         </td>                       
-                    </tr>
-                </tbody>
-                
-            </table>
-
+            <div class="table-responsive">
+                <table class="table table-condensed"> 
+                    <thead>
+                        <tr>
+                            <th scope="col" class = "m-1 p-1 w-auto">
+                                Period
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Type
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Pay Block
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Date
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Earnings Individual
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Earnings Group
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Zone Minutes
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Wrist Time
+                            </th> 
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Check In<br>
+                                Missed: [[session.session_players[current_subject].missed_check_ins]]
+                            </th>   
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Force Check In
+                            </th>                   
+                        </tr>
+                    </thead>
+                    <tbody id="player_list">
+                        <tr v-for="(p, index) in session.session_players[current_subject].session_player_periods" v-bind:key="p.id">
+                            <td class="player_table_cell text-nowrap w-auto">
+                            [[p.period_number]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.period_type]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.pay_block]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                            [[p.fitbit_formatted_date]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                $[[p.earnings_individual]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                $[[p.earnings_group]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.zone_minutes]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto" v-bind:style="[p.wrist_time_met ? {} : {'color':'red'}]">
+                                [[p.fitbit_on_wrist_minutes]]
+                            </td> 
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                <span v-if="p.check_in" style="color: lightgreen;">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span v-else style="color: crimson;">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                <span v-if="p.check_in_forced" style="color: lightgreen;">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span v-else-if="!p.check_in">                                
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            v-on:click = "sendForceCheckIn(p.id)"
+                                            title="Force Check In"
+                                            v-bind:disabled="reconnecting || working">
+                                        <i class="far fa-arrow-alt-circle-left"></i>
+                                    </button>
+                                </span>                            
+                            </td>                       
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </div>
         </div>
     
     </div>

@@ -132,21 +132,27 @@
                     {%include "subject/subject_home/connect/connect_card.html"%}   
                 </div>
             </div>
+
+            <div class="row justify-content-center p-0 m-0">
+                <div class="col-md text-end text-muted p-0 m-0">
+                    <span class="align-middle">[[session_player.name]]</span>
+                </div>  
+            </div>
             
-            <div class="row justify-content-center mt-2 pb-0 mb-0">
-                <div class="col-md text-end text-muted">
+            <div class="row justify-content-center p-0 m-0">
+                <div class="col-md text-end text-muted p-0 m-0">
                     <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
                 </div>  
             </div>
             
-            <div class="row justify-content-center pt-0 mt-0">
-                <div class="col-md text-end text-muted">
+            <div class="row justify-content-center p-0 m-0">
+                <div class="col-md text-end text-muted p-0 m-0">
                     <span class="align-middle">v[[software_version]]</span>
                 </div>  
             </div>
             
-            <div class="row justify-content-center pt-0 mt-0" v-if="session.parameter_set.consent_form_required">
-                <div class="col-md text-end">
+            <div class="row justify-content-center p-0 m-0" v-if="session.parameter_set.consent_form_required">
+                <div class="col-md text-end p-0 m-0">
                     <button type="button" class="btn btn-link text-muted text-end m-0 p-0" title="Consent Form" v-on:click="showConsentForm()">
                         Consent Form 
                      </button>
