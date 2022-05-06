@@ -257,7 +257,7 @@ class SessionPlayer(models.Model):
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
             if r["status"] != "fail":
-                self.process_fitbit_last_synced(r["devices"]["result"])
+                self.process_fitbit_last_synced(r["result"]["devices"]["result"])
 
         if r["status"] == "fail" :
             return r

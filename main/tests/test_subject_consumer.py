@@ -45,6 +45,7 @@ class TestSubjectConsumer(TestCase):
         session_player_1.save()
         data2 = {'playerKey': '2ce05dfc-c421-4c04-ae35-4b2cf4166978', 'first_load_done': True}
 
+        #session not started
         r = take_get_session_subject(session_player_1.id, data)
         self.assertEqual(r["show_fitbit_connect"], False)
         self.assertEqual(r["fitbit_error_message"], "")
