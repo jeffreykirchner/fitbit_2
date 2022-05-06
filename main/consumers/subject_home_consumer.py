@@ -392,8 +392,9 @@ def take_get_session_subject(session_player_id, data):
 
         if session_player.fitbit_user_id == "":
             show_fitbit_connect = True
+            fitbit_error_message = "Connect your fitbit the app."
 
-        if not first_load_done:        
+        if not first_load_done and not show_fitbit_connect:        
             value = session_player.pull_todays_metrics()
     
             if value["status"] == "fail":
@@ -435,8 +436,11 @@ def take_get_session_id(player_key):
     '''
     get the session id for the player_key
     '''
-    session_player = SessionPlayer.objects.get(player_key=player_key)
-
+    try:
+        session_player = SessionPlayer.objects.get(player_key=player_key)
+    except ObjectDoesNotExist:
+        return None
+        
     return session_player.session.id
   
 def take_chat(session_id, session_player_id, data):
@@ -610,7 +614,7 @@ def take_check_in(session_id, session_player_id, data):
     result = {}
 
     logger = logging.getLogger(__name__) 
-    logger.info(f"Take check in: {session_id} {session_player_id} {data}")
+    logger.info(f"Take check in: session {session_id}, player {session_player_id}, {data}")
 
     try:       
         p = Parameters.objects.first()
@@ -704,7 +708,7 @@ def take_survey_complete(session_id, session_player_id, data):
     result = {}
 
     logger = logging.getLogger(__name__) 
-    logger.info(f"Take check in: {session_id} {session_player_id} {data}")
+    logger.info(f"Take survey complete: session {session_id}, player {session_player_id}, {data}")
 
     try:       
         p = Parameters.objects.first()
