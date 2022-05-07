@@ -25,7 +25,7 @@
                         </div>
 
                         <div v-else class="pe-5 ps-2" v-bind:id="'chat_id_' + c.id">
-                            <span class="fw-bold">Partner:</span> [[c.text]]
+                            <span class="fw-bold" v-bind:style="{'color':c.sender_color}">[[c.sender_label]]:</span> [[c.text]]
                         </div>
                     </div>
                 </div>        

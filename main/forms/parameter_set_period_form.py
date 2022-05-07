@@ -90,7 +90,6 @@ class ParameterSetPeriodForm(forms.ModelForm):
                  'show_graph_2', 'graph_2_start_period_number', 'graph_2_end_period_number', 
                  'pay_block', ]
     
-
     def clean_survey_link(self):
         
         try:
