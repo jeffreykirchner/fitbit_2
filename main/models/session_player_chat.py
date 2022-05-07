@@ -90,7 +90,8 @@ class SessionPlayerChat(models.Model):
 
         return{
             "id" : self.id,    
-            "sender_label" : self.session_player.parameter_set_player.id_label,  
+            "sender_label" : self.session_player.parameter_set_player.id_label,
+            "sender_color" : self.session_player.parameter_set_player.display_color,  
             "sender_id" : self.session_player.id,    
             "text" : self.text,
             "show_time_stamp" : self.show_time_stamp,

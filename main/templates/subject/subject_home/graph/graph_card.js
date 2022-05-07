@@ -719,7 +719,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     //labels
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Partner", marginY-25, 15);
+    ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
     ctx.fillText("Pay", marginY-30, 28);
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
