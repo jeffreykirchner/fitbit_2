@@ -13,7 +13,7 @@ class ParameterSetPeriodPaymentForm(forms.ModelForm):
     parameterset period payment edit form
     '''
 
-    payment = forms.DecimalField(label='Payment',
+    payment = forms.DecimalField(label='Individual Payment',
                                      min_value=0,
                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period_payment.payment",
                                                                      "step":"0.01"}))
