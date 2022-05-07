@@ -180,7 +180,7 @@ class Session(models.Model):
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
         writer.writerow(["Session ID", "Period", "Player", "Group", 
-                         "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Wrist Time", 
+                         "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
                          "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):

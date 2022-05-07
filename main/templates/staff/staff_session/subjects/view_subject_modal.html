@@ -35,8 +35,17 @@
                                 Zone Minutes
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Min BPM
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Resting HR
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Age
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Wrist Time
-                            </th> 
+                            </th>                             
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Check In<br>
                                 Missed: [[session.session_players[current_subject].missed_check_ins]]
@@ -68,6 +77,15 @@
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.zone_minutes]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.fitbit_min_heart_rate_zone_bpm]]
+                            </td>fitbit_resting_heart_rate
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.fitbit_resting_heart_rate]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.fitbit_age]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto" v-bind:style="[p.wrist_time_met ? {} : {'color':'red'}]">
                                 [[p.fitbit_on_wrist_minutes]]
