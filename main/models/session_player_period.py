@@ -70,6 +70,8 @@ class SessionPlayerPeriod(models.Model):
 
     fitbit_on_wrist_minutes = models.IntegerField(default=0)          #minutes fit bit was one wrist (sum of heart time series) 
     fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)   #minimum bmp a subject must have to register active zone minutes
+    fitbit_resting_heart_rate = models.IntegerField(default=0)        #resting heart rate
+    fitbit_age = models.IntegerField(default=0)                        #age reported by fitbit.
 
     last_login = models.DateTimeField(null=True, blank=True)          #last time the subject logged this day
     
@@ -245,6 +247,7 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         self.fitbit_heart_time_series = d         
+        self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
 
         heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
 
@@ -371,7 +374,9 @@ class SessionPlayerPeriod(models.Model):
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
+
             self.fitbit_profile = result["fitbit_profile"]["result"]
+            self.fitbit_age = self.fitbit_profile['user']['age']
 
             #only store activities for this day
             fitbit_activities_raw = result["fitbit_activities"]["result"]
@@ -448,9 +453,9 @@ class SessionPlayerPeriod(models.Model):
         '''
         take csv writer and add row
         '''
-    #    ["Session ID", "Period", "Player", "Group", 
-    #                      "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Wrist Time", 
-    #                      "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+        # ["Session ID", "Period", "Player", "Group", 
+        #                  "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
+        #                  "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])                    "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
 
         writer.writerow([self.session_period.session.id,
                          self.session_period.period_number,
@@ -463,6 +468,8 @@ class SessionPlayerPeriod(models.Model):
                          self.fitbit_minutes_heart_fat_burn,
                          self.fitbit_minutes_heart_out_of_range,
                          self.fitbit_min_heart_rate_zone_bpm,
+                         self.fitbit_resting_heart_rate,
+                         self.fitbit_age,
                          self.fitbit_on_wrist_minutes,
                          self.check_in,
                          self.check_in_forced,
@@ -476,10 +483,6 @@ class SessionPlayerPeriod(models.Model):
         '''
         take csv writer and add row
         '''
-        # ["Session ID", "Period", "Player", "Group", 
-        #                  "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Wrist Time", 
-        #                  "Check In", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
-
         v = [self.session_period.session.id,
              self.session_period.period_number,
              self.session_player.player_number,
@@ -590,6 +593,9 @@ class SessionPlayerPeriod(models.Model):
             "earnings_total" : self.get_earning(),
             "zone_minutes" : self.zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
+            "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
+            "fitbit_resting_heart_rate" : self.fitbit_resting_heart_rate,
+            "fitbit_age" : self.fitbit_age,    
             "last_login" : self.last_login,
             "check_in" : self.check_in,
             "check_in_forced" : self.check_in_forced,
