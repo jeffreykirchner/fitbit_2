@@ -63,6 +63,10 @@ class SubjectHomeView(View):
             elif session_player_period_today.session_period.parameter_set_period.period_type == "No Pay":
                 subject_graph_help_doc = "Subject graph help no pay"
                 subject_check_in_help_doc = "Subject check in help no pay"
+            elif session_player_period_today.session_period.parameter_set_period.period_type == "Individual Pay":
+                subject_graph_help_doc = "Subject graph help individual pay"
+                subject_check_in_help_doc = "Subject check in help individual pay"
+
         
 
         return render(request=request,
