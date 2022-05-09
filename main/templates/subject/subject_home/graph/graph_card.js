@@ -769,7 +769,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
     if(app.session.current_parameter_set_period.period_type == "No Pay")
     {
-        ctx.fillText("Sum="+session_player_partner.current_block_earnings.earnings_no_pay_percent+"%", w - 5, 18);
+        ctx.fillText("Sum="+Math.min(session_player_partner.current_block_earnings.earnings_no_pay_percent,100)+"%", w - 5, 18);
     }
     else
     {
@@ -781,7 +781,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.textAlign = "right";
     if(app.session.current_parameter_set_period.period_type == "No Pay")
     {
-        ctx.fillText("Sum="+app.session_player.current_block_earnings.earnings_no_pay_percent+'%', w - 5, h-marginX+40);
+        ctx.fillText("Sum="+Math.min(app.session_player.current_block_earnings.earnings_no_pay_percent,100)+'%', w - 5, h-marginX+40);
     }
     else
     {
