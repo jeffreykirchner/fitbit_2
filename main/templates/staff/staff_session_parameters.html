@@ -47,6 +47,7 @@
 {% block content %}
 
 <!-- modals -->
+<div v-if="session">
 {%include "staff/staff_session_parameters/general_settings/edit_parameterset_modal.html"%}
 {%include "staff/staff_session_parameters/players/edit_parameterset_player_modal.html"%}
 {%include "staff/staff_session_parameters/periods/edit_parameterset_periods_modal.html"%}
@@ -55,9 +56,10 @@
 {%include "staff/staff_session_parameters/control/upload_parameters_modal.html"%}
 {%include "staff/staff_session_parameters/control/import_parameters_modal.html"%}
 {%include "help_modal.html"%}
+</div>
 
 <!-- cards -->
-<div class="row justify-content-lg-center mb-4" v-cloak>
+<div class="row justify-content-lg-center mb-4" v-cloak v-if="session">
     <div class="col-lg">
         {%include "staff/staff_session_parameters/general_settings/general_settings_card.html"%}  
     </div>
@@ -72,9 +74,15 @@
     </div>        
 </div>
 
-<div class="row justify-content-lg-center" v-cloak>
+<div class="row justify-content-lg-center" v-cloak v-if="session">
     <div class="col-lg">
         {%include "staff/staff_session_parameters/periods/periods_card.html"%}  
+    </div>
+</div>
+
+<div class="row justify-content-lg-center mt-4" v-else>
+    <div class = "col mt-4 text-center">
+        <i class="fas fa-cog fa-spin fa-2x"></i>
     </div>
 </div>
                         
