@@ -33,8 +33,9 @@ class SessionPlayerPeriod(models.Model):
     session_period = models.ForeignKey(SessionPeriod, on_delete=models.CASCADE, related_name="session_player_periods_a")
     session_player = models.ForeignKey(SessionPlayer, on_delete=models.CASCADE, related_name="session_player_periods_b")
 
-    earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)        #earnings from individual activity this period
-    earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)             #earnings from group bonus this period
+    earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)     #earnings from individual activity this period
+    earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)               #earnings from group bonus this period
+    earnings_no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)                               #no pay fitbit percent
 
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
     sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
@@ -133,6 +134,22 @@ class SessionPlayerPeriod(models.Model):
 
         return 0
     
+    def get_individual_parameter_set_no_pay_percent(self):
+        '''
+        calc and return no pay percent
+        '''
+        # pervious_session_player_period = self.get_pervious_player_period()
+
+        # if not pervious_session_player_period:
+        #     return 0
+
+        period_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
+
+        if period_payment:
+            return period_payment.no_pay_percent
+
+        return 0
+    
     def get_group_parameter_set_payment(self):
         '''
         calc and return individual earnings
@@ -157,10 +174,12 @@ class SessionPlayerPeriod(models.Model):
         if not self.check_in:
             self.parameter_set_period_payment=0
             self.earnings_group=0
+            self.earnings_no_pay_percent=0
             self.save()
             return {"status":"fail", "message" : "not checked in"}
 
         self.earnings_individual = self.get_individual_parameter_set_payment()
+        self.earnings_no_pay_percent = self.get_individual_parameter_set_no_pay_percent()
         self.save()
 
         if self.group_checked_in_today():
@@ -566,6 +585,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
             "earnings_total" : self.get_earning(),
+            "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             "zone_minutes" : self.zone_minutes,
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
@@ -591,6 +611,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
             "earnings_total" : self.get_earning(),
+            "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             "zone_minutes" : self.zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,

@@ -679,8 +679,16 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         ctx.fillStyle = app.session_player.parameter_set_player.display_color;
 
         if(app.session_player.session_player_periods_2[i].check_in)
-        {
-            text1 = '$' + app.session_player.session_player_periods_2[i].earnings_individual;
+        {   
+            if(app.session_player.session_player_periods_2[i].period_type == "No Pay")
+            {
+                text1 = app.session_player.session_player_periods_2[i].earnings_no_pay_percent + '%';
+            }
+            else
+            {
+                text1 = '$' + app.session_player.session_player_periods_2[i].earnings_individual;
+            }
+
             text2 = '$' + app.session_player.session_player_periods_2[i].earnings_group;
         }
         else
@@ -702,7 +710,14 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
         if(session_player_partner.session_player_periods_2[i].check_in)
         {
-            text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_individual;
+            if(app.session_player.session_player_periods_2[i].period_type == "No Pay")
+            {
+                text1 = session_player_partner.session_player_periods_2[i].earnings_no_pay_percent + '%';
+            }
+            else
+            {
+                text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_individual; 
+            }
         }
         else
         {
@@ -720,10 +735,26 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
     ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
-    ctx.fillText("Pay", marginY-30, 28);
+
+    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    {
+        ctx.fillText("Fitbit", marginY-30, 28);
+    }
+    else
+    {
+        ctx.fillText("Pay", marginY-30, 28);
+    }
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-    ctx.fillText("My Pay", marginY-25, h-marginX+40);
+
+    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    {
+       ctx.fillText("My Fitbit", marginY-15, h-marginX+40);
+    }
+    else
+    {
+        ctx.fillText("My Pay", marginY-25, h-marginX+40);
+    }
 
     if(show_team_pay_label)
     {
@@ -735,11 +766,28 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.individual, w - 5, 18);
+
+    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    {
+        ctx.fillText("Sum="+session_player_partner.current_block_earnings.earnings_no_pay_percent+"%", w - 5, 18);
+    }
+    else
+    {
+        ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.individual, w - 5, 18);
+    }
+    
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
+    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    {
+        ctx.fillText("Sum="+app.session_player.current_block_earnings.earnings_no_pay_percent+'%', w - 5, h-marginX+40);
+    }
+    else
+    {
+        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
+    }
+
 
     if(show_team_pay_label)
     {

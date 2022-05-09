@@ -18,11 +18,12 @@ class ParameterSetPeriodPayment(models.Model):
     parameter_set_period = models.ForeignKey(ParameterSetPeriod, on_delete=models.CASCADE, related_name="parameter_set_period_pays_a")
     parameter_set_zone_minutes = models.ForeignKey('main.ParameterSetZoneMinutes', on_delete=models.CASCADE, related_name="parameter_set_period_pays_b")
 
-    payment = models.DecimalField(decimal_places=2, default=0, max_digits=5)            #amount individual earns reaching this activity level
-    group_bonus = models.DecimalField(decimal_places=2, default=0, max_digits=5)        #amount group earns if reaching this acttvity level
+    payment = models.DecimalField(verbose_name='Individual Payment', decimal_places=2, default=0, max_digits=5)      #amount individual earns reaching this activity level
+    group_bonus = models.DecimalField(verbose_name='Group Payment', decimal_places=2, default=0, max_digits=5)       #amount group earns if reaching this acttvity level
+    no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)                            #amount of fitbit earned by checking in today
 
-    timestamp = models.DateTimeField(auto_now_add= True)
-    updated= models.DateTimeField(auto_now= True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    updated= models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.id)
@@ -43,6 +44,7 @@ class ParameterSetPeriodPayment(models.Model):
 
         self.payment = source.get("payment")
         self.group_bonus = source.get("group_bonus")
+        self.no_pay_percent = source.get("no_pay_percent")
 
         self.save()
         
@@ -60,6 +62,7 @@ class ParameterSetPeriodPayment(models.Model):
             "id" : self.id,
             "payment" : round(self.payment),
             "group_bonus" : round(self.group_bonus),
+            "no_pay_percent" : self.no_pay_percent,
             "parameter_set_zone_minutes" : self.parameter_set_zone_minutes.json(),
         }
     
@@ -73,6 +76,7 @@ class ParameterSetPeriodPayment(models.Model):
             "id" : self.id,
             "payment" : self.payment,
             "group_bonus" : self.group_bonus,
+            "no_pay_percent" : self.no_pay_percent,
         }
 
 
