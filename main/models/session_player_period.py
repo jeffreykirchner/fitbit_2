@@ -495,6 +495,7 @@ class SessionPlayerPeriod(models.Model):
                          self.earnings_individual,
                          self.earnings_group,
                          self.get_earning(),
+                         self.earnings_no_pay_percent,
                          self.get_last_login_str(),
                          ])
     

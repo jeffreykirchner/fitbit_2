@@ -186,7 +186,7 @@ class Session(models.Model):
 
         writer.writerow(["Session ID", "Period", "Player", "Group", 
                          "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
-                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])
+                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "No Pay Percent", "Last Visit Time"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
             for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
