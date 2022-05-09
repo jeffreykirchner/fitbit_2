@@ -98,6 +98,8 @@ class Session(models.Model):
         setup and start experiment
         '''
 
+        logger = logging.getLogger(__name__) 
+
         self.started = True
         self.finished = False     
 
@@ -108,6 +110,8 @@ class Session(models.Model):
         for i, p in enumerate(self.parameter_set.parameter_set_periods.all()):
             session_periods.append(main.models.SessionPeriod(session=self, parameter_set_period=p, period_number=i+1, period_date=period_date))
             period_date += timedelta(days=1)
+
+        logger.info(f"Session Periods Created")
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
 
@@ -117,6 +121,7 @@ class Session(models.Model):
 
         for i in self.session_players.all():
             i.start()
+            logger.info(f"Player {i} Created")
     
     def update_end_date(self):
         '''
@@ -405,7 +410,7 @@ class Session(models.Model):
 
             "finished":self.finished,
             "parameter_set":self.parameter_set.json(),
-            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related('session_player_periods_b', 'session_player_chats_b')],
+            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related('session_player_periods_b', 'session_player_chats_b', 'parameter_set_player')],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),

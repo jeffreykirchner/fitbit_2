@@ -636,17 +636,7 @@ class SessionPlayer(models.Model):
                                                                                 .order_by('-timestamp')[:100:-1]
                     ]
 
-        todays_session_player_period = self.get_todays_session_player_period()
-        
-        session_player_periods_group_1_json = []
-
-        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
-            session_player_periods_group_1_json.append(p.get_session_player_periods_1_json())
-        
-        session_player_periods_group_2_json = []
-
-        for p in self.session.session_players.exclude(id=self.id).filter(group_number=self.group_number):
-            session_player_periods_group_2_json.append(p.get_session_player_periods_2_json())      
+        todays_session_player_period = self.get_todays_session_player_period()  
 
         period_number = todays_session_player_period.session_period.period_number if todays_session_player_period else 0 
 
@@ -674,16 +664,16 @@ class SessionPlayer(models.Model):
 
             "chat" : chat,
 
-            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.filter(session_period__period_number__lte=period_number)],
+            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.select_related('session_period').filter(session_period__period_number__lte=period_number)],
 
-            "current_block_earnings" : self.get_current_block_earnings(),
+            # "current_block_earnings" : self.get_current_block_earnings(),
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
-            "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+            # "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
             "missed_check_ins" : self.get_current_missed_check_ins(),
 
-            "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
-            "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
+            #"individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            #"group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
