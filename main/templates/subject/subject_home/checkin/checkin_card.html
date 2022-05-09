@@ -72,7 +72,13 @@
                 </span>                 
             </div>
             <div class="col text-start ps-1">
-                $[[session_player.individual_earnings]]
+                <span v-if="session.current_parameter_set_period.period_type==='No Pay'">
+                    [[session_player.no_pay_percent]]% of keeping your Fitbit
+                </span>
+                <span v-else>
+                    $[[session_player.individual_earnings]]
+                </span>
+                
             </div>
         </div>
         <div class="row" v-if="session.current_parameter_set_period.period_type==='Group Pay'">

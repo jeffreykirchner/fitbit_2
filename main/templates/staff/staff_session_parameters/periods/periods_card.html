@@ -44,7 +44,7 @@
                                 </th>
                                 <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
                                     [[p.label]] <br>
-                                    Individual / Group Bonus
+                                    Individual/Group/%
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
                                     Copy
@@ -85,7 +85,7 @@
                                     [[p.pay_block]]
                                 </td>                               
                                 <td v-for="(p, index2) in p.parameter_set_period_payments" v-bind:key="p.id" v-on:click="showEditParametersetPeriodPayment(index, index2)" class="player_table_cell text-nowrap">
-                                    $[[p.payment]] / $[[p.group_bonus]]
+                                    $[[p.payment]] / $[[p.group_bonus]] / [[p.no_pay_percent]]%
                                 </td>
                                 <td class="text-nowrap">
                                     <button class="btn btn-outline-primary btn-sm me-2"
