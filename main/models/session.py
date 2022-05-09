@@ -409,8 +409,8 @@ class Session(models.Model):
             "median_zone_minutes" : [i.get_median_zone_minutes() for i in self.session_periods.all()],
 
             "finished":self.finished,
-            "parameter_set":self.parameter_set.json(),
-            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related('session_player_periods_b', 'session_player_chats_b', 'parameter_set_player')],
+            "parameter_set": self.parameter_set.json(),
+            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related()],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
@@ -455,7 +455,7 @@ class Session(models.Model):
             "is_after_last_period" : self.is_after_last_period(),
             "is_last_period": is_last_period, 
 
-            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number)],
+            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number).prefetch_related()],
         }
           
 @receiver(post_delete, sender=Session)
