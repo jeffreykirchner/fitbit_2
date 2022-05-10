@@ -25,7 +25,7 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-        
+
     steps:
       - uses: actions/checkout@v2
 
@@ -43,29 +43,29 @@ jobs:
         run: pip install -r requirements.txt
         
       - name: Run tests
-      env:
-        ALLOWED_HOSTS: localhost 127.0.0.1
-        DBHOST: localhosttake_get_sessio
-        DBNAME: github_actions
-        DBPASS: postgres
-        DBUSER: postgres
-        LOG_LOCATION: abc
-        ESI_AUTH_URL : abc
-        ESI_AUTH_ACCOUNT_URL : abc
-        ESI_AUTH_PASSWORD_RESET_URL : abc
-        ESI_AUTH_USERNAME : abc
-        ESI_AUTH_PASS : abc
-        ESI_AUTH_APP : abc
-        EMAIL_MS_HOST : abc
-        EMAIL_MS_USER_NAME : abc
-        EMAIL_MS_PASSWORD : abc
-        FITBIT_MS_USERNAME : abc
-        FITBIT_MS_PASS : abc
-        FITBIT_MS_URL : abc
-        FITBIT_MS_REGISTRATION : abc
-        REDIS : abc
-        SECRET_KEY: super_duper_secret_key
-      run: python manage.py test
+        env:
+          ALLOWED_HOSTS: localhost 127.0.0.1
+          DBHOST: localhosttake_get_sessio
+          DBNAME: github_actions
+          DBPASS: postgres
+          DBUSER: postgres
+          LOG_LOCATION: abc
+          ESI_AUTH_URL : abc
+          ESI_AUTH_ACCOUNT_URL : abc
+          ESI_AUTH_PASSWORD_RESET_URL : abc
+          ESI_AUTH_USERNAME : abc
+          ESI_AUTH_PASS : abc
+          ESI_AUTH_APP : abc
+          EMAIL_MS_HOST : abc
+          EMAIL_MS_USER_NAME : abc
+          EMAIL_MS_PASSWORD : abc
+          FITBIT_MS_USERNAME : abc
+          FITBIT_MS_PASS : abc
+          FITBIT_MS_URL : abc
+          FITBIT_MS_REGISTRATION : abc
+          REDIS : abc
+          SECRET_KEY: super_duper_secret_key
+        run: python manage.py test
       
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v2
