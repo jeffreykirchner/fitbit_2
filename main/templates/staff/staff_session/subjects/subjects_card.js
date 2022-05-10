@@ -220,6 +220,27 @@ takeUpdateSubject(messageData){
     } 
 },
 
+/** send session update form   
+*/
+sendLoadFullSubject(id){
+    this.working = true;
+    app.sendMessage("load_full_subject",
+                   {"subject_id" : id});
+},
+
+takeLoadFullSubject(messageData)
+{
+    for(i=0;i<app.session.session_players.length;i++)
+    {
+        if(app.session.session_players[i].id == messageData.status.session_player.id)
+        {
+            app.session.session_players[i] = messageData.status.session_player;
+        }
+    }
+
+    app.updateChatDisplay();
+},
+
 /** show edit subject modal
 */
 showEditSubject:function(id){
@@ -259,8 +280,10 @@ hideEditSubject:function(){
 
 /** show view subject modal
 */
-showViewSubject:function(id){
+showViewSubject:function(id, subject_id){
     
+    app.sendLoadFullSubject(subject_id);
+
     app.current_subject = id;
 
     var myModal = new bootstrap.Modal(document.getElementById('viewSubjectModal'), {
@@ -272,7 +295,9 @@ showViewSubject:function(id){
 
 /** show view subject modal
 */
-showViewSubjectChat:function(id){
+showViewSubjectChat:function(id, subject_id){
+
+    app.sendLoadFullSubject(subject_id);
     
     app.current_subject = id;
 
@@ -281,7 +306,6 @@ showViewSubjectChat:function(id){
         })
 
     myModal.toggle();
-    app.updateChatDisplay();
 },
 
 /**

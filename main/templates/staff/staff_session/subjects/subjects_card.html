@@ -126,10 +126,10 @@
                                         <i class="fas fa-times"></i>
                                     </span>
                                 </td>
-                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index)">
+                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index, p.id)">
                                     <i class="fas fa-history"></i>
                                 </td>
-                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubjectChat(index)" v-show="session.parameter_set.enable_chat">
+                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubjectChat(index, p.id)" v-show="session.parameter_set.enable_chat">
                                     <i class="far fa-comment"></i>
                                 </td>
                                 <td class="player_table_cell text-nowrap" v-show="session.current_experiment_phase == 'Instructions'">

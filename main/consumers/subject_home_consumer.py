@@ -101,14 +101,14 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         if r["value"] == "success":
 
             for p in event_result["recipients"]:
-
-                await self.channel_layer.send(
-                    p,
-                    {"type": "update_chat",
-                    "subject_result": subject_result,
-                    "staff_result": staff_result,
-                    "sender_channel_name": self.channel_name}
-                )
+                if p != "":
+                    await self.channel_layer.send(
+                        p,
+                        {"type": "update_chat",
+                        "subject_result": subject_result,
+                        "staff_result": staff_result,
+                        "sender_channel_name": self.channel_name}
+                    )
 
     async def next_instruction(self, event):
         '''

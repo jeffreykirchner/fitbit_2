@@ -701,7 +701,7 @@ class SessionPlayer(models.Model):
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
 
-            "survey_link" : self.get_current_survey_link(),
+            #"survey_link" : self.get_current_survey_link(),
         }
     
     def json_for_subject(self, session_player):
@@ -734,7 +734,19 @@ class SessionPlayer(models.Model):
         '''
 
         return{
-            "id" : self.id,    
+            "id" : self.id,      
+            "name" : self.name,
+            "student_id" : self.student_id,   
+            "email" : self.email,
+            "group_number" : self.group_number,    
+
+            "parameter_set_player" : self.parameter_set_player.json(),
+
+            "current_instruction" : self.current_instruction,
+            "current_instruction_complete" : self.current_instruction_complete,
+            "instructions_finished" : self.instructions_finished,
+
+            "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
         }
 
 

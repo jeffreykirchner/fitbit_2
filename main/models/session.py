@@ -410,7 +410,7 @@ class Session(models.Model):
 
             "finished":self.finished,
             "parameter_set": self.parameter_set.json(),
-            "session_players":[i.json_for_staff() for i in self.session_players.all().prefetch_related()],
+            "session_players":[i.json_min() for i in self.session_players.all().select_related('parameter_set_player')],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),

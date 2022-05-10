@@ -104,10 +104,7 @@ var app = Vue.createApp({
                     break; 
                 case "update_reset_connections":
                     app.takeUpdateResetConnections(messageData);
-                    break; 
-                case "update_name":
-                    app.takeUpdateName(messageData);
-                    break;         
+                    break;       
                 case "download_summary_data":
                     app.takeDownloadSummaryData(messageData);
                     break;
@@ -152,6 +149,9 @@ var app = Vue.createApp({
                     break;
                 case "update_consent_form":
                     app.takeUpdateConsentForm(messageData);
+                    break;
+                case "load_full_subject":
+                    app.takeLoadFullSubject(messageData);
                     break;
             }
 
