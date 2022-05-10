@@ -153,6 +153,9 @@ class TestSubjectConsumer(TestCase):
         #success
         r = take_check_in(session.id, session_player_1.id, data1)
         self.assertEqual(r["value"], "success")
+
+        session_player_1 = self.session.session_players.first()
+        self.assertEqual(session_player_1.session_player_periods_b.first().check_in, True)
         
         
 
