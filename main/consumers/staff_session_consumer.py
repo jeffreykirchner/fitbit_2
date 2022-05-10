@@ -320,6 +320,18 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def load_full_subject(self, event):
+        '''
+        return full subject object
+        '''
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_load_full_subject)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -397,23 +409,6 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         #update not from a client
         if event["data"]["value"] == "fail":
             return
-
-        message_data = {}
-        message_data["status"] = event["data"]
-
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
-
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-
-    async def update_name(self, event):
-        '''
-        send update name notice to staff screens
-        '''
-
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Eng game update")
 
         message_data = {}
         message_data["status"] = event["data"]
@@ -879,5 +874,23 @@ def take_force_check_in(session_id, data):
     
     return {"value" : "success",
             "session_player_period" : session_player_period.json_for_staff(),}
+
+def take_load_full_subject(session_id, data):
+    '''
+    force a check in for a subject on a given day
+    '''
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_load_full_subject: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+        session_player = session.session_players.get(id=data["subject_id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_load_full_subject session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    
+    return {"value" : "success",
+            "session_player" : session_player.json_for_staff(),}
 
 
