@@ -92,7 +92,7 @@ def get_fitbit_metrics_test():
     prm = main.models.Parameters.objects.first()
     tmz = pytz.timezone(prm.experiment_time_zone)
 
-    data["result"]["devices"]["result"][0]["lastSyncTime"] =  datetime.now(tmz)
+    data["result"]["devices"]["result"][0]["lastSyncTime"] =  datetime.now(tmz).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
     return data
 

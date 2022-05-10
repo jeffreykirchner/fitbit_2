@@ -13,6 +13,7 @@ from main.models import Session
 from main.models import SessionPlayer
 
 from main.consumers import take_get_session_subject
+from main.consumers import take_check_in
 
 import main
 
@@ -55,8 +56,26 @@ class TestSubjectConsumer(TestCase):
         test subject check in from consumer
         '''
 
-        session_player_1 = self.session.sesion_players.first()
+        session_player_1 = self.session.session_players.first()
 
+        data1 = {"software_version":"1.00", "current_period" : "1"}
+        data2 = {"software_version":"1.01", "current_period" : "1"}
+        data3 = {"software_version":"1.00", "current_period" : "2"}
+
+        #session not found
+        r = take_check_in(self.session.id+1, session_player_1.id, data1)
+        self.assertEqual(r["value"], "fail")
+        self.assertEqual(r["result"]["error_message"], "Session not available.")
+        
+        #software version
+        r = take_check_in(self.session.id, session_player_1.id, data2)
+        self.assertEqual(r["value"], "fail")
+        self.assertEqual(r["result"]["error_message"], "Refresh your browser.")
+
+        #current period
+        r = take_check_in(self.session.id, session_player_1.id, data1)
+        self.assertEqual(r["value"], "fail")
+        self.assertEqual(r["result"]["error_message"], "Session has not begun.")
 
         
 

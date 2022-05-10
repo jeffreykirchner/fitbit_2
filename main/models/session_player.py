@@ -664,7 +664,7 @@ class SessionPlayer(models.Model):
             "group_number" : self.group_number,
 
             "player_number" : self.player_number,
-            "player_key" : self.player_key,
+            #"player_key" : self.player_key,
 
             "disabled" : self.disabled,
             "consent_form_required" : self.consent_form_required,
@@ -738,7 +738,8 @@ class SessionPlayer(models.Model):
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
-            "group_number" : self.group_number,    
+            "group_number" : self.group_number,   
+            "player_number" : self.player_number, 
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
