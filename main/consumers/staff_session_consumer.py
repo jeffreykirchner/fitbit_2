@@ -65,7 +65,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         #build response
         message_data = {}
-        message_data =  await sync_to_async(take_update_session_form)(self.session_id, event["message_text"])
+        message_data["status"] =  await sync_to_async(take_update_session_form)(self.session_id, event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -532,7 +532,7 @@ def take_update_session_form(session_id, data):
         if not session.started:    
             session.update_end_date()
 
-        return {"status":"success", "session" : session.json()}                      
+        return {"value" : "success", "session" : session.json()}                      
                                 
     logger.info("Invalid session form")
     return {"status":"fail", "errors":dict(form.errors.items())}

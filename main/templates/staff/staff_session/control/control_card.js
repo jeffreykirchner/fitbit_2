@@ -9,21 +9,21 @@ start_experiment(){
  * @param messageData {json}
 */
 takeStartExperiment(messageData){
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 /** update start status
 *    @param messageData {json} session day in json format
 */
 takeUpdateStartExperiment(messageData){
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 /** update start status
 *    @param messageData {json} session day in json format
 */
 takeUpdateResetExperiment(messageData){
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 /**reset experiment, remove all bids, asks and trades
@@ -42,7 +42,7 @@ reset_experiment(){
 */
 takeResetExperiment(messageData){
     app.chat_list_to_display=[];
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 resetConnections(){
@@ -58,14 +58,14 @@ resetConnections(){
 *    @param messageData {json} session day in json format
 */
 takeUpdateResetConnections(messageData){
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 /** take reset experiment response
  * @param messageData {json}
 */
 takeResetConnections(messageData){
-    app.takeGetSession(messageData);
+    app.takeGetSession(messageData.session);
 },
 
 /**advance to next phase

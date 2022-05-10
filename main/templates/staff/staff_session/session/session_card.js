@@ -12,9 +12,9 @@ sendUpdateSession(){
 takeUpdateSession(messageData){
     app.clearMainFormErrors();
 
-    if(messageData.status == "success")
+    if(messageData.status.value == "success")
     {
-        app.takeGetSession(messageData);       
+        app.takeGetSession(messageData.status.session);       
         $('#editSessionModal').modal('hide');    
     } 
     else

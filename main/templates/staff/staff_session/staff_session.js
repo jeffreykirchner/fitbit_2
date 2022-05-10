@@ -70,7 +70,7 @@ var app = Vue.createApp({
 
             switch(messageType) {                
                 case "get_session":
-                    app.takeGetSession(messageData);
+                    app.takeGetSession(messageData.session);
                     break;
                 case "update_session":
                     app.takeUpdateSession(messageData);
@@ -181,9 +181,9 @@ var app = Vue.createApp({
         /** take create new session
         *    @param messageData {json} session day in json format
         */
-        takeGetSession(messageData){
+        takeGetSession(session){
 
-            app.session = messageData.session;
+            app.session = session;
 
             if(app.session.started)
             {

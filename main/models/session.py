@@ -111,7 +111,7 @@ class Session(models.Model):
             session_periods.append(main.models.SessionPeriod(session=self, parameter_set_period=p, period_number=i+1, period_date=period_date))
             period_date += timedelta(days=1)
 
-        logger.info(f"Session Periods Created")
+        #logger.info(f"Session Periods Created")
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
 
@@ -121,7 +121,7 @@ class Session(models.Model):
 
         for i in self.session_players.all():
             i.start()
-            logger.info(f"Player {i} Created")
+            # logger.info(f"Player {i} Created")
     
     def update_end_date(self):
         '''
