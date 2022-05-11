@@ -639,25 +639,25 @@ def take_check_in(session_id, session_player_id, data):
             status = "fail"
             error_message = "Refresh your browser."
     
+    #session started
+    if status == "success":
+        if not session.started:
+            status = "fail"
+            error_message = "Session has not begun."
+    
     #period number
     if status == "success":
         if session_player_period.session_period.period_number != client_current_period:
             status = "fail"
-            error_message = "Refresh your browser."
+            error_message = " Refresh your browser."
     
     #check for survey
     if status == "success":
         if session_player.get_current_survey_link() != "":
             status = "fail"
-            error_message = "Refresh your browser."
-
-    #session started
-    if status == "success":
-        if not session.started:
-            status = "fail"
-            error_message = "Session not started."
+            error_message = "  Refresh your browser."
     
-    #session not finsihed
+    #session not finished
     if status == "success":
         if session.finished:
             status = "fail"
@@ -667,7 +667,7 @@ def take_check_in(session_id, session_player_id, data):
     if status == "success":
         if session_player.disabled:
             status = "fail"
-            error_message = "Session complete."
+            error_message = " Session complete."
 
     #wrist time
     if status == "success":

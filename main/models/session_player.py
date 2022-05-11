@@ -338,14 +338,14 @@ class SessionPlayer(models.Model):
                 #test synced today
                 #v = v-timedelta(days=1)
 
-                logger.info(f'pull_fitbit_last_synced sync time {v}')
+                #logger.info(f'pull_fitbit_last_synced sync: time {v}')
 
                 d = {}
                 d["last_sync"] = todays_date()
                 d["last_sync"] = d["last_sync"].replace(hour=v.hour,minute=v.minute, second=v.second,microsecond=v.microsecond,
                                                         year=v.year,month=v.month,day=v.day)
 
-                logger.info(f'pull_fitbit_last_synced sync time {d}')
+                #logger.info(f'pull_fitbit_last_synced sync time: {d}')
 
                 d["device"] = i.get("deviceVersion")
 
@@ -356,6 +356,8 @@ class SessionPlayer(models.Model):
             self.fitbit_last_synced = a[0]['last_sync'] #datetime.strptime(v,'%Y-%m-%dT%H:%M:%S.%f')
             self.fitbit_device = a[0]['device']
             self.save()
+
+            #logger.info(f"pull_fitbit_last_synced sync time: { self.fitbit_last_synced}")
 
             return {"status" : "success", "message" : ""}
 
@@ -664,7 +666,7 @@ class SessionPlayer(models.Model):
             "group_number" : self.group_number,
 
             "player_number" : self.player_number,
-            "player_key" : self.player_key,
+            #"player_key" : self.player_key,
 
             "disabled" : self.disabled,
             "consent_form_required" : self.consent_form_required,
@@ -738,7 +740,8 @@ class SessionPlayer(models.Model):
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
-            "group_number" : self.group_number,    
+            "group_number" : self.group_number,   
+            "player_number" : self.player_number, 
 
             "parameter_set_player" : self.parameter_set_player.json(),
 

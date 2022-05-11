@@ -65,7 +65,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         #build response
         message_data = {}
-        message_data =  await sync_to_async(take_update_session_form)(self.session_id, event["message_text"])
+        message_data["status"] =  await sync_to_async(take_update_session_form)(self.session_id, event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -532,7 +532,7 @@ def take_update_session_form(session_id, data):
         if not session.started:    
             session.update_end_date()
 
-        return {"status":"success", "session" : session.json()}                      
+        return {"value" : "success", "session" : session.json()}                      
                                 
     logger.info("Invalid session form")
     return {"status":"fail", "errors":dict(form.errors.items())}
@@ -798,9 +798,13 @@ def take_fill_with_test_data(session_id, data):
     
     session.fill_with_test_data()
 
-    for player in session.session_players.all():
+    logger.info(f'take_take_fill_with_test_data: data filled')
+
+    for player in session.session_players.all().prefetch_related("session_player_periods_b"):
         for session_period_player in player.session_player_periods_b.all():
             session_period_player.calc_and_store_payment()
+    
+    logger.info(f'take_take_fill_with_test_data: calc payments')
     
     return {"value" : "success",
             "session_players" : [p.json() for p in session.session_players.all()]}

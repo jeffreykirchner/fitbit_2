@@ -172,11 +172,11 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         if not self.check_in:
-            self.parameter_set_period_payment=0
+            self.earnings_individual=0
             self.earnings_group=0
             self.earnings_no_pay_percent=0
             self.save()
-            return {"status":"fail", "message" : "not checked in"}
+            return {"value":"fail", "message" : "not checked in"}
 
         self.earnings_individual = self.get_individual_parameter_set_payment()
         self.earnings_no_pay_percent = self.get_individual_parameter_set_no_pay_percent()
@@ -191,7 +191,7 @@ class SessionPlayerPeriod(models.Model):
                                                            session_player__group_number=self.session_player.group_number)
         g.update(earnings_group=e)
 
-        return {"status":"success", "message" : ""}
+        return {"value":"success", "message" : ""}
     
     def group_checked_in_today(self):
         '''
