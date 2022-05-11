@@ -36,6 +36,8 @@ var app = Vue.createApp({
                     increment_period : "1",
                     increment_player : "1",
 
+                    editParametersetModal : null,
+
                 }},
     methods: {
 
@@ -147,12 +149,16 @@ var app = Vue.createApp({
 
         doFirstLoad()
         {
-            $('#importParametersModal').on("hidden.bs.modal", this.hideImportParameters); 
-            $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
-            $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
-            $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-            $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-            $('#editParametersetPeriodPaymentModal').on("hidden.bs.modal", this.hideEditParametersetPeriodPayment);
+            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {
+                                            keyboard: false
+                                            })
+            
+            document.getElementById('editParametersetModal').addEventListener('hidden.bs.modal', app.hideEditParameterset);
+            document.getElementById('importParametersModal').addEventListener('hidden.bs.modal', app.hideImportParameters);
+            document.getElementById('editParametersetPlayerModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPlayer);
+            document.getElementById('editParametersetPeriodModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriod);
+            document.getElementById('editParametersetZoneMinutesModal').addEventListener('hidden.bs.modal', app.hideEditParametersetZoneMinutes);
+            document.getElementById('editParametersetPeriodPaymentModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriodPayment);
         },
 
         /** send winsock request to get session info

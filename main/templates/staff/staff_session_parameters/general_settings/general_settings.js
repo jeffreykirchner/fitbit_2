@@ -7,11 +7,11 @@ showEditParameterset:function(){
     app.cancelModal=true;
     app.paramtersetBeforeEdit = Object.assign({}, app.session.parameter_set);
 
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    // var myModal = new bootstrap.Modal(document.getElementById('editParametersetModal'), {
+    //     keyboard: false
+    //     })
+    app.editParametersetModal.toggle();
+    //myModal.toggle();
 },
 
 /** hide edit session modal
@@ -45,7 +45,8 @@ takeUpdateParameterset(messageData){
     if(messageData.status.value == "success")
     {
         app.session.parameter_set = messageData.status.parameter_set;       
-        $('#editParametersetModal').modal('hide');            
+        //$('#editParametersetModal').modal('hide');
+        app.editParametersetModal.hide();            
     } 
     else
     {
