@@ -26,6 +26,7 @@ var app = Vue.createApp({
                     chat_list_to_display : [],                  //list of chats to display on screen
                     notice_list_to_display : [],                //list of chats to display on screen
 
+                    control_working : false,                    //show spinner in control frame when working
                     data_downloading : false,                   //show spinner when data downloading
                     payments_downloading : false,               //show spinner when payments downloading
                     payments_copied : false,                    //show after payments copied to clipboard
@@ -193,8 +194,24 @@ var app = Vue.createApp({
             {
                 
             }
+
+            if(!app.first_load_done)
+            {
+                setTimeout(app.doFirstLoad, 500);
+            }
             
             app.updatePhaseButtonText();    
+        },
+
+        /**
+         * do after session has loaded
+         */
+        doFirstLoad()
+        {
+            $('#editSubjectModal').on("hidden.bs.modal", this.hideEditSubject);
+            $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
+            $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
+            $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
         },
 
         /**update text of move on button based on current state
@@ -250,13 +267,13 @@ var app = Vue.createApp({
         */
         clearMainFormErrors(){
             
-            for(var item in app.$data.session)
+            for(var item in app.session)
             {
                 $("#id_" + item).attr("class","form-control");
                 $("#id_errors_" + item).remove();
             }
 
-            s = app.$data.staff_edit_name_etc_form_ids;
+            s = app.staff_edit_name_etc_form_ids;
             for(var i in s)
             {
                 $("#id_" + s[i]).attr("class","form-control");
@@ -287,13 +304,7 @@ var app = Vue.createApp({
         }, 
     },
 
-    mounted(){
-
-        $('#editSubjectModal').on("hidden.bs.modal", this.hideEditSubject);
-        $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
-        $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
-        $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
-
+    mounted(){       
         window.addEventListener('resize', this.updateGraph);
     },
 

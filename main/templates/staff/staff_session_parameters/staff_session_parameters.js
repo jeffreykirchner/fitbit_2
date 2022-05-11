@@ -61,9 +61,6 @@ var app = Vue.createApp({
                 case "get_session":
                     app.takeGetSession(messageData);
                     break;
-                case "update_session":
-                    app.takeUpdateSession(messageData);
-                    break;
                 case "update_parameterset":
                     app.takeUpdateParameterset(messageData);
                     break;        
@@ -140,40 +137,28 @@ var app = Vue.createApp({
             else
             {
                 
-            }                     
+            }   
+            
+            if(!app.first_load_done)
+            {
+                setTimeout(app.doFirstLoad, 500);
+            }
+        },
+
+        doFirstLoad()
+        {
+            $('#importParametersModal').on("hidden.bs.modal", this.hideImportParameters); 
+            $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
+            $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
+            $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
+            $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
+            $('#editParametersetPeriodPaymentModal').on("hidden.bs.modal", this.hideEditParametersetPeriodPayment);
         },
 
         /** send winsock request to get session info
         */
         sendGetSession(){
-            app.sendMessage("get_session",{"sessionID" : app.$data.sessionID});
-        },
-
-        /** send session update form   
-        */
-        sendUpdateSession(){
-            app.$data.cancelModal = false;
-            app.$data.working = true;
-            app.sendMessage("update_session",{"formData" : $("#sessionForm").serializeArray(),
-                                              "sessionID" : app.$data.sessionID});
-        },
-
-        /** take update session reponse
-         * @param messageData {json} result of update, either sucess or fail with errors
-        */
-        takeUpdateSession(messageData){
-            app.clearMainFormErrors();
-
-            if(messageData.status == "success")
-            {
-                app.takeGetSession(messageData);       
-                $('#editSessionModal').modal('hide');    
-            } 
-            else
-            {
-                app.$data.cancelModal=true;                           
-                app.displayErrors(messageData.errors);
-            } 
+            app.sendMessage("get_session",{"sessionID" : app.sessionID});
         },
 
         /**trucate text to 10 charcters with elipsis
@@ -269,13 +254,7 @@ var app = Vue.createApp({
     },
 
     mounted(){
-        $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession); 
-        $('#importParametersModal').on("hidden.bs.modal", this.hideImportParameters); 
-        $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
-        $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
-        $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-        $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-        $('#editParametersetPeriodPaymentModal').on("hidden.bs.modal", this.hideEditParametersetPeriodPayment);
+        //$('#editSessionModal').on("hidden.bs.modal", this.hideEditSession); 
     },
 
 }).mount('#app');

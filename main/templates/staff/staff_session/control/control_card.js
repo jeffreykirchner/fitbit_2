@@ -1,7 +1,8 @@
 /**start the experiment
 */
 start_experiment(){
-    app.$data.working = true;
+    app.working = true;
+    app.control_working = true;
     app.sendMessage("start_experiment", {});
 },
 
@@ -9,6 +10,7 @@ start_experiment(){
  * @param messageData {json}
 */
 takeStartExperiment(messageData){
+    app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
@@ -16,6 +18,7 @@ takeStartExperiment(messageData){
 *    @param messageData {json} session day in json format
 */
 takeUpdateStartExperiment(messageData){
+    app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
@@ -23,6 +26,7 @@ takeUpdateStartExperiment(messageData){
 *    @param messageData {json} session day in json format
 */
 takeUpdateResetExperiment(messageData){
+    app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
@@ -33,7 +37,8 @@ reset_experiment(){
         return;
     }
 
-    app.$data.working = true;
+    app.working = true;
+    app.control_working = true;
     app.sendMessage("reset_experiment", {});
 },
 
@@ -41,6 +46,7 @@ reset_experiment(){
  * @param messageData {json}
 */
 takeResetExperiment(messageData){
+    app.control_working = false;
     app.chat_list_to_display=[];
     app.takeGetSession(messageData.session);
 },
@@ -50,7 +56,8 @@ resetConnections(){
         return;
     }
 
-    app.$data.working = true;
+    app.working = true;
+    app.control_working = true;
     app.sendMessage("reset_connections", {});
 },
 
@@ -58,6 +65,7 @@ resetConnections(){
 *    @param messageData {json} session day in json format
 */
 takeUpdateResetConnections(messageData){
+    app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
@@ -65,6 +73,7 @@ takeUpdateResetConnections(messageData){
  * @param messageData {json}
 */
 takeResetConnections(messageData){
+    app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
@@ -76,7 +85,8 @@ next_experiment_phase(){
         return;
     }    
 
-    app.$data.working = true;
+    app.working = true;
+    app.control_working = true;
     app.sendMessage("next_phase", {});
 },
 
@@ -84,6 +94,8 @@ next_experiment_phase(){
  * @param messageData {json}
 */
 takeNextPhase(messageData){
+
+    app.control_working = false;
     
     if(messageData.status.value == "success")
     {
@@ -102,6 +114,8 @@ takeNextPhase(messageData){
  * @param messageData {json}
 */
 takeUpdateNextPhase(messageData){
+
+    app.control_working = false;
     
     if(messageData.status.value == "success")
     {
@@ -123,7 +137,8 @@ endEarly(){
         return;
     }
 
-    app.$data.working = true;
+    app.working = true;
+    app.control_working = true;
     app.sendMessage("end_early", {});
 },
 
@@ -131,6 +146,7 @@ endEarly(){
  * @param messageData {json}
 */
 takeEndEarly(messageData){
+    app.control_working = false;
     this.session = messageData.status.session;
 },
 
@@ -212,6 +228,7 @@ fillDefaultInvitation(){
 fillWithTestData(){
     this.cancelModal = false;
     this.working = true;
+    app.control_working = true;
 
     app.sendMessage("fill_with_test_data",
                    {});
@@ -221,6 +238,7 @@ fillWithTestData(){
  * fill with test data
  */
  takeFillWithTestData(){
+    app.control_working = false;
     if(messageData.status.value == "success")
     {         
         this.session.session_players = messageData.status.session_players;
