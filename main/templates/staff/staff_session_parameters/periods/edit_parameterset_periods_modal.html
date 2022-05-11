@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 <!--Edit Period Modal -->
-<div class="modal fade" id="editParametersetPeriodModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetModal" aria-hidden="true">
+<div class="modal fade" id="editParametersetPeriodModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPeriodModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -18,7 +18,7 @@
                     {% endfor %}
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" v-if="session">
                 
                 <button type="button"
                         class="btn btn-outline-primary"

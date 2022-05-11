@@ -369,7 +369,7 @@ class SessionPlayer(models.Model):
         prm = main.models.Parameters.objects.first()
         tmz = pytz.timezone(prm.experiment_time_zone) 
 
-        return  self.fitbit_last_synced.astimezone(tmz).strftime("%#m/%#d/%Y %#I:%M %p")
+        return  self.fitbit_last_synced.astimezone(tmz).strftime("%-m/%#d/%Y %#-I:%M %p")
     
     def fitbit_synced_today(self):
         '''
@@ -750,6 +750,7 @@ class SessionPlayer(models.Model):
             "instructions_finished" : self.instructions_finished,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
+            "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
         }
 
 

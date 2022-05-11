@@ -8,7 +8,7 @@
     app.parametersetZoneMinutesBeforeEdit = Object.assign({}, app.session.parameter_set.parameter_set_zone_minutes[index]);
     app.parametersetZoneMinutesBeforeEditIndex = index;
 
-    app.current_parameter_set_zone_minutes = app.$data.session.parameter_set.parameter_set_zone_minutes[index];
+    app.current_parameter_set_zone_minutes = app.session.parameter_set.parameter_set_zone_minutes[index];
 
     var myModal = new bootstrap.Modal(document.getElementById('editParametersetZoneMinutesModal'), {
         keyboard: false
@@ -60,7 +60,7 @@ takeUpdateZoneMinutes(messageData){
  * add or remove value from active minutes
  */
 sendAddParameterSetZoneMinutes(value){
-    app.$data.working = true;
+    app.working = true;
     app.sendMessage("add_parameterset_zone_minutes", {"sessionID" : app.sessionID,
                                                         "value" : value,});
 },
@@ -69,7 +69,7 @@ sendAddParameterSetZoneMinutes(value){
  * take result from sendAddParameterSetZoneMinutes
  */
 takeAddParameterSetZoneMinutes(messageData){
-    app.$data.cancelModal=false;
+    app.cancelModal=false;
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")

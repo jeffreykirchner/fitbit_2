@@ -36,6 +36,8 @@ var app = Vue.createApp({
                     increment_period : "1",
                     increment_player : "1",
 
+                    editParametersetModal : null,
+
                 }},
     methods: {
 
@@ -60,9 +62,6 @@ var app = Vue.createApp({
             switch(messageType) {                
                 case "get_session":
                     app.takeGetSession(messageData);
-                    break;
-                case "update_session":
-                    app.takeUpdateSession(messageData);
                     break;
                 case "update_parameterset":
                     app.takeUpdateParameterset(messageData);
@@ -108,7 +107,7 @@ var app = Vue.createApp({
                     break;
             }
 
-            app.$data.first_load_done = true;
+            app.first_load_done = true;
 
             app.working = false;
         },
@@ -120,7 +119,7 @@ var app = Vue.createApp({
         sendMessage(messageType, messageText) {
             
 
-            app.$data.chatSocket.send(JSON.stringify({
+            app.chatSocket.send(JSON.stringify({
                     'messageType': messageType,
                     'messageText': messageText,
                 }));
@@ -140,40 +139,32 @@ var app = Vue.createApp({
             else
             {
                 
-            }                     
+            }   
+            
+            if(!app.first_load_done)
+            {
+                setTimeout(app.doFirstLoad, 500);
+            }
+        },
+
+        doFirstLoad()
+        {
+            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {
+                                            keyboard: false
+                                            })
+            
+            document.getElementById('editParametersetModal').addEventListener('hidden.bs.modal', app.hideEditParameterset);
+            document.getElementById('importParametersModal').addEventListener('hidden.bs.modal', app.hideImportParameters);
+            document.getElementById('editParametersetPlayerModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPlayer);
+            document.getElementById('editParametersetPeriodModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriod);
+            document.getElementById('editParametersetZoneMinutesModal').addEventListener('hidden.bs.modal', app.hideEditParametersetZoneMinutes);
+            document.getElementById('editParametersetPeriodPaymentModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriodPayment);
         },
 
         /** send winsock request to get session info
         */
         sendGetSession(){
-            app.sendMessage("get_session",{"sessionID" : app.$data.sessionID});
-        },
-
-        /** send session update form   
-        */
-        sendUpdateSession(){
-            app.$data.cancelModal = false;
-            app.$data.working = true;
-            app.sendMessage("update_session",{"formData" : $("#sessionForm").serializeArray(),
-                                              "sessionID" : app.$data.sessionID});
-        },
-
-        /** take update session reponse
-         * @param messageData {json} result of update, either sucess or fail with errors
-        */
-        takeUpdateSession(messageData){
-            app.clearMainFormErrors();
-
-            if(messageData.status == "success")
-            {
-                app.takeGetSession(messageData);       
-                $('#editSessionModal').modal('hide');    
-            } 
-            else
-            {
-                app.$data.cancelModal=true;                           
-                app.displayErrors(messageData.errors);
-            } 
+            app.sendMessage("get_session",{"sessionID" : app.sessionID});
         },
 
         /**trucate text to 10 charcters with elipsis
@@ -210,7 +201,7 @@ var app = Vue.createApp({
         */
         clearMainFormErrors(){
             
-            for(var item in app.$data.session)
+            for(var item in app.session)
             {
                 $("#id_" + item).attr("class","form-control");
                 $("#id_errors_" + item).remove();
@@ -269,13 +260,7 @@ var app = Vue.createApp({
     },
 
     mounted(){
-        $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession); 
-        $('#importParametersModal').on("hidden.bs.modal", this.hideImportParameters); 
-        $('#editParametersetModal').on("hidden.bs.modal", this.hideEditParameterset);
-        $('#editParametersetPlayerModal').on("hidden.bs.modal", this.hideEditParametersetPlayer);
-        $('#editParametersetPeriodModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-        $('#editParametersetZoneMinutesModal').on("hidden.bs.modal", this.hideEditParametersetPeriod);
-        $('#editParametersetPeriodPaymentModal').on("hidden.bs.modal", this.hideEditParametersetPeriodPayment);
+        //$('#editSessionModal').on("hidden.bs.modal", this.hideEditSession); 
     },
 
 }).mount('#app');

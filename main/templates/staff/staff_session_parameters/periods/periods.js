@@ -8,7 +8,7 @@
     app.parametersetPeriodBeforeEdit = Object.assign({}, app.session.parameter_set.parameter_set_periods[index]);
     app.parametersetPeriodBeforeEditIndex = index;
 
-    app.current_parameter_set_period = app.$data.session.parameter_set.parameter_set_periods[index];
+    app.current_parameter_set_period = app.session.parameter_set.parameter_set_periods[index];
 
     tinymce.get("id_notice_text").setContent(app.current_parameter_set_period.notice_text);
 
