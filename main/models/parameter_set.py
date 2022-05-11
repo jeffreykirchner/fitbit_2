@@ -24,7 +24,8 @@ class ParameterSet(models.Model):
     enable_chat = models.BooleanField(default=False, verbose_name = 'Enable Chat')                           #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
 
-    graph_y_max = models.IntegerField(verbose_name='Graph: Y Max', default=75)                #max height of subject graph
+    graph_y_max = models.IntegerField(verbose_name='Graph: Y Max', default=75)           #max height of subject graph
+    group_size = models.IntegerField(verbose_name='Group Size', default=2)               #max height of subject graph
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 
@@ -54,6 +55,7 @@ class ParameterSet(models.Model):
             self.enable_chat = new_ps.get("enable_chat")
             self.show_instructions = new_ps.get("show_instructions")
             self.graph_y_max = new_ps.get("graph_y_max")
+            self.group_size = new_ps.get("group_size")
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = new_ps.get("consent_form_required")
@@ -192,6 +194,7 @@ class ParameterSet(models.Model):
             "show_instructions" : "True" if self.show_instructions else "False",
             "instruction_set" : self.instruction_set.json_min(),
             "graph_y_max" : self.graph_y_max,
+            "group_size" : self.group_size,
 
             "parameter_set_players" : [p.json() for p in self.parameter_set_players.all()],
             "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all().prefetch_related()],

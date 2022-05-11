@@ -297,6 +297,8 @@ def take_update_parameterset(data):
         #print("valid form")                
         form.save()    
 
+        session.auto_assign_groups()
+
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
     logger.info("Invalid paramterset form")
@@ -383,6 +385,7 @@ def take_add_parameterset_player(data):
         session.parameter_set.add_new_player()
 
     session.update_player_count()
+    session.auto_assign_groups()
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
