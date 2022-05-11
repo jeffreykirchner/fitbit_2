@@ -17,6 +17,12 @@ class ParameterSetForm(forms.ModelForm):
                                       widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.graph_y_max",
                                                                       "step":"1",
                                                                       "min":"1"}))
+    
+    group_size = forms.IntegerField(label='Group Size',
+                                    min_value=1,
+                                    widget=forms.NumberInput(attrs={"v-model":"session.parameter_set.group_size",
+                                                                    "step":"1",
+                                                                    "min":"1"}))
                                        
     enable_chat = forms.ChoiceField(label='Enable Chat',
                                        choices=((True, 'Yes'), (False,'No' )),
@@ -46,4 +52,4 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['graph_y_max', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']
+        fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']

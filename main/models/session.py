@@ -379,6 +379,23 @@ class Session(models.Model):
         return list of channels ids for specified group
         '''
         return [p.channel_name for p in self.session_players.filter(group_number=group_number)]
+    
+    def auto_assign_groups(self):
+        '''
+        auto assign gruops to session players based on parameter set group size.
+        '''
+        temp_group = 1
+        temp_counter = 0
+
+        for i in self.session_players.all():
+            i.group_number = temp_group
+            i.save()
+            temp_counter+=1
+
+            if temp_counter == self.parameter_set.group_size:
+                temp_group += 1
+                temp_counter = 0
+
 
     def json(self):
         '''
