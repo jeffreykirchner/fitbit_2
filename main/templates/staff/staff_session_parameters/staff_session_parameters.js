@@ -105,7 +105,7 @@ var app = Vue.createApp({
                     break;
             }
 
-            app.$data.first_load_done = true;
+            app.first_load_done = true;
 
             app.working = false;
         },
@@ -117,7 +117,7 @@ var app = Vue.createApp({
         sendMessage(messageType, messageText) {
             
 
-            app.$data.chatSocket.send(JSON.stringify({
+            app.chatSocket.send(JSON.stringify({
                     'messageType': messageType,
                     'messageText': messageText,
                 }));
@@ -195,7 +195,7 @@ var app = Vue.createApp({
         */
         clearMainFormErrors(){
             
-            for(var item in app.$data.session)
+            for(var item in app.session)
             {
                 $("#id_" + item).attr("class","form-control");
                 $("#id_errors_" + item).remove();
