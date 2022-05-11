@@ -1,6 +1,8 @@
 '''
 build test
 '''
+from datetime import  datetime
+from datetime import  timedelta
 from copy import deepcopy
 from decimal import  Decimal
 
@@ -246,3 +248,149 @@ class TestSubjectConsumer(TestCase):
         self.assertEqual(session_player_4.get_block_earnings(1),{"individual":6,"group_bonus":0,"total":6,"earnings_no_pay_percent":0})
         self.assertEqual(session_player_3.get_block_earnings(2),{"individual":0,"group_bonus":0,"total":0,"earnings_no_pay_percent":0})
         self.assertEqual(session_player_4.get_block_earnings(2),{"individual":3,"group_bonus":0,"total":3,"earnings_no_pay_percent":0})
+
+    def test_pay_level_group_pay(self):
+        '''
+        test correct pay at differnt zone minute levels
+        '''
+
+        session = Session.objects.all().first()
+        session_player_5 = self.session.session_players.get(player_number=5)
+        session_player_6 = self.session.session_players.get(player_number=6)
+
+        d_today = (todays_date() - timedelta(days=15)).date()
+        r = take_update_session_form(session.id, {'formData': [{'name': 'title', 'value': '*** New Session ***'}, {'name': 'start_date', 'value': d_today}]})
+        self.assertEqual(r["value"], "success")
+        session = Session.objects.all().first()
+
+        r = take_start_experiment(session.id, {})
+        self.assertEqual(r["value"], "success")
+        self.assertEqual(r["started"], True)
+        session = Session.objects.all().first()
+        self.assertEqual(session.get_current_session_period().period_number, 16)
+
+        #player 5
+        #zone minutes under 30 min
+        session_player_5_p15 = session_player_5.session_player_periods_b.get(session_period__period_number=15)
+        session_player_5_p15.check_in=True
+        session_player_5_p15.zone_minutes=15
+        session_player_5_p15.save()
+        r=session_player_5_p15.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_5_p15 = session_player_5.session_player_periods_b.get(session_period__period_number=15)
+        self.assertEqual(session_player_5_p15.earnings_individual, Decimal('0'))
+        self.assertEqual(session_player_5_p15.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_5_p15.earnings_no_pay_percent, 0)
+
+        #30 -44 min
+        session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
+        session_player_5_p16.check_in=True
+        session_player_5_p16.zone_minutes=35
+        session_player_5_p16.save()
+        r=session_player_5_p16.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
+        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('5'))
+        self.assertEqual(session_player_5_p16.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_5_p16.earnings_no_pay_percent, 0)
+
+        #45-59
+        session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
+        session_player_5_p17.check_in=True
+        session_player_5_p17.zone_minutes=45
+        session_player_5_p17.save()
+        r=session_player_5_p17.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
+        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('7'))
+        self.assertEqual(session_player_5_p17.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_5_p17.earnings_no_pay_percent, 0)
+
+        #60+
+        session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
+        session_player_5_p18.check_in=True
+        session_player_5_p18.zone_minutes=60
+        session_player_5_p18.save()
+        r=session_player_5_p18.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
+        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('9'))
+        self.assertEqual(session_player_5_p18.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
+
+        #player 6
+        session_player_6_p15 = session_player_6.session_player_periods_b.get(session_period__period_number=15)
+        session_player_6_p15.check_in=True
+        session_player_6_p15.zone_minutes=29
+        session_player_6_p15.save()
+        r=session_player_6_p15.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_6_p15 = session_player_6.session_player_periods_b.get(session_period__period_number=15)
+        self.assertEqual(session_player_6_p15.earnings_individual, Decimal('0'))
+        self.assertEqual(session_player_6_p15.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_6_p15.earnings_no_pay_percent, 0)
+
+        #30 -44 min
+        session_player_6_p16 = session_player_6.session_player_periods_b.get(session_period__period_number=16)
+        session_player_6_p16.check_in=True
+        session_player_6_p16.zone_minutes=44
+        session_player_6_p16.save()
+        r=session_player_6_p16.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_6_p16 = session_player_6.session_player_periods_b.get(session_period__period_number=16)
+        self.assertEqual(session_player_6_p16.earnings_individual, Decimal('5'))
+        self.assertEqual(session_player_6_p16.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_6_p16.earnings_no_pay_percent, 0)
+        
+        #45-59
+        session_player_6_p17 = session_player_6.session_player_periods_b.get(session_period__period_number=17)
+        session_player_6_p17.check_in=True
+        session_player_6_p17.zone_minutes=59
+        session_player_6_p17.save()
+        r=session_player_6_p17.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_6_p17 = session_player_6.session_player_periods_b.get(session_period__period_number=17)
+        self.assertEqual(session_player_6_p17.earnings_individual, Decimal('7'))
+        self.assertEqual(session_player_6_p17.earnings_group, Decimal('4'))
+        self.assertEqual(session_player_6_p17.earnings_no_pay_percent, 0)
+
+        #60+
+        session_player_6_p18 = session_player_6.session_player_periods_b.get(session_period__period_number=18)
+        session_player_6_p18.check_in=True
+        session_player_6_p18.zone_minutes=72
+        session_player_6_p18.save()
+        r=session_player_6_p18.calc_and_store_payment()
+        self.assertEqual(r["value"], "success")
+
+        session_player_6_p18 = session_player_6.session_player_periods_b.get(session_period__period_number=18)
+        self.assertEqual(session_player_6_p18.earnings_individual, Decimal('9'))
+        self.assertEqual(session_player_6_p18.earnings_group, Decimal('6'))
+        self.assertEqual(session_player_6_p18.earnings_no_pay_percent, 0)
+
+        #check player 5
+        session_player_5_p15 = session_player_5.session_player_periods_b.get(session_period__period_number=15)
+        self.assertEqual(session_player_5_p15.earnings_individual, Decimal('0'))
+        self.assertEqual(session_player_5_p15.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_5_p15.earnings_no_pay_percent, 0)
+
+        session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
+        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('5'))
+        self.assertEqual(session_player_5_p16.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_5_p16.earnings_no_pay_percent, 0)
+
+        session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
+        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('7'))
+        self.assertEqual(session_player_5_p17.earnings_group, Decimal('4'))
+        self.assertEqual(session_player_5_p17.earnings_no_pay_percent, 0)
+
+        session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
+        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('9'))
+        self.assertEqual(session_player_5_p18.earnings_group, Decimal('6'))
+        self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
