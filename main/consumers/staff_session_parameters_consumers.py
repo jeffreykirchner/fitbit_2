@@ -602,6 +602,8 @@ def take_import_parameters(data):
     target_session.update_player_count()
     target_session.update_end_date()
 
+    target_session.auto_assign_groups()
+
     return status      
 
 def take_download_parameters(data):
