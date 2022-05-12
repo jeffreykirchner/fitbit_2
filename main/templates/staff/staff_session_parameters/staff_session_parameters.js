@@ -37,6 +37,7 @@ var app = Vue.createApp({
                     increment_period : "1",
                     increment_player : "1",
 
+                    //modals
                     editParametersetModal : null,
                     importParametersModal : null,
                     editParametersetPlayerModal : null,            
@@ -44,6 +45,8 @@ var app = Vue.createApp({
                     editParametersetZoneMinutesModal : null,
                     editParametersetPeriodPaymentModal : null,
 
+                    //form paramters
+                    session_import : null,
                 }},
     methods: {
 

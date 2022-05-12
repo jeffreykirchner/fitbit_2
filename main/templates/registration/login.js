@@ -11,6 +11,8 @@
               loginButtonText : 'Submit <i class="fas fa-sign-in-alt"></i>',
               loginErrorText : "",
               form_ids : {{form_ids|safe}},
+              username:null,
+              password:null,
               }                          
           },
 
@@ -20,10 +22,11 @@
               login:function(){
                   app.loginButtonText = '<i class="fas fa-spinner fa-spin"></i>';
                   app.loginErrorText = "";
+                  var form = document.querySelector('login_form');
 
                   axios.post('/accounts/login/', {
                           action :"login",
-                          formData : $("#login_form").serializeArray(), 
+                          formData : {username:app.username, password:app.password},
                                                       
                       })
                       .then(function (response) {     

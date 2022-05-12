@@ -23,10 +23,18 @@ hideEditParameterset:function(){
 /** update parameterset settings
 */
 sendUpdateParameterset(){
+
+    formData = {}
+
+    for(i=0;i<app.parameterset_form_ids.length;i++)
+    {
+        v=app.parameterset_form_ids[i];
+        formData[v]=app.session.parameter_set[v];
+    }
     
     app.working = true;
     app.sendMessage("update_parameterset", {"sessionID" : app.sessionID,
-                                            "formData" : $("#parametersetForm").serializeArray(),});
+                                            "formData" : formData,});
 },
 
 /** handle result of updating parameter set

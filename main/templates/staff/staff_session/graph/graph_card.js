@@ -303,11 +303,12 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
      ctx.fillStyle = "DimGray";
      ctx.textAlign = "center";
      ctx.lineCap = "round";
-     ctx.globalAlpha = 0.25;
- 
+     ctx.globalAlpha = 0.25; 
+    
+     if(!app.session.current_parameter_set_period) return;
 
-     let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
-     let previous_zone_minutes = 0;
+    let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
+    let previous_zone_minutes = 0;
  
     if (payments_list)
     {

@@ -515,10 +515,10 @@ def take_update_session_form(session_id, data):
     except ObjectDoesNotExist:
         logger.warning(f"take_update_session_form session, not found: {session_id}")
     
-    form_data_dict = {}
+    form_data_dict = form_data
 
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
+    # for field in form_data:            
+    #     form_data_dict[field["name"]] = field["value"]
     
     if session.started:
         form_data_dict["start_date"] = session.get_start_date_string_widget()

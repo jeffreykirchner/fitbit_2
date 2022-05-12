@@ -1,8 +1,7 @@
 sendName(){
 
     app.working = true;
-    app.sendMessage("name", {"formData" : $("#endGameForm").serializeArray()});
-                     
+    app.sendMessage("name", {"formData" : {name: session_player.name, student_id:session_player.student_id}});            
 },
 
 /** take result of moving goods

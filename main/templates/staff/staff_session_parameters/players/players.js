@@ -30,11 +30,31 @@ hideEditParametersetPlayer:function(){
 sendUpdateParametersetPlayer(){
 
     if(app.session.started) return;
+
+    formData = {}
+
+    let parameter_set_players = app.session.parameter_set.parameter_set_players;
+
+    index=-1;
+    for(i=0;i<parameter_set_players.length;i++)
+    {
+        if(parameter_set_players[i].id == app.current_parameter_set_player.id)
+        {
+            index=i;
+            break;
+        }
+    }
+
+    for(i=0;i<app.parameterset_player_form_ids.length;i++)
+    {
+        v=app.parameterset_player_form_ids[i];
+        formData[v]=parameter_set_players[index][v];
+    }
     
     app.working = true;
     app.sendMessage("update_parameterset_player", {"sessionID" : app.sessionID,
                                                    "paramterset_player_id" : app.current_parameter_set_player.id,
-                                                   "formData" : $("#parametersetPlayerForm").serializeArray(),});
+                                                   "formData" : formData,});
 },
 
 /** handle result of updating parameter set player
@@ -58,24 +78,12 @@ takeUpdateParametersetPlayer(messageData){
     } 
 },
 
-/** update parameterset player group settings
-*/
-sendUpdateParametersetPlayerGroup(){
-    
-    app.working = true;
-    app.sendMessage("update_parameterset_player_group", {"sessionID" : app.sessionID,
-                                                         "paramterset_player_group_id" : app.current_parameter_set_player_group.id,
-                                                         "formData" : $("#parametersetPlayerGroupForm").serializeArray(),});
-},
-
 /** copy specified period's groups forward to future groups
 */
 sendRemoveParameterSetPlayer(){
-
     app.working = true;
     app.sendMessage("remove_parameterset_player", {"sessionID" : app.sessionID,
-                                                   "increment_player" : app.increment_player});
-                                                   
+                                                   "increment_player" : app.increment_player});                                               
 },
 
 /** handle result of copying groups forward

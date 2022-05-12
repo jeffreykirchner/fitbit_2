@@ -17,7 +17,7 @@ class ImportParametersForm(forms.Form):
     session =  forms.ModelChoiceField(label="Select session to import.",
                                       queryset=None,
                                       empty_label=None,
-                                      widget=forms.Select(attrs={}))
+                                      widget=forms.Select(attrs={"v-model":"session_import"}))
 
 
     
