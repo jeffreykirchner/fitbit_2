@@ -12,11 +12,7 @@
 
     tinymce.get("id_notice_text").setContent(app.current_parameter_set_period.notice_text);
 
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetPeriodModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.editParametersetPeriodModal.toggle();
 },
 
 /** hide edit parameter set periods
@@ -51,7 +47,7 @@ takeUpdatePeriods(messageData){
     if(messageData.status.value == "success")
     {
         app.session.parameter_set = messageData.status.parameter_set;       
-        $('#editParametersetPeriodModal').modal('hide');            
+        app.editParametersetPeriodModal.hide();        
     } 
     else
     {
@@ -92,11 +88,7 @@ takeAddParameterSetPeriod(messageData){
 
     app.current_parameter_set_period_payment = app.session.parameter_set.parameter_set_periods[index].parameter_set_period_payments[index2];
 
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetPeriodPaymentModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.editParametersetPeriodPaymentModal.toggle();
 },
 
 /** hide edit parameter set period payment
@@ -129,7 +121,7 @@ takeUpdatePayment(messageData){
     if(messageData.status.value == "success")
     {
         app.session.parameter_set = messageData.status.parameter_set;       
-        $('#editParametersetPeriodPaymentModal').modal('hide');            
+        app.editParametersetPeriodPaymentModal.hide();            
     } 
     else
     {

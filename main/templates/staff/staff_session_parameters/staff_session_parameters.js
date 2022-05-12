@@ -38,6 +38,11 @@ var app = Vue.createApp({
                     increment_player : "1",
 
                     editParametersetModal : null,
+                    importParametersModal : null,
+                    editParametersetPlayerModal : null,            
+                    editParametersetPeriodModal : null,           
+                    editParametersetZoneMinutesModal : null,
+                    editParametersetPeriodPaymentModal : null,
 
                 }},
     methods: {
@@ -150,9 +155,12 @@ var app = Vue.createApp({
 
         doFirstLoad()
         {
-            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {
-                                            keyboard: false
-                                            })
+            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false})
+            app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false})
+            app.editParametersetPlayerModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPlayerModal'), {keyboard: false})            
+            app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false})            
+            app.editParametersetZoneMinutesModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetZoneMinutesModal'), {keyboard: false})
+            app.editParametersetPeriodPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodPaymentModal'), {keyboard: false})
             
             document.getElementById('editParametersetModal').addEventListener('hidden.bs.modal', app.hideEditParameterset);
             document.getElementById('importParametersModal').addEventListener('hidden.bs.modal', app.hideImportParameters);
@@ -266,7 +274,7 @@ var app = Vue.createApp({
     },
 
     mounted(){
-        //$('#editSessionModal').on("hidden.bs.modal", this.hideEditSession); 
+
     },
 
 }).mount('#app');

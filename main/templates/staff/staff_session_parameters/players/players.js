@@ -10,13 +10,8 @@
 
     app.parametersetPlayerBeforeEditIndex = index;
     app.current_parameter_set_player = app.session.parameter_set.parameter_set_players[index];
-    
 
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetPlayerModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.editParametersetPlayerModal.toggle();
 },
 
 /** hide edit parmeter set player
@@ -54,7 +49,7 @@ takeUpdateParametersetPlayer(messageData){
     if(messageData.status.value == "success")
     {
         app.session.parameter_set = messageData.status.parameter_set;       
-        $('#editParametersetPlayerModal').modal('hide');        
+        app.editParametersetPlayerModal.hide();       
     } 
     else
     {
@@ -88,7 +83,7 @@ sendRemoveParameterSetPlayer(){
 takeRemoveParameterSetPlayer(messageData){
 
     app.session.parameter_set = messageData.status.parameter_set;   
-    $('#editParametersetPlayerModal').modal('hide');
+    app.editParametersetPlayerModal.hide();
 },
 
 /** add player to parameter set

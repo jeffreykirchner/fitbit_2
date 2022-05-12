@@ -48,6 +48,12 @@ var app = Vue.createApp({
                     margin2 : 10,
                     sizeW : 0,
                     sizeH : 0,
+
+                    //modals
+                    editSubjectModal : null,
+                    editSessionModal : null,
+                    sendMessageModal : null,
+                    uploadEmailModal : null,
                 }},
     methods: {
 
@@ -208,10 +214,15 @@ var app = Vue.createApp({
          */
         doFirstLoad()
         {
-            $('#editSubjectModal').on("hidden.bs.modal", this.hideEditSubject);
-            $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
-            $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
-            $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
+            app.editSubjectModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editSubjectModal'), {keyboard: false})
+            app.editSessionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editSessionModal'), {keyboard: false})            
+            app.sendMessageModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sendMessageModal'), {keyboard: false})            
+            app.uploadEmailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('uploadEmailModal'), {keyboard: false})
+
+            document.getElementById('editSubjectModal').addEventListener('hidden.bs.modal', app.hideEditSubject);
+            document.getElementById('editSessionModal').addEventListener('hidden.bs.modal', app.hideEditSession);
+            document.getElementById('sendMessageModal').addEventListener('hidden.bs.modal', app.hideSendInvitations);
+            document.getElementById('uploadEmailModal').addEventListener('hidden.bs.modal', app.hideSendEmailList);
         },
 
         /**update text of move on button based on current state
