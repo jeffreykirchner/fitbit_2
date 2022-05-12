@@ -10,11 +10,7 @@
 
     app.current_parameter_set_zone_minutes = app.session.parameter_set.parameter_set_zone_minutes[index];
 
-    var myModal = new bootstrap.Modal(document.getElementById('editParametersetZoneMinutesModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.editParametersetZoneMinutesModal.toggle();
 },
 
 /** hide edit parameter set active minutes
@@ -47,7 +43,7 @@ takeUpdateZoneMinutes(messageData){
     if(messageData.status.value == "success")
     {
         app.session.parameter_set = messageData.status.parameter_set;       
-        $('#editParametersetZoneMinutesModal').modal('hide');            
+        app.editParametersetZoneMinutesModal.hide();         
     } 
     else
     {

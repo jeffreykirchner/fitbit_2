@@ -286,10 +286,11 @@ def take_update_parameterset(data):
         logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
         return
             
-    form_data_dict = {}
+    form_data_dict = form_data
+    form_data_dict["instruction_set"] = form_data_dict["instruction_set"]["id"]
 
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
+    # for field in form_data:            
+    #     form_data_dict[field["name"]] = field["value"]
 
     form = ParameterSetForm(form_data_dict, instance=session.parameter_set)
 
@@ -323,10 +324,10 @@ def take_update_parameterset_player(data):
         logger.warning(f"take_update_parameterset_type paramterset_player, not found ID: {paramterset_player_id}")
         return
     
-    form_data_dict = {}
+    form_data_dict = form_data
 
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
+    # for field in form_data:            
+    #     form_data_dict[field["name"]] = field["value"]
 
     logger.info(f'form_data_dict : {form_data_dict}')
 
@@ -590,10 +591,13 @@ def take_import_parameters(data):
     session_id = data["sessionID"]
     form_data = data["formData"]
     
-    form_data_dict = {}
+    form_data_dict = form_data
 
-    for field in form_data:            
-        form_data_dict[field["name"]] = field["value"]
+    if not form_data_dict["session"]:
+        return {"status" : "fail", "message" :  "Invalid session."}
+
+    # for field in form_data:            
+    #     form_data_dict[field["name"]] = field["value"]
 
     source_session = Session.objects.get(id=form_data_dict["session"])
     target_session = Session.objects.get(id=session_id)
@@ -601,6 +605,8 @@ def take_import_parameters(data):
     status = target_session.parameter_set.from_dict(source_session.parameter_set.json()) 
     target_session.update_player_count()
     target_session.update_end_date()
+
+    target_session.auto_assign_groups()
 
     return status      
 

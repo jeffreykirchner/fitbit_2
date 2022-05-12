@@ -3,7 +3,7 @@
 sendUpdateSession(){
     this.cancelModal = false;
     this.working = true;
-    app.sendMessage("update_session",{"formData" : $("#sessionForm").serializeArray()});
+    app.sendMessage("update_session",{"formData" : {title:app.session.title, start_date:app.session.start_date_widget}});
 },
 
 /** take update session reponse
@@ -15,12 +15,12 @@ takeUpdateSession(messageData){
     if(messageData.status.value == "success")
     {
         app.takeGetSession(messageData.status.session);       
-        $('#editSessionModal').modal('hide');    
+        app.editSessionModal.hide();    
     } 
     else
     {
         this.cancelModal=true;                           
-        app.displayErrors(messageData.errors);
+        app.displayErrors(messageData.status.errors);
     } 
 },
 
@@ -31,11 +31,7 @@ showEditSession:function(){
     this.cancelModal=true;
     this.sessionBeforeEdit = Object.assign({}, this.session);
 
-    var myModal = new bootstrap.Modal(document.getElementById('editSessionModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.editSessionModal.toggle();
 },
 
 /** hide edit session modal

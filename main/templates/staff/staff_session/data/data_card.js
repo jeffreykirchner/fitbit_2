@@ -15,7 +15,7 @@ takeDownloadSummaryData(messageData){
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Fitbit_2_Summary_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Summary_Data_Session_" + app.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -41,7 +41,7 @@ takeDownloadHeartRateData(messageData){
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Fitbit_2_Heart_Rate_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Heart_Rate_Data_Session_" + app.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -67,7 +67,7 @@ takedownloadActivityData(messageData){
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Fitbit_2_Activity_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Fitbit_2_Activity_Data_Session_" + app.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -93,7 +93,7 @@ takeDownloadChatData(messageData){
     var blob = new Blob(["\ufeff", messageData.status.result]);
     var url = URL.createObjectURL(blob);
     downloadLink.href = url;
-    downloadLink.download = "Trade_Steal_Payment_Data_Session_" + app.$data.session.id +".csv";
+    downloadLink.download = "Trade_Steal_Payment_Data_Session_" + app.session.id +".csv";
 
     document.body.appendChild(downloadLink);
     downloadLink.click();

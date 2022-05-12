@@ -7,7 +7,7 @@
     if(messageData.status.value == "success")
     {
         let result = messageData.status.result;
-        let session_players = app.$data.session.session_players;
+        let session_players = app.session.session_players;
 
         session_player = app.findSessionPlayer(result.id);
 
@@ -120,7 +120,7 @@ takeFinishedInstructions(messageData){
  */
 findSessionPlayerIndex(id){
 
-    let session_players = app.$data.session.session_players;
+    let session_players = app.session.session_players;
     for(let i=0; i<session_players.length; i++)
     {
         if(session_players[i].id == id)
@@ -150,8 +150,7 @@ takeUpdateEmailList(messageData){
 
     if(messageData.status.value == "success")
     {            
-        $('#uploadEmailModal').modal('hide');    
-
+        app.uploadEmailModal.hide(); 
         app.session = messageData.status.result.session;
     } 
     else
@@ -168,11 +167,7 @@ showSendEmailList(){
 
     this.csv_email_list = "";
     
-    var myModal = new bootstrap.Modal(document.getElementById('uploadEmailModal'), {
-        keyboard: false
-        })
-
-    myModal.toggle();
+    app.uploadEmailModal.toggle();
 },
 
 /** hide edit subject modal
@@ -203,7 +198,7 @@ takeUpdateSubject(messageData){
 
     if(messageData.status.value == "success")
     {            
-        $('#editSubjectModal').modal('hide');    
+        app.editSubjectModal.hide();   
 
         let session_player = app.findSessionPlayer(messageData.status.session_player.id);
         session_player.name = messageData.status.session_player.name;
@@ -215,7 +210,7 @@ takeUpdateSubject(messageData){
     } 
     else
     {
-        app.$data.cancelModal=true;                           
+        app.cancelModal=true;                           
         app.displayErrors(messageData.status.errors);
     } 
 },
@@ -260,12 +255,8 @@ showEditSubject:function(id){
     this.staffEditNameEtcForm.group_number = session_player.group_number;
     this.staffEditNameEtcForm.disabled = session_player.disabled ? 1 : 0;
     this.staffEditNameEtcForm.fitbit_user_id = session_player.fitbit_user_id;
-    
-    var myModal = new bootstrap.Modal(document.getElementById('editSubjectModal'), {
-        keyboard: false
-        })
 
-    myModal.toggle();
+    app.editSubjectModal.toggle();
 },
 
 /** hide edit subject modal

@@ -42,6 +42,10 @@ var app = Vue.createApp({
                     margin2 : 35,
                     sizeW : 0,
                     sizeH : 0,
+
+                    endGameModal : null,
+                    consentModal : null,
+
                 }},
     methods: {
 
@@ -149,12 +153,7 @@ var app = Vue.createApp({
             else
             {
                 
-            }     
-            
-            if(app.session_player.consent_form_required)
-            {
-                setTimeout(app.showConsentForm, 250);
-            }
+            }                
             
             if(this.session.current_experiment_phase != 'Done')
             {
@@ -178,6 +177,29 @@ var app = Vue.createApp({
             {
                 setTimeout(this.processInstructionPage, 1000);
                 this.instructionDisplayScroll();
+            }
+
+            if(!app.first_load_done)
+            {
+                setTimeout(app.doFirstLoad, 500);
+            }
+        },
+
+        doFirstLoad()
+        {
+
+            app.endGameModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('endGameModal'), {keyboard: false})
+            app.consentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('consentModal'), {keyboard: false})
+
+            document.getElementById('endGameModal').addEventListener('hidden.bs.modal', app.hideEndGameModal);
+
+            {%if session.parameter_set.test_mode%} setTimeout(this.doTestMode, this.randomNumber(1000 , 10000)); {%endif%}
+    
+            window.addEventListener('resize', this.updateGraph);
+
+            if(app.session_player.consent_form_required)
+            {
+                app.showConsentForm();
             }
         },
 
@@ -211,16 +233,11 @@ var app = Vue.createApp({
         takeUpdateResetExperiment(messageData){
             app.takeGetSession(messageData);
 
-            $('#endGameModal').modal('hide');
+            app.endGameModal.hide();
         },
 
         showConsentForm(){
-           
-            var myModal = new bootstrap.Modal(document.getElementById('consentModal'), {
-                keyboard: false
-                })
-        
-            myModal.toggle();
+            app.consentModal.toggle();
         },
 
         /**
@@ -236,7 +253,7 @@ var app = Vue.createApp({
         */
         takeConsentForm(messageData){
             app.session_player.consent_form_required = messageData.status.result.consent_form_required; 
-            $('#consentModal').modal('hide');   
+            app.consentModal.hide();
         },
 
         takeSurveyComplete(messageData){
@@ -256,8 +273,8 @@ var app = Vue.createApp({
          * @param messageData {json}
         */
         takeUpdateNextPhase(messageData){
-            $('#avatarChoiceGridModal').modal('hide');
-            $('#endGameModal').modal('hide');
+
+            app.endGameModal.hide();
 
             this.session.current_experiment_phase = messageData.status.session.current_experiment_phase;
             this.session.session_players = messageData.status.session_players;
@@ -289,31 +306,17 @@ var app = Vue.createApp({
         */
         clearMainFormErrors(){
             
-            for(var item in this.session)
+            for(var item in app.session)
             {
-                $("#id_" + item).attr("class","form-control");
-                $("#id_errors_" + item).remove();
-            }
-
-            s = this.session_player_move_two_form_ids;
-            for(var i in s)
-            {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
-            }
-
-            s = this.session_player_move_three_form_ids;
-            for(var i in s)
-            {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + item);
+                if(e) e.remove();
             }
 
             s = this.end_game_form_ids;
             for(var i in s)
             {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
             }
         },
 
@@ -321,22 +324,20 @@ var app = Vue.createApp({
         */
         displayErrors(errors){
             for(var e in errors)
-            {
-                $("#id_" + e).attr("class","form-control is-invalid")
-                var str='<span id=id_errors_'+ e +' class="text-danger">';
-                
-                for(var i in errors[e])
                 {
-                    str +=errors[e][i] + '<br>';
+                    //e = document.getElementById("id_" + e).getAttribute("class", "form-control is-invalid")
+                    var str='<span id=id_errors_'+ e +' class="text-danger">';
+                    
+                    for(var i in errors[e])
+                    {
+                        str +=errors[e][i] + '<br>';
+                    }
+
+                    str+='</span>';
+
+                    document.getElementById("div_id_" + e).insertAdjacentHTML('beforeend', str);
+                    document.getElementById("div_id_" + e).scrollIntoView();
                 }
-
-                str+='</span>';
-                $("#div_id_" + e).append(str); 
-
-                var elmnt = document.getElementById("div_id_" + e);
-                elmnt.scrollIntoView(); 
-
-            }
         }, 
 
         /**
@@ -344,7 +345,7 @@ var app = Vue.createApp({
          */
         findSessionPlayer(id){
 
-            let session_players = app.$data.session.session_players;
+            let session_players = app.session.session_players;
             for(let i=0; i<session_players.length; i++)
             {
                 if(session_players[i].id == id)
@@ -361,7 +362,7 @@ var app = Vue.createApp({
          */
         findSessionPlayerIndex(id){
 
-            let session_players = app.$data.session.session_players;
+            let session_players = app.session.session_players;
             for(let i=0; i<session_players.length; i++)
             {
                 if(session_players[i].id == id)
@@ -376,16 +377,6 @@ var app = Vue.createApp({
     },
 
     mounted(){
-
-        $('#moveTwoGoodsModal').on("hidden.bs.modal", this.hideTransferModal);
-        $('#moveThreeGoodsModal').on("hidden.bs.modal", this.hideTransferModal);
-        $('#avatarChoiceGridModal').on("hidden.bs.modal", this.hideChoiceGridModal);
-        $('#endGameModal').on("hidden.bs.modal", this.hideEndGameModal);
-        {%if session.parameter_set.test_mode%} setTimeout(this.doTestMode, this.randomNumber(1000 , 10000)); {%endif%}
-
-        window.addEventListener('resize', this.updateGraph);
-
-        setTimeout(this.updateGraph, 250);
 
     },
 

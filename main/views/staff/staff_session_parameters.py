@@ -165,6 +165,7 @@ def upload_parameter_set(v, session):
 
     session.update_player_count()
     session.update_end_date()
+    session.auto_assign_groups()
 
     return JsonResponse({"session" : session.json(),
                          "message" : message,

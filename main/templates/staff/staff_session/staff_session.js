@@ -48,6 +48,12 @@ var app = Vue.createApp({
                     margin2 : 10,
                     sizeW : 0,
                     sizeH : 0,
+
+                    //modals
+                    editSubjectModal : null,
+                    editSessionModal : null,
+                    sendMessageModal : null,
+                    uploadEmailModal : null,
                 }},
     methods: {
 
@@ -208,10 +214,15 @@ var app = Vue.createApp({
          */
         doFirstLoad()
         {
-            $('#editSubjectModal').on("hidden.bs.modal", this.hideEditSubject);
-            $('#editSessionModal').on("hidden.bs.modal", this.hideEditSession);
-            $('#sendMessageModal').on("hidden.bs.modal", this.hideSendInvitations);
-            $('#uploadEmailModal').on("hidden.bs.modal", this.hideSendEmailList);
+            app.editSubjectModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editSubjectModal'), {keyboard: false})
+            app.editSessionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editSessionModal'), {keyboard: false})            
+            app.sendMessageModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sendMessageModal'), {keyboard: false})            
+            app.uploadEmailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('uploadEmailModal'), {keyboard: false})
+
+            document.getElementById('editSubjectModal').addEventListener('hidden.bs.modal', app.hideEditSubject);
+            document.getElementById('editSessionModal').addEventListener('hidden.bs.modal', app.hideEditSession);
+            document.getElementById('sendMessageModal').addEventListener('hidden.bs.modal', app.hideSendInvitations);
+            document.getElementById('uploadEmailModal').addEventListener('hidden.bs.modal', app.hideSendEmailList);
         },
 
         /**update text of move on button based on current state
@@ -269,15 +280,15 @@ var app = Vue.createApp({
             
             for(var item in app.session)
             {
-                $("#id_" + item).attr("class","form-control");
-                $("#id_errors_" + item).remove();
+                e = document.getElementById("id_errors_" + item);
+                if(e) e.remove();
             }
 
             s = app.staff_edit_name_etc_form_ids;
             for(var i in s)
             {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
             }
         },
 
@@ -285,22 +296,20 @@ var app = Vue.createApp({
         */
         displayErrors(errors){
             for(var e in errors)
-            {
-                $("#id_" + e).attr("class","form-control is-invalid")
-                var str='<span id=id_errors_'+ e +' class="text-danger">';
-                
-                for(var i in errors[e])
                 {
-                    str +=errors[e][i] + '<br>';
+                    //e = document.getElementById("id_" + e).getAttribute("class", "form-control is-invalid")
+                    var str='<span id=id_errors_'+ e +' class="text-danger">';
+                    
+                    for(var i in errors[e])
+                    {
+                        str +=errors[e][i] + '<br>';
+                    }
+
+                    str+='</span>';
+
+                    document.getElementById("div_id_" + e).insertAdjacentHTML('beforeend', str);
+                    document.getElementById("div_id_" + e).scrollIntoView(); 
                 }
-
-                str+='</span>';
-                $("#div_id_" + e).append(str); 
-
-                var elmnt = document.getElementById("div_id_" + e);
-                elmnt.scrollIntoView(); 
-
-            }
         }, 
     },
 
