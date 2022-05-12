@@ -176,13 +176,13 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
                               "result" :  {"session": event_result["session"]}}
 
             for p in event_result["recipients"]:
-
-                await self.channel_layer.send(
-                    p,
-                    {"type": "update_check_in",
-                     "result" : json.dumps(subject_result, cls=DjangoJSONEncoder),
-                     "sender_channel_name": self.channel_name}
-                )
+                if p !="":
+                    await self.channel_layer.send(
+                        p,
+                        {"type": "update_check_in",
+                        "result" : json.dumps(subject_result, cls=DjangoJSONEncoder),
+                        "sender_channel_name": self.channel_name}
+                    )
     
     async def survey_complete(self, event):
         '''
