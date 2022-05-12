@@ -344,7 +344,7 @@ var app = Vue.createApp({
          */
         findSessionPlayer(id){
 
-            let session_players = app.$data.session.session_players;
+            let session_players = app.session.session_players;
             for(let i=0; i<session_players.length; i++)
             {
                 if(session_players[i].id == id)
@@ -361,7 +361,7 @@ var app = Vue.createApp({
          */
         findSessionPlayerIndex(id){
 
-            let session_players = app.$data.session.session_players;
+            let session_players = app.session.session_players;
             for(let i=0; i<session_players.length; i++)
             {
                 if(session_players[i].id == id)

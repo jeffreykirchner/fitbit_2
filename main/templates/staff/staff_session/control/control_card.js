@@ -195,10 +195,10 @@ showSendInvitations(){
 
     app.cancelModal=true;
 
-    app.$data.sendMessageModalForm.subject = app.$data.session.invitation_subject;
-    app.$data.sendMessageModalForm.text = app.$data.session.invitation_text;
+    app.sendMessageModalForm.subject = app.session.invitation_subject;
+    app.sendMessageModalForm.text = app.session.invitation_text;
 
-    tinymce.get("id_invitation_subject").setContent(this.$data.sendMessageModalForm.text);
+    tinymce.get("id_invitation_subject").setContent(this.sendMessageModalForm.text);
     
     var myModal = new bootstrap.Modal(document.getElementById('sendMessageModal'), {
         keyboard: false
