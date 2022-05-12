@@ -20,7 +20,7 @@ takeUpdateSession(messageData){
     else
     {
         this.cancelModal=true;                           
-        app.displayErrors(messageData.errors);
+        app.displayErrors(messageData.status.errors);
     } 
 },
 

@@ -54,22 +54,23 @@
                       });                        
                   },
 
-                  clearMainFormErrors:function(){
+                  clearMainFormErrors(){
 
                         s = app.form_ids;                    
                         for(var i in s)
                         {
-                            $("#id_" + s[i]).attr("class","form-control");
-                            $("#id_errors_" + s[i]).remove();
+                            //e = document.getElementById("id_" + s[i]);
+                            e = document.getElementById("id_errors_" + s[i]);
+                            if(e) e.remove();
                         }
 
                     },
               
                 //display form errors
-                displayErrors:function(errors){
+                displayErrors(errors){
                       for(var e in errors)
                       {
-                          $("#id_" + e).attr("class","form-control is-invalid")
+                          //e = document.getElementById("id_" + e).getAttribute("class", "form-control is-invalid")
                           var str='<span id=id_errors_'+ e +' class="text-danger">';
                           
                           for(var i in errors[e])
@@ -78,8 +79,8 @@
                           }
 
                           str+='</span>';
-                          $("#div_id_" + e).append(str); 
 
+                          document.getElementById("div_id_" + e).insertAdjacentHTML('beforeend', str);
                       }
                   },
 

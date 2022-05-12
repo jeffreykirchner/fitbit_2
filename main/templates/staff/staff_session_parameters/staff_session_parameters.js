@@ -14,7 +14,7 @@ var app = Vue.createApp({
                     first_load_done : false,          //true after software is loaded for the first time
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
-                    session : null, {{session_json|safe}}                  
+                    session : null, //{{session_json|safe}}                  
                     valuecost_modal_label:'Edit Value or Cost',
 
                     current_parameter_set_player : {},  //{{first_parameter_set_player_json|safe}}
@@ -26,6 +26,7 @@ var app = Vue.createApp({
                     parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
                     parameterset_period_form_ids: {{parameterset_period_form_ids|safe}},
                     parameterset_zone_minutes_form_ids: {{parameterset_zone_minutes_form_ids|safe}},
+                    parameterset_period_payment_form_ids: {{parameterset_period_payment_form_ids|safe}},
 
                     upload_file: null,
                     upload_file_name:'Choose File',
@@ -203,36 +204,43 @@ var app = Vue.createApp({
             
             for(var item in app.session)
             {
-                $("#id_" + item).attr("class","form-control");
-                $("#id_errors_" + item).remove();
+                e = document.getElementById("id_errors_" + item);
+                if(e) e.remove();
             }
 
             s = app.parameterset_form_ids;
             for(var i in s)
             {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
+            }
+
+            s = app.parameterset_zone_minutes_form_ids;
+            for(var i in s)
+            {
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
             }
 
             s = app.parameterset_player_form_ids;
             for(var i in s)
             {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
-            }
-
-            s = app.parameterset_player_form_ids;
-            for(var i in s)
-            {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
             }
 
             s = app.parameterset_period_form_ids;
             for(var i in s)
             {
-                $("#id_" + s[i]).attr("class","form-control");
-                $("#id_errors_" + s[i]).remove();
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
+            }
+
+            s = app.parameterset_period_payment_form_ids;
+            for(var i in s)
+            {
+                e = document.getElementById("id_errors_" + s[i]);
+                if(e) e.remove();
             }
         },
 
@@ -240,22 +248,20 @@ var app = Vue.createApp({
         */
         displayErrors(errors){
             for(var e in errors)
-            {
-                $("#id_" + e).attr("class","form-control is-invalid")
-                var str='<span id=id_errors_'+ e +' class="text-danger">';
-                
-                for(var i in errors[e])
                 {
-                    str +=errors[e][i] + '<br>';
+                    //e = document.getElementById("id_" + e).getAttribute("class", "form-control is-invalid")
+                    var str='<span id=id_errors_'+ e +' class="text-danger">';
+                    
+                    for(var i in errors[e])
+                    {
+                        str +=errors[e][i] + '<br>';
+                    }
+
+                    str+='</span>';
+
+                    document.getElementById("div_id_" + e).insertAdjacentHTML('beforeend', str);
+                    document.getElementById("div_id_" + e).scrollIntoView();
                 }
-
-                str+='</span>';
-                $("#div_id_" + e).append(str); 
-
-                var elmnt = document.getElementById("div_id_" + e);
-                elmnt.scrollIntoView(); 
-
-            }
         }, 
     },
 

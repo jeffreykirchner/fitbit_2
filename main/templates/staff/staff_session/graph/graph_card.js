@@ -305,20 +305,24 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
      ctx.lineCap = "round";
      ctx.globalAlpha = 0.25;
  
+
      let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
      let previous_zone_minutes = 0;
  
-     for(let i=0;i<payments_list.length;i++)
-     {
-         let current_zone_minutes = Math.min(payments_list[i].parameter_set_zone_minutes.zone_minutes + 1, 
-                                             app.session.parameter_set.graph_y_max);
-         let y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
- 
-         
-         ctx.fillText(payments_list[i].parameter_set_zone_minutes.label + " min.", w/2 - marginY, y+4);
- 
-         previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
-     }
+    if (payments_list)
+    {
+        for(let i=0;i<payments_list.length;i++)
+        {
+            let current_zone_minutes = Math.min(payments_list[i].parameter_set_zone_minutes.zone_minutes + 1, 
+                                                app.session.parameter_set.graph_y_max);
+            let y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+    
+            
+            ctx.fillText(payments_list[i].parameter_set_zone_minutes.label + " min.", w/2 - marginY, y+4);
+    
+            previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
+        }
+    }
  
      ctx.restore();
  },
