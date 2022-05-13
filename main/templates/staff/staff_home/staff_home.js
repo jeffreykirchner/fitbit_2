@@ -74,16 +74,6 @@ var app = Vue.createApp({
             }
             
         },       
-
-        formatDate: function(value){
-            if (value) {        
-                //console.log(value);                    
-                return moment(String(value)).local().format('MM/DD/YYYY');
-            }
-            else{
-                return "date format error";
-            }
-        },
         
         {%include "staff/staff_home/sessions_card_full_admin.js"%}
         {%include "staff/staff_home/sessions_card.js"%}

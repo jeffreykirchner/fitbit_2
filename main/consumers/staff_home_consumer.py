@@ -13,6 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.db.models import Func, F, Value, CharField
 
 from main.consumers import SocketConsumerMixin
 
@@ -190,7 +191,8 @@ def get_session_list_json(usr):
 
     return list(Session.objects.filter(soft_delete=False) \
                                .filter(Q(id__in=session_list_1) | Q(id__in=session_list_2)) \
-                               .values('title', 'id', 'locked', 'start_date'))
+                               .values('title', 'id', 'locked', 'start_date') \
+                               .annotate(str_date=Func(F('start_date'), Value('FMMM/DD/YYYY'), function='to_char', output_field=CharField())))
 
 def get_session_list_admin_json(usr):
     '''
@@ -199,7 +201,8 @@ def get_session_list_admin_json(usr):
     if usr.is_superuser:
         return list(Session.objects.filter(soft_delete=False) \
                               .order_by('-start_date') \
-                              .values('title', 'id', 'locked', 'creator__last_name', 'creator__first_name', 'start_date'))
+                              .values('title', 'id', 'locked', 'creator__last_name', 'creator__first_name', 'start_date') \
+                              .annotate(str_date=Func(F('start_date'), Value('FMMM/DD/YYYY'), function='to_char', output_field=CharField())))
     else:
         return []
 
