@@ -83,7 +83,10 @@
             <br>
             <br>
             <br>
-            Please wait for the experiment to begin.
+            Please wait for the study to begin.
+            <div v-if="session.is_before_first_period">
+                The first day is [[session.start_date]].
+            </div>            
         </div>
     </div>
     
@@ -94,7 +97,7 @@
             <br>
             <br>
             <br>
-            The experiment is complete, thank you for your participation.
+            The study is complete, thank you for your participation.
         </div>
     </div>
     

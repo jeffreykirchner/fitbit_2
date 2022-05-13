@@ -735,6 +735,8 @@ class SessionPlayer(models.Model):
         minimal json object of model
         '''
 
+        todays_session_player_period = self.get_todays_session_player_period()
+
         return{
             "id" : self.id,      
             "name" : self.name,
@@ -751,6 +753,10 @@ class SessionPlayer(models.Model):
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
+
+            "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
+            "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
+            "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
         }
 
 

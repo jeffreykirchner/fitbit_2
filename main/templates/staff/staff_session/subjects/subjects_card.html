@@ -63,6 +63,15 @@
                                     Last Sync
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1">
+                                    Check In Today
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Zone Minutes Today
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
+                                    Wrist Time Today
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1">
                                     History
                                 </th> 
                                 <th scope="col" class = "text-center m-1 p-1" v-show="session.parameter_set.enable_chat">
@@ -119,6 +128,20 @@
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.fitbit_last_synced]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" >
+                                    <span v-if="p.checked_in_today" style="color: lightgreen;">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span v-else style="color: crimson;">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </td>
+                                <td class="player_table_cell text-nowrap" >
+                                    [[p.todays_zone_minutes]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" >
+                                    [[p.todays_wrist_minutes]]
                                 </td>
                                 <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index, p.id)">
                                     <i class="fas fa-history"></i>
