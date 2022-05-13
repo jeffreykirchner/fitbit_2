@@ -40,7 +40,7 @@
                         <a :href="'/staff-session/' + s.id + '/' "><span v-html="s.title"></span></a>                                        
                     </td>
                     <td class="text-center"> 
-                        [[formatDate(s.start_date)]]                             
+                        [[s.str_date]]                             
                     </td>
                     <td class="text-center">
                         {%if user.is_staff%}
