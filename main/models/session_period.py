@@ -42,7 +42,7 @@ class SessionPeriod(models.Model):
         return formatted day of week
         '''
 
-        return self.period_date.strftime("%#m/%#d/%Y")
+        return self.period_date.strftime("%-m/%#d/%Y")
     
     def get_formatted_day_of_week(self):
         '''

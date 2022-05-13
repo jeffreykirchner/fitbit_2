@@ -91,7 +91,7 @@ class Session(models.Model):
         '''
         get a formatted string of end date
         '''
-        return  self.end_date.strftime("%#m/%#d/%Y")
+        return  self.end_date.strftime("%-m/%#d/%Y")
 
     def start_experiment(self):
         '''
