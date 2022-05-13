@@ -93,7 +93,7 @@ class TestSubjectConsumer(TestCase):
 
         #start experiment
         d_today = todays_date().date()
-        r = take_update_session_form(session.id, {'formData': [{'name': 'title', 'value': '*** New Session ***'}, {'name': 'start_date', 'value': d_today}]})
+        r = take_update_session_form(session.id, {'formData': {'title': '*** New Session ***', 'start_date': d_today}})
         self.assertEqual(r["value"], "success")
         session = Session.objects.all().first()
 
@@ -171,7 +171,7 @@ class TestSubjectConsumer(TestCase):
 
         #start experiment
         d_today = todays_date().date()
-        r = take_update_session_form(session.id, {'formData': [{'name': 'title', 'value': '*** New Session ***'}, {'name': 'start_date', 'value': d_today}]})
+        r = take_update_session_form(session.id, {'formData': {'title': '*** New Session ***', 'start_date': d_today}})
         self.assertEqual(r["value"], "success")
         session = Session.objects.all().first()
 
@@ -259,7 +259,7 @@ class TestSubjectConsumer(TestCase):
         session_player_6 = self.session.session_players.get(player_number=6)
 
         d_today = (todays_date() - timedelta(days=15)).date()
-        r = take_update_session_form(session.id, {'formData': [{'name': 'title', 'value': '*** New Session ***'}, {'name': 'start_date', 'value': d_today}]})
+        r = take_update_session_form(session.id, {'formData': {'title': '*** New Session ***', 'start_date': d_today}})
         self.assertEqual(r["value"], "success")
         session = Session.objects.all().first()
 
@@ -408,7 +408,7 @@ class TestSubjectConsumer(TestCase):
         session_player_8 = self.session.session_players.get(player_number=8)
 
         d_today = (todays_date() - timedelta(days=57)).date()
-        r = take_update_session_form(session.id, {'formData': [{'name': 'title', 'value': '*** New Session ***'}, {'name': 'start_date', 'value': d_today}]})
+        r = take_update_session_form(session.id, {'formData': {'title': '*** New Session ***', 'start_date': d_today}})
         self.assertEqual(r["value"], "success")
         session = Session.objects.all().first()
 
