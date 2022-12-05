@@ -38,7 +38,7 @@ class SessionPlayerPeriod(models.Model):
     earnings_no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)                               #no pay fitbit percent
 
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
-    sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
+    #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
 
     check_in = models.BooleanField(verbose_name='Checked In', default=False)                     #true if player was able to check in this period
     check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)       #true if staff forces a check in
@@ -67,7 +67,7 @@ class SessionPlayerPeriod(models.Model):
     fitbit_minutes_heart_peak = models.IntegerField(default=0)                 #todays heart rate peak
 
     fitbit_heart_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's heart rate time series
-    fitbit_sleep_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's sleep time series
+    #fitbit_sleep_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)  #today's sleep time series
 
     fitbit_on_wrist_minutes = models.IntegerField(default=0)          #minutes fit bit was one wrist (sum of heart time series) 
     fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)   #minimum bmp a subject must have to register active zone minutes
@@ -368,7 +368,7 @@ class SessionPlayerPeriod(models.Model):
 
         data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
         data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
-        data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
+        #data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
         data["fitbit_heart_time_series"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
 
         r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
@@ -406,8 +406,8 @@ class SessionPlayerPeriod(models.Model):
                     self.fitbit_activities["activities"].append(i)           
 
             #sleep
-            self.fitbit_sleep_time_series = result["fitbit_sleep_time_series"]["result"]
-            self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
+            # self.fitbit_sleep_time_series = result["fitbit_sleep_time_series"]["result"]
+            # self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
 
             #store pull time           
             if save_pull_time:
@@ -481,7 +481,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.player_number,
                          self.session_player.group_number,
                          self.zone_minutes,
-                         self.sleep_minutes,
+                         #self.sleep_minutes,
                          self.fitbit_minutes_heart_peak,
                          self.fitbit_minutes_heart_cardio,
                          self.fitbit_minutes_heart_fat_burn,

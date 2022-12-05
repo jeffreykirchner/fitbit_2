@@ -81,6 +81,7 @@ class SessionPlayer(models.Model):
         self.fitbit_user_id = ""
         self.consent_form_required = False
         self.disabled = False        
+        self.fitbit_last_synced = None
 
         self.save()
     
