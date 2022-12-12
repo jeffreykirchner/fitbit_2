@@ -50,15 +50,13 @@
                                 <th scope="col" class = "text-center m-1 p-1">
                                     Active
                                 </th>  
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1" 
+                                    v-if="session.parameter_set.consent_form_required=='True'">
                                     Consent
                                 </th>                                              
                                 <th scope="col" class = "text-center m-1 p-1">
                                     Shareable<br>Login Link
                                 </th> 
-                                <th scope="col" class = "text-center m-1 p-1">
-                                    Connected
-                                </th>
                                 <th scope="col" class = "text-center m-1 p-1">
                                     Last Sync
                                 </th>
@@ -107,8 +105,10 @@
                                         <i class="fas fa-times"></i>
                                     </span>
                                 </td>  
-                                <td class="player_table_cell text-nowrap">
-                                    <span v-if="!p.consent_form_required" style="color: lightgreen;">
+                                <td class="player_table_cell text-nowrap" 
+                                    v-if="session.parameter_set.consent_form_required=='True'">
+                                    <span v-if="!p.consent_form_required" 
+                                          style="color: lightgreen;">
                                         <i class="fas fa-check"></i>
                                     </span>
                                     <span v-else style="color: crimson;">
@@ -117,15 +117,7 @@
                                 </td>                                                
                                 <td class="player_table_cell text-nowrap">
                                     <a v-bind:href="p.login_link">Login Link</a>
-                                </td>
-                                <td class="player_table_cell text-nowrap">
-                                    <span v-if="p.connected_count > 0" style="color: lightgreen;">
-                                        <i class="fas fa-check"></i>
-                                    </span>
-                                    <span v-else style="color: crimson;">
-                                        <i class="fas fa-times"></i>
-                                    </span>
-                                </td>
+                                </td>                                
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.fitbit_last_synced]]
                                 </td>
