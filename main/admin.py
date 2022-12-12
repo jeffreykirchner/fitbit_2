@@ -4,6 +4,7 @@ admin interface
 from django.contrib import admin
 from django.contrib import messages
 from django.conf import settings
+from django.utils.translation import ngettext
 
 from main.forms import ParametersForm
 from main.forms import SessionFormAdmin
@@ -22,11 +23,42 @@ from main.models import SessionPlayerPeriod
 
 from main.models import  HelpDocs
 
+from main.models import HelpDocSubjectSet
+from main.models import HelpDocSubject
+
 from main.models.instruction_set import InstructionSet
 from main.models.instruction import Instruction
 from main.models.session_period import SessionPeriod
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER
+
+class HelpDocSubectInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    model = HelpDocSubject
+    fields = ['title', 'text']
+
+@admin.register(HelpDocSubjectSet)
+class HelpDocSubjectSetAdmin(admin.ModelAdmin):
+
+   fields = ['label']
+   actions = ['setup']
+   inlines = [HelpDocSubectInline]
+
+   @admin.action(description='Initialize Help Docs')
+   def setup(self, request, queryset):
+        for v in queryset:
+            v.setup()
+        
+        self.message_user(request, ngettext(
+            '%d help doc set is initialized.',
+            '%d help doc sets are initialized.',
+            queryset.count(),
+        ) % queryset.count(), messages.SUCCESS)
 
 @admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
