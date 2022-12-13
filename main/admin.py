@@ -40,7 +40,7 @@ class HelpDocSubectInline(admin.TabularInline):
         return False
 
     model = HelpDocSubject
-    fields = ['title', 'text']
+    fields = ['text']
 
 @admin.register(HelpDocSubjectSet)
 class HelpDocSubjectSetAdmin(admin.ModelAdmin):
