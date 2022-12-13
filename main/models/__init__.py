@@ -3,7 +3,10 @@ build models
 '''
 from .parameters import Parameters
 
-from .help_docs import  HelpDocs
+from .help_docs import HelpDocs
+
+from .help_doc_subject_set import HelpDocSubjectSet
+from .help_doc_subject import HelpDocSubject
 
 from .instruction_set import InstructionSet
 from .instruction import Instruction

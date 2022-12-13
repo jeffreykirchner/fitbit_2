@@ -4,6 +4,7 @@ admin interface
 from django.contrib import admin
 from django.contrib import messages
 from django.conf import settings
+from django.utils.translation import ngettext
 
 from main.forms import ParametersForm
 from main.forms import SessionFormAdmin
@@ -22,11 +23,60 @@ from main.models import SessionPlayerPeriod
 
 from main.models import  HelpDocs
 
+from main.models import HelpDocSubjectSet
+from main.models import HelpDocSubject
+
 from main.models.instruction_set import InstructionSet
 from main.models.instruction import Instruction
 from main.models.session_period import SessionPeriod
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER
+
+class HelpDocSubectInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    model = HelpDocSubject
+    fields = ['text']
+
+@admin.register(HelpDocSubjectSet)
+class HelpDocSubjectSetAdmin(admin.ModelAdmin):
+
+    fields = ['label']
+    actions = ['setup','duplicate_set']
+    inlines = [HelpDocSubectInline]
+
+    @admin.action(description='Initialize Help Docs')
+    def setup(self, request, queryset):
+        for v in queryset:
+            v.setup()
+        
+        self.message_user(request, ngettext(
+            '%d help doc set is initialized.',
+            '%d help doc sets are initialized.',
+            queryset.count(),
+        ) % queryset.count(), messages.SUCCESS)
+    
+    @admin.action(description='Duplicate Set')
+    def duplicate_set(self, request, queryset):
+            '''
+            duplicate help doc set
+            '''
+            if queryset.count() != 1:
+                  self.message_user(request,"Select only one help doc set to copy.", messages.ERROR)
+                  return
+
+            base_help_doc_set = queryset.first()
+
+            help_doc_set = HelpDocSubjectSet()
+            help_doc_set.label = f"Copy of '{base_help_doc_set.label}'"
+            help_doc_set.save()
+            help_doc_set.copy_pages(base_help_doc_set.help_docs_subject)
+
+            self.message_user(request,f'{base_help_doc_set} has been duplicated', messages.SUCCESS)
 
 @admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
@@ -132,8 +182,6 @@ class SessionPlayerChatAdmin(admin.ModelAdmin):
       
     def has_delete_permission(self, request, obj=None):
         return False
-    
-    
     
     readonly_fields = []
 

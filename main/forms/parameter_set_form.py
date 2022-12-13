@@ -45,6 +45,10 @@ class ParameterSetForm(forms.ModelForm):
                                             empty_label=None,
                                             queryset=main.models.InstructionSet.objects.all(),
                                             widget=forms.Select(attrs={"v-model":"session.parameter_set.instruction_set.id"}))
+    
+    help_doc_subject_set = forms.ModelChoiceField(label='Subject Help Docs',                                            
+                                            queryset=main.models.HelpDocSubjectSet.objects.all(),
+                                            widget=forms.Select(attrs={"v-model":"session.parameter_set.help_doc_subject_set.id"}))
 
     test_mode = forms.ChoiceField(label='Test Mode',
                                        choices=((True, 'Yes'), (False,'No' )),
@@ -52,4 +56,5 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required', 'consent_form', 'show_instructions', 'instruction_set', 'test_mode']
+        fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required',
+                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set', 'test_mode']

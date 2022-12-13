@@ -478,10 +478,13 @@ class SessionPlayer(models.Model):
         '''
         return a processed help doc with help_doc_title
         '''
+        help_doc_subject = self.session.parameter_set.help_doc_subject_set.help_docs_subject.all().filter(title=help_doc_title)
 
-        help_doc_json = main.models.HelpDocs.objects.get(title=help_doc_title).json()
-
-        help_doc_json["text"] = self.process_help_doc(help_doc_json["text"])
+        if help_doc_subject:
+            help_doc_json = help_doc_subject.first().json()
+            help_doc_json["text"] = self.process_help_doc(help_doc_json["text"])
+        else:
+            help_doc_json = {"text" : "Not Found."}
 
         return help_doc_json
     
