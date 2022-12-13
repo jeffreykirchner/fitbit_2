@@ -45,12 +45,12 @@ class HelpDocSubectInline(admin.TabularInline):
 @admin.register(HelpDocSubjectSet)
 class HelpDocSubjectSetAdmin(admin.ModelAdmin):
 
-   fields = ['label']
-   actions = ['setup']
-   inlines = [HelpDocSubectInline]
+    fields = ['label']
+    actions = ['setup','duplicate_set']
+    inlines = [HelpDocSubectInline]
 
-   @admin.action(description='Initialize Help Docs')
-   def setup(self, request, queryset):
+    @admin.action(description='Initialize Help Docs')
+    def setup(self, request, queryset):
         for v in queryset:
             v.setup()
         
@@ -59,6 +59,24 @@ class HelpDocSubjectSetAdmin(admin.ModelAdmin):
             '%d help doc sets are initialized.',
             queryset.count(),
         ) % queryset.count(), messages.SUCCESS)
+    
+    @admin.action(description='Duplicate Set')
+    def duplicate_set(self, request, queryset):
+            '''
+            duplicate help doc set
+            '''
+            if queryset.count() != 1:
+                  self.message_user(request,"Select only one help doc set to copy.", messages.ERROR)
+                  return
+
+            base_help_doc_set = queryset.first()
+
+            help_doc_set = HelpDocSubjectSet()
+            help_doc_set.label = f"Copy of '{base_help_doc_set.label}'"
+            help_doc_set.save()
+            help_doc_set.copy_pages(base_help_doc_set.help_docs_subject)
+
+            self.message_user(request,f'{base_help_doc_set} has been duplicated', messages.SUCCESS)
 
 @admin.register(Parameters)
 class ParametersAdmin(admin.ModelAdmin):
@@ -164,8 +182,6 @@ class SessionPlayerChatAdmin(admin.ModelAdmin):
       
     def has_delete_permission(self, request, obj=None):
         return False
-    
-    
     
     readonly_fields = []
 

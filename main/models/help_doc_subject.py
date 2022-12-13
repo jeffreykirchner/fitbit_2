@@ -10,7 +10,7 @@ class HelpDocSubject(models.Model):
     '''
     help document
     '''
-    help_doc_subject_set = models.ForeignKey(HelpDocSubjectSet, on_delete=models.CASCADE, related_name="help_doc_subject")
+    help_doc_subject_set = models.ForeignKey(HelpDocSubjectSet, on_delete=models.CASCADE, related_name="help_docs_subject")
 
     title = models.CharField(verbose_name = 'Title', max_length = 300, default="")    
     text = HTMLField(verbose_name = 'Help Doc Text', max_length = 100000, default="")

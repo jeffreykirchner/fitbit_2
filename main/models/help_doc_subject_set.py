@@ -32,26 +32,32 @@ class HelpDocSubjectSet(models.Model):
             models.UniqueConstraint(fields=['label', ], name='unique_help_doc_subject_set'),
         ]
 
-    def copy_pages(self, i_set):
+    def copy_pages(self, hd_set):
         '''
         copy instruction pages
         '''
+
+        self.help_docs_subject.all().delete()
         
         #session player periods
-        instructions = []
+        help_docs_subject = []
 
-        for i in i_set.all():
-            instructions.append(main.models.Instruction(instruction_set=self, text_html=i.text_html, page_number=i.page_number))
+        for i in hd_set.all():
+            help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title=i.title, text=i.text))
         
-        main.models.Instruction.objects.bulk_create(instructions)
+        main.models.HelpDocSubject.objects.bulk_create(help_docs_subject)
     
     def setup(self):
 
-        self.help_doc_subject.all().delete()
+        self.help_docs_subject.all().delete()
 
-        main.models.HelpDocSubject.objects.create(help_doc_subject_set=self, title="Graph Help", text="Help text here.")
-        main.models.HelpDocSubject.objects.create(help_doc_subject_set=self, title="Checkin Help", text="Help text here.")
-        main.models.HelpDocSubject.objects.create(help_doc_subject_set=self, title="Chat Help", text="Help text here.")
+        help_docs_subject = []
+
+        help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Graph Help", text="Help text here."))
+        help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Checkin Help", text="Help text here."))
+        help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Chat Help", text="Help text here."))
+
+        main.models.HelpDocSubject.objects.bulk_create(help_docs_subject)
         
     #return json object of class
     def json(self):
@@ -63,7 +69,7 @@ class HelpDocSubjectSet(models.Model):
             "id" : self.id,         
 
             "label" : self.label,
-            "instructions" : [i.json() for i in self.instructions.all()],
+            "help_docs_subject" : [i.json() for i in self.help_docs_subject.all()],
         }
     
     #return json object of class
@@ -73,7 +79,7 @@ class HelpDocSubjectSet(models.Model):
         '''
 
         return{
-            "id" : self.id,         
+            "id" : self.id,        
 
             "label" : self.label,
         }

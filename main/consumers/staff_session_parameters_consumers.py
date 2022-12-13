@@ -288,6 +288,7 @@ def take_update_parameterset(data):
             
     form_data_dict = form_data
     form_data_dict["instruction_set"] = form_data_dict["instruction_set"]["id"]
+    form_data_dict["help_doc_subject_set"] = form_data_dict["help_doc_subject_set"]["id"]
 
     # for field in form_data:            
     #     form_data_dict[field["name"]] = field["value"]

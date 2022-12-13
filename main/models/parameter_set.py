@@ -11,6 +11,7 @@ from django.db.utils import IntegrityError
 from main.globals import get_random_hex_color
 
 from main.models import InstructionSet
+from main.models import HelpDocSubjectSet
 
 import main
 
@@ -20,6 +21,7 @@ class ParameterSet(models.Model):
     parameter set
     '''    
     instruction_set = models.ForeignKey(InstructionSet, on_delete=models.CASCADE, related_name="parameter_sets")
+    help_doc_subject_set = models.ForeignKey(HelpDocSubjectSet, on_delete=models.CASCADE, related_name="parameter_sets_b", null=True)
     
     enable_chat = models.BooleanField(default=False, verbose_name = 'Enable Chat')                           #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
@@ -59,6 +61,11 @@ class ParameterSet(models.Model):
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = new_ps.get("consent_form_required")
+
+            self.instruction_set = InstructionSet.objects.get(label=new_ps.get("instruction_set")["label"])
+
+            if new_ps.get("help_doc_subject_set", None):
+                self.help_doc_subject_set = HelpDocSubjectSet.objects.get(label=new_ps.get("help_doc_subject_set")["label"])
 
             self.save()
 
@@ -202,6 +209,8 @@ class ParameterSet(models.Model):
 
             "consent_form" : self.consent_form,
             "consent_form_required" : "True" if self.consent_form_required else "False",
+
+            "help_doc_subject_set" : self.help_doc_subject_set.json() if self.help_doc_subject_set else {"id":None},
 
             "test_mode" : "True" if self.test_mode else "False",
         }

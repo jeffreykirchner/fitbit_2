@@ -51,23 +51,7 @@ class SubjectHomeView(View):
 
         # sprite_sheet_css = generate_css_sprite_sheet('main/static/avatars.json', static('avatars.png'))
 
-        parameters = Parameters.objects.first()
-
-        subject_graph_help_doc = "Subject graph help fixed"
-        subject_check_in_help_doc = "Subject check in help fixed"
-        
-        if session_player_period_today:
-            if session_player_period_today.session_period.parameter_set_period.period_type == "Group Pay":
-                subject_graph_help_doc = "Subject graph help group"
-                subject_check_in_help_doc = "Subject check in help group"
-            elif session_player_period_today.session_period.parameter_set_period.period_type == "No Pay":
-                subject_graph_help_doc = "Subject graph help no pay"
-                subject_check_in_help_doc = "Subject check in help no pay"
-            elif session_player_period_today.session_period.parameter_set_period.period_type == "Individual Pay":
-                subject_graph_help_doc = "Subject graph help individual pay"
-                subject_check_in_help_doc = "Subject check in help individual pay"
-
-        
+        parameters = Parameters.objects.first()        
 
         return render(request=request,
                       template_name=self.template_name,
@@ -83,9 +67,7 @@ class SubjectHomeView(View):
                                "session_player" : session_player,
                                "session_player_json" : {},
                                "session" : session,
-                               "parameters" : parameters,
-                               "subject_graph_help_doc" : subject_graph_help_doc,   
-                               "subject_check_in_help_doc" : subject_check_in_help_doc,                            
+                               "parameters" : parameters,                        
                                "fitbit_registration_link" : get_registration_link(session_player.player_key),
                                "session_json":{}
                                })
