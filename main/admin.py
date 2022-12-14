@@ -32,6 +32,10 @@ from main.models.session_period import SessionPeriod
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 
+@admin.register(HelpDocSubject)
+class HelpDocSubjectAdmin(admin.ModelAdmin):
+    fields = ['title','text']
+
 class HelpDocSubectInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
         return False
