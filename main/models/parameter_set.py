@@ -64,7 +64,7 @@ class ParameterSet(models.Model):
 
             self.instruction_set = InstructionSet.objects.get(label=new_ps.get("instruction_set")["label"])
 
-            if new_ps.get("help_doc_subject_set", None):
+            if new_ps.get("help_doc_subject_set")["id"]:
                 self.help_doc_subject_set = HelpDocSubjectSet.objects.get(label=new_ps.get("help_doc_subject_set")["label"])
 
             self.save()
@@ -130,8 +130,6 @@ class ParameterSet(models.Model):
             parameter_set_player = main.models.ParameterSetPlayer()
             parameter_set_player.parameter_set = self
             parameter_set_player.save()
-        
-        pass
 
     def add_new_player(self):
         '''
