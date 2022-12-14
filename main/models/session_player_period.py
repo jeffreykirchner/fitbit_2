@@ -447,10 +447,8 @@ class SessionPlayerPeriod(models.Model):
 
         #https://chapmanu.co1.qualtrics.com/jfe/form/SV_9BJPiWNYT9hZ6tM?student_id=[student%20id]&session_id=10786&first_name=[first%20name]&last_name=[last%20name]&email=[email]&recruiter_id=[recruiter%20id]
         link_string = f'{self.session_period.parameter_set_period.survey_link}?'
-        link_string += f'student_id={self.session_player.student_id}&'
         link_string += f'session_id={self.session_player.session.id}&'
-        link_string += f'name={self.session_player.name}&'
-        link_string += f'subject_id={self.session_player.student_id}&'
+        link_string += f'player_id={self.session_player.player_number}&'
         link_string += f'period={self.session_period.period_number}&'
         link_string += f'activity_key={self.activity_key}&'
         link_string += f'session_name={self.session_period.session.title}&'
