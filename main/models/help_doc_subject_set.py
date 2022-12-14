@@ -63,7 +63,7 @@ class HelpDocSubjectSet(models.Model):
         help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Subject graph help individual pay", text="Graph help text here: individual pay"))
         help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Subject graph help no pay", text="Graph help text here: no pay"))
 
-        help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Subject chat Help", text="Chat help text here."))
+        help_docs_subject.append(main.models.HelpDocSubject(help_doc_subject_set=self, title="Subject chat help", text="Chat help text here."))
 
         main.models.HelpDocSubject.objects.bulk_create(help_docs_subject)
         
