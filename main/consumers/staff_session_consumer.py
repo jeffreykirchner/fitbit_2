@@ -332,6 +332,19 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         message["messageData"] = message_data
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def pull_time_series_data(self, event):
+        '''
+        pull timeseries data for session
+        '''
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_pull_time_series_data)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -491,12 +504,12 @@ def take_get_session(session_key):
     session = None
     logger = logging.getLogger(__name__)
 
-    # try:        
-    session = Session.objects.get(session_key=session_key)
-    return session.json()
-    # except ObjectDoesNotExist:
-    #     logger.warning(f"staff get_session session, not found: {session_key}")
-    #     return {}
+    try:        
+        session = Session.objects.get(session_key=session_key)
+        return session.json()
+    except ObjectDoesNotExist:
+        logger.warning(f"staff get_session session, not found: {session_key}")
+        return {}
 
 def take_update_session_form(session_id, data):
     '''
@@ -899,5 +912,24 @@ def take_load_full_subject(session_id, data):
     
     return {"value" : "success",
             "session_player" : session_player.json_for_staff(),}
+
+def take_pull_time_series_data(session_id, data):
+    '''
+    force a check in for a subject on a given day
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_pull_time_series_data: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_pull_time_series_data session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    for i in session.session_players.all():
+        i.pull_secondary_time_series()
+
+    return {"value" : "success",}
 
 

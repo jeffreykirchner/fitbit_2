@@ -30,6 +30,7 @@ var app = Vue.createApp({
                     data_downloading : false,                   //show spinner when data downloading
                     payments_downloading : false,               //show spinner when payments downloading
                     payments_copied : false,                    //show after payments copied to clipboard
+                    time_series_pulled : false,                 //show after time series data pulled
 
                     staffEditNameEtcForm : {name : "", student_id : "", email : "", id : -1},
                     sendMessageModalForm : {subject : "", text : ""},
@@ -159,6 +160,9 @@ var app = Vue.createApp({
                     break;
                 case "load_full_subject":
                     app.takeLoadFullSubject(messageData);
+                    break;
+                case "pull_time_series_data":
+                    app.takesPullTimeSeriesData(messageData);
                     break;
             }
 

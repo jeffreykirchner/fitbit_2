@@ -357,14 +357,14 @@ class SessionPlayerPeriod(models.Model):
 
         data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
 
-        if not settings.DEBUG:
-            data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
-            data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
+        # if not settings.DEBUG:
+        #     data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
+        #     data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
 
-            data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
-            data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
-            data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
-            data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
+        #     data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
+        #     data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
+        #     data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
+        #     data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
 
         data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
         data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
@@ -382,14 +382,14 @@ class SessionPlayerPeriod(models.Model):
         try:       
             self.session_player.process_fitbit_last_synced(result["devices"]["result"])
 
-            if not settings.DEBUG:
-                self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
-                self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
+            # if not settings.DEBUG:
+            #     self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
+            #     self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
 
-                self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
-                self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
-                self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
-                self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
+            #     self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
+            #     self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
+            #     self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
+            #     self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
@@ -495,6 +495,12 @@ class SessionPlayerPeriod(models.Model):
                          self.get_earning(),
                          self.earnings_no_pay_percent,
                          self.get_last_login_str(),
+                         self.fitbit_calories,
+                         self.fitbit_steps,
+                         self.fitbit_minutes_sedentary,
+                         self.fitbit_minutes_lightly_active,
+                         self.fitbit_minutes_fairly_active,
+                         self.fitbit_minutes_very_active,
                          ])
     
     def write_heart_rate_download_csv(self, writer):

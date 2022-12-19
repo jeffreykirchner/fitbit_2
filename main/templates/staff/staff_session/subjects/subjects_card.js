@@ -181,7 +181,7 @@ hideSendEmailList(){
     }
 },
 
-/** send session update form   
+/** send subject update form   
 */
 sendUpdateSubject(){
     this.cancelModal = false;
@@ -369,4 +369,29 @@ takeUpdateConsentForm(messageData){
     {
         
     } 
+},
+
+/** send request to pull time series data
+*/
+senddPullTimeSeriesData(){
+
+    app.working = true;
+    app.time_series_pulled = false;
+    app.sendMessage("pull_time_series_data",
+                   {});
+},
+
+/**
+ * take result of senddPullTimeSeriesData
+ */
+takesPullTimeSeriesData(messageData)
+{
+    if(messageData.status.value == "success")
+    { 
+        app.time_series_pulled = true;
+    }
+    else
+    {
+
+    }
 },

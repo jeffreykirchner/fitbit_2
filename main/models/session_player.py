@@ -295,6 +295,56 @@ class SessionPlayer(models.Model):
                 
         return {"status" : "success", "message" : ""}
     
+    def pull_secondary_time_series(self):
+        '''
+        '''
+        logger = logging.getLogger(__name__)
+        
+        first_period_date = self.session.session_periods.first().period_date.strftime("%Y-%m-%d")
+        last_period_date = self.session.session_periods.last().period_date.strftime("%Y-%m-%d")
+
+        data = {}
+
+        data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{first_period_date}/{last_period_date}.json'
+
+        data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{first_period_date}/{last_period_date}.json'
+
+        r = get_fitbit_metrics(self.fitbit_user_id, data)
+
+        if r['status'] == 'fail':
+            logger.error(f'pull_secondary_time_series error: {r["message"]}')            
+            return {"status" : r['status'], "message" : r["message"]}
+        
+        result = r['result']
+        
+        session_player_periods = []
+        for index, p in enumerate(self.session_player_periods_b.all()):
+            p.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][index]["value"]
+            p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
+
+            p.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][index]["value"]
+            p.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][index]["value"]
+            p.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][index]["value"]
+            p.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][index]["value"]        
+
+            session_player_periods.append(p)
+        
+        main.models.SessionPlayerPeriod.objects.bulk_update(session_player_periods, ['fitbit_steps', 
+                                                                                     'fitbit_calories', 
+                                                                                     'fitbit_minutes_sedentary', 
+                                                                                     'fitbit_minutes_lightly_active',
+                                                                                     'fitbit_minutes_fairly_active',
+                                                                                     'fitbit_minutes_very_active'])
+
+       
+        
+
+        return {"status" : "success"}
+
     def pull_fitbit_last_synced(self):
         '''
         pull the last time a fitbit has been synced

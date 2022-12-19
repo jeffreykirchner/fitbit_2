@@ -18,7 +18,21 @@
         </span>
 
         <span class="float-end d-none d-sm-block me-4">
-            <button type="button" class="btn btn-outline-primary" title="Upload Email List" v-on:click="showSendEmailList()" v-show="session.started">
+            <button type="button" 
+                    class="btn btn-outline-primary me-2" 
+                    title="Pull Time Series Data" 
+                    v-on:click="senddPullTimeSeriesData()" 
+                    v-bind:disabled="working"
+                    v-show="session.started">
+                Pull Time Series Data <span v-if="time_series_pulled"><i class="fas fa-check"></i></span>
+            </button>
+
+            <button type="button" 
+                    class="btn btn-outline-primary" 
+                    title="Upload Email List" 
+                    v-on:click="showSendEmailList()" 
+                    v-bind:disabled="working"
+                    v-show="session.started">
                 Upload Player List
             </button>
         </span>        
