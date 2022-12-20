@@ -262,13 +262,35 @@ class SessionPlayer(models.Model):
         '''
         logger = logging.getLogger(__name__) 
         data = {}
+        session_player_periods_bp = []
 
         todays_session_player_period = self.get_todays_session_player_period()   
         yesterdays_session_player_period = self.get_yesterdays_session_player_period()     
 
         #if during session
         if todays_session_player_period:
-            r = todays_session_player_period.pull_secondary_metrics(True)
+
+            temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
+
+            data["devices"] = 'https://api.fitbit.com/1/user/-/devices.json'
+            data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
+
+            data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+            data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d.json'
+
+
+            session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
+                                                                     .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
+                                                                     .order_by("-session_period__period_number")[:5]
+            
+            for p in session_player_periods_bp:
+                temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
+
+                data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+                data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d.json'
+
+            r = get_fitbit_metrics(self.fitbit_user_id, data)
+
         else:
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
@@ -276,27 +298,48 @@ class SessionPlayer(models.Model):
                 self.process_fitbit_last_synced(r["result"]["devices"]["result"])
 
         if r["status"] == "fail" :
-            return r
+            return {"status" : r['status'], "message" : r["message"]}
                     
+        result = r["result"]
+        if todays_session_player_period:
+            todays_session_player_period.pull_secondary_metrics(save_pull_time=True,
+                                                                result={"devices" : result["devices"],
+                                                                        "fitbit_profile" : result["fitbit_profile"],
+                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
+                                                                        "fitbit_activities" : result["fitbit_activities_td"]})
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
+
+        for p in session_player_periods_bp:
+            p.back_pull=True
+
+            p.pull_secondary_metrics(save_pull_time=False,
+                                     result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
+                                             "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+            p.save()
+
+            if p.check_in:
+                p.take_check_in(False)
+
+           
         
         #do back pull if needed
-        if yesterdays_session_player_period:
-            if not yesterdays_session_player_period.back_pull:
-                yesterdays_session_player_period.back_pull=True
-                yesterdays_session_player_period.save()
+        # if yesterdays_session_player_period:
+        #     if not yesterdays_session_player_period.back_pull:
+        #         yesterdays_session_player_period.back_pull=True
+        #         yesterdays_session_player_period.save()
 
-            if yesterdays_session_player_period.check_in:
-                yesterdays_session_player_period.take_check_in(False)
-            else:
-                yesterdays_session_player_period.pull_secondary_metrics(False)
+        #     if yesterdays_session_player_period.check_in:
+        #         yesterdays_session_player_period.take_check_in(False)
+        #     else:
+        #         yesterdays_session_player_period.pull_secondary_metrics(False)
                 
         return {"status" : "success", "message" : ""}
     
     def pull_secondary_time_series(self):
         '''
+        pull activity data at end of experiment
         '''
         logger = logging.getLogger(__name__)
         
