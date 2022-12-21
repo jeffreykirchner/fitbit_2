@@ -256,7 +256,7 @@ class SessionPlayer(models.Model):
 
         return self.session_player_periods_b.filter(session_period__period_number=current_session_period.period_number-1).first()
     
-    def pull_todays_metrics(self):
+    def pull_todays_metrics(self, todays_session_player_period=None):
         '''
         pull needed metrics from yesterday and today
         '''
@@ -264,8 +264,8 @@ class SessionPlayer(models.Model):
         data = {}
         session_player_periods_bp = []
 
-        todays_session_player_period = self.get_todays_session_player_period()   
-        yesterdays_session_player_period = self.get_yesterdays_session_player_period()     
+        if not todays_session_player_period:
+            todays_session_player_period = self.get_todays_session_player_period()    
 
         #if during session
         if todays_session_player_period:

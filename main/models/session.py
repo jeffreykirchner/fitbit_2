@@ -367,13 +367,14 @@ class Session(models.Model):
 
             if not p.back_pull:
 
+                self.pull_todays_metrics(p)
+
                 p.back_pull=True
                 p.save()
 
                 if p.check_in:
                     p.take_check_in(False)
-                else:
-                    p.pull_secondary_metrics(False)
+
 
     def get_group_channel_list(self, group_number):
         '''
