@@ -363,14 +363,13 @@ class Session(models.Model):
         
         for i in self.session_players.exclude(disabled=True):
 
-            p = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number).last()
+            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number, back_pull=False)
 
-            if not p.back_pull:
+            if pull_list:
 
-                self.pull_todays_metrics(p)
+                p = pull_list.last()
 
-                p.back_pull=True
-                p.save()
+                i.pull_todays_metrics(p)
 
                 if p.check_in:
                     p.take_check_in(False)
