@@ -95,8 +95,8 @@ class SessionPlayerPeriod(models.Model):
         '''
         fill with test data
         '''
-
-        self.zone_minutes = random.randrange(0, 90)
+        
+        self.zone_minutes = random.randrange(0, self.session_player.session.parameter_set.graph_y_max+10)
 
         self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
         self.fitbit_heart_time_series = {"message":"filled with test data"}
