@@ -15,12 +15,12 @@ var app = Vue.createApp({
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
                     session : null, //{{session_json|safe}}                  
-                    valuecost_modal_label:'Edit Value or Cost',
 
                     current_parameter_set_player : {},  //{{first_parameter_set_player_json|safe}}
                     current_parameter_set_period : {}, //{{first_parameter_set_period_json|safe}}
                     current_parameter_set_period_payment : {},  //{{first_parameter_set_period_payment_json|safe}}
                     current_parameter_set_zone_minutes : {},  //{{first_parameter_set_zone_minutes_json|safe}}               
+                    current_parameter_set : {instruction_set : {id:0}, help_doc_subject_set : {id:0}},
 
                     parameterset_form_ids: {{parameterset_form_ids|safe}},
                     parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
@@ -104,7 +104,10 @@ var app = Vue.createApp({
                     break;   
                 case "update_parameterset_zone_minutes":
                     app.takeUpdateZoneMinutes(messageData);
-                    break;     
+                    break;    
+                case "add_parameterset_pay_block":
+                    app.takeAddParameterSetPayBlock(messageData);
+                    break; 
                 case "import_parameters":
                     app.takeImportParameters(messageData);
                     break;
@@ -164,13 +167,8 @@ var app = Vue.createApp({
             app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false})            
             app.editParametersetZoneMinutesModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetZoneMinutesModal'), {keyboard: false})
             app.editParametersetPeriodPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodPaymentModal'), {keyboard: false})
-            
-            document.getElementById('editParametersetModal').addEventListener('hidden.bs.modal', app.hideEditParameterset);
-            document.getElementById('importParametersModal').addEventListener('hidden.bs.modal', app.hideImportParameters);
-            document.getElementById('editParametersetPlayerModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPlayer);
-            document.getElementById('editParametersetPeriodModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriod);
-            document.getElementById('editParametersetZoneMinutesModal').addEventListener('hidden.bs.modal', app.hideEditParametersetZoneMinutes);
-            document.getElementById('editParametersetPeriodPaymentModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriodPayment);
+            app.editParametersetPayBlockPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockPaymentModal'), {keyboard: false})
+            app.editParametersetPayBlockModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockModal'), {keyboard: false})
         },
 
         /** send winsock request to get session info
@@ -207,6 +205,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session_parameters/players/players.js"%}
         {%include "staff/staff_session_parameters/periods/periods.js"%}
         {%include "staff/staff_session_parameters/zone_minutes/zone_minutes.js"%}
+        {%include "staff/staff_session_parameters/pay_blocks/pay_blocks.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages

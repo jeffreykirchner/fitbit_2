@@ -54,6 +54,8 @@
 {%include "staff/staff_session_parameters/zone_minutes/edit_parameterset_zone_minutes_modal.html"%}
 {%include "staff/staff_session_parameters/control/upload_parameters_modal.html"%}
 {%include "staff/staff_session_parameters/control/import_parameters_modal.html"%}
+{%include "staff/staff_session_parameters/pay_blocks/edit_parameterset_pay_block_modal.html"%}
+{%include "staff/staff_session_parameters/pay_blocks/edit_parameterset_pay_block_payment_modal.html"%}
 {%include "help_modal.html"%}
 </div>
 {%include "staff/staff_session_parameters/periods/edit_parameterset_periods_modal.html"%}
@@ -72,6 +74,12 @@
     <div class="col-lg">
         {%include "staff/staff_session_parameters/control/control_card.html"%}  
     </div>        
+</div>
+
+<div class="row justify-content-lg-center mb-4" v-cloak v-if="session">
+    <div class="col-lg">
+        {%include "staff/staff_session_parameters/pay_blocks/pay_blocks_card.html"%}
+    </div>
 </div>
 
 <div class="row justify-content-lg-center" v-cloak v-if="session">

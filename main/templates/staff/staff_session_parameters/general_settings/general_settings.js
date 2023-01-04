@@ -4,37 +4,19 @@
  */
 showEditParameterset:function(){
     app.clearMainFormErrors();
-    app.cancelModal=true;
-    app.paramtersetBeforeEdit = Object.assign({}, app.session.parameter_set);
+
+    app.current_parameter_set = Object.assign({}, app.session.parameter_set);
 
     app.editParametersetModal.toggle();
-},
-
-/** hide edit session modal
-*/
-hideEditParameterset:function(){
-    if(app.cancelModal)
-    {
-        Object.assign(app.session.parameter_set, app.paramtersetBeforeEdit);
-        app.paramtersetBeforeEdit=null;
-    }
 },
 
 /** update parameterset settings
 */
 sendUpdateParameterset(){
-
-    formData = {}
-
-    for(i=0;i<app.parameterset_form_ids.length;i++)
-    {
-        v=app.parameterset_form_ids[i];
-        formData[v]=app.session.parameter_set[v];
-    }
     
     app.working = true;
     app.sendMessage("update_parameterset", {"sessionID" : app.sessionID,
-                                            "formData" : formData,});
+                                            "formData" : app.current_parameter_set,});
 },
 
 /** handle result of updating parameter set

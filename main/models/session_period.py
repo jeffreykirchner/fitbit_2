@@ -24,7 +24,7 @@ class SessionPeriod(models.Model):
     period_date = models.DateField(default=now)                  #date of period
 
     timestamp = models.DateTimeField(auto_now_add= True)
-    updated= models.DateTimeField(auto_now= True)
+    updated = models.DateTimeField(auto_now= True)
 
     def __str__(self):
         return f"Session {self.session.title}, Periods {self.period_number}, Date {self.period_date}"

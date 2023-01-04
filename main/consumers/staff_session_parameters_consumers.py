@@ -254,6 +254,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # logger = logging.getLogger(__name__) 
         # logger.info("Connection update")
 
+    async def add_parameterset_pay_block(self, event):
+        '''
+        add a parameterset period
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_add_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "add_parameterset_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
 def get_session(id_):
     '''
     return session with specified id
@@ -300,6 +315,7 @@ def take_update_parameterset(data):
         form.save()    
 
         session.auto_assign_groups()
+        session.parameter_set.update_json_local()
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -314,29 +330,24 @@ def take_update_parameterset_player(data):
     logger.info(f"Update parameterset player: {data}")
 
     session_id = data["sessionID"]
-    paramterset_player_id = data["paramterset_player_id"]
     form_data = data["formData"]
 
     session = Session.objects.get(id=session_id)
 
     try:        
-        parameter_set_player = ParameterSetPlayer.objects.get(id=paramterset_player_id)
+        parameter_set_player = ParameterSetPlayer.objects.get(id=form_data["id"])
     except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_type paramterset_player, not found ID: {paramterset_player_id}")
+        logger.warning(f"take_update_parameterset_type paramterset_player, not found ID: {form_data['id']}")
         return
     
     form_data_dict = form_data
 
-    # for field in form_data:            
-    #     form_data_dict[field["name"]] = field["value"]
-
-    logger.info(f'form_data_dict : {form_data_dict}')
-
     form = ParameterSetPlayerForm(form_data_dict, instance=parameter_set_player)
 
     if form.is_valid():
-        #print("valid form")             
-        form.save()              
+                 
+        form.save()
+        session.parameter_set.update_json_fk(update_players=True)             
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -361,6 +372,7 @@ def take_remove_parameterset_player(data):
                 session.parameter_set.parameter_set_players.last().delete()
 
         session.update_player_count()
+        session.parameter_set.update_json_fk(update_players=True)
     except ObjectDoesNotExist:
         logger.warning(f"take_remove_parameterset_player paramterset_player, not found")
         return
@@ -388,6 +400,7 @@ def take_add_parameterset_player(data):
 
     session.update_player_count()
     session.auto_assign_groups()
+    session.parameter_set.update_json_fk(update_players=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
@@ -415,6 +428,7 @@ def take_add_parameterset_period(data):
             session.parameter_set.parameter_set_periods.last().delete()
     
     session.update_end_date()
+    session.parameter_set.update_json_fk(update_periods=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
@@ -441,7 +455,9 @@ def take_update_parameterset_period(data):
         #print("valid form")             
         form.save()              
 
+       
         session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_periods=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -470,6 +486,7 @@ def take_update_parameterset_period_copy_forward(data):
     for p in parameter_set_period_list:
         p.copy_forward(parameter_set_period)
    
+    session.parameter_set.update_json_fk(update_periods=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
 
@@ -497,6 +514,8 @@ def take_update_parameterset_period_copy_previous(data):
     else:
          logger.warning(f"update_parameterset_period_copy_previous paramterset_period, no prevous period ID: {data['id']}")
    
+    session.parameter_set.update_json_fk(update_periods=True)
+
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
 def take_update_parameterset_period_payment(data):
@@ -523,6 +542,7 @@ def take_update_parameterset_period_payment(data):
         form.save()              
 
         session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_periods=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -549,6 +569,29 @@ def take_add_parameterset_zone_minutes(data):
         session.parameter_set.add_new_zone_minutes()
     elif session.parameter_set.parameter_set_zone_minutes.count()>1:
         session.parameter_set.parameter_set_zone_minutes.first().delete()
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
+
+def take_add_parameterset_pay_block(data):
+    '''
+    add a new parameter set pay block
+    '''
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Add parameterset pay block: {data}")
+
+    session_id = data["sessionID"]
+    value = data["value"]
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_add_parameterset_pay_block session, not found ID: {session_id}")
+        return
+
+    if value == 1:
+        session.parameter_set.add_new_pay_block()
+    elif session.parameter_set.parameter_set_pay_blocks_a.count() > 1:
+        session.parameter_set.parameter_set_pay_blocks_a.last().delete()
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 

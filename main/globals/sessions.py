@@ -23,3 +23,12 @@ class PeriodType(models.TextChoices):
     FIXED_PAY = 'Fixed Pay', _('Fixed Pay')
     INDIVIDUAL_PAY = 'Individual Pay', _('Individual Pay')
     GROUP_PAY = 'Group Pay', _('Group Pay')
+
+class PayBlockType(models.TextChoices):
+    '''
+    pay block types
+    '''
+    NO_PAY = 'No Pay', _('No Pay')
+    AVERAGE = 'Average', _('Average')
+    TOTAL = 'Total', _('Total')
+

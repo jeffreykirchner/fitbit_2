@@ -19,7 +19,7 @@ class ParameterSetZoneMinutes(models.Model):
     label = models.CharField(verbose_name='Label Shown', max_length = 20, default="min to min")    #label shown on display
 
     timestamp = models.DateTimeField(auto_now_add= True)
-    updated= models.DateTimeField(auto_now= True)
+    updated = models.DateTimeField(auto_now= True)
 
     def __str__(self):
         return str(self.id)

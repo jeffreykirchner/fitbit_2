@@ -1,5 +1,5 @@
 '''
-parameterset player edit form
+parameterset period payment form
 '''
 
 from django import forms

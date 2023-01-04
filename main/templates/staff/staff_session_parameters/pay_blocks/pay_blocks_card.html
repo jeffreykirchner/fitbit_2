@@ -1,0 +1,96 @@
+<div class="card" v-show="first_load_done">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+           Pay Blocks ([[Object.keys(session.parameter_set.parameter_set_pay_blocks).length]])
+        </span>  
+        
+        <span class="float-end">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Parameters Pay Blocks')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>
+    </div>
+    <div class="card-body">        
+        <div class="row justify-content-center">
+            <!-- player settings -->
+            <div class="col-md-auto text-center">                
+                <div class="table-responsive">
+                    <table class="table table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th scope="col" class = "text-nowrap">
+                                    Block Number
+                                </th> 
+                                <th scope="col" class = "text-nowrap">
+                                    Type
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Payments
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Copy
+                                </th>                       
+                            </tr>
+                        </thead>
+                        <tbody id="period_list">
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_pay_blocks" v-bind:key="p.id">
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[p.pay_block_number]]
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                    [[p.pay_block_type]]
+                                </td>
+                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                   
+                                </td>
+                               
+                                <td class="text-nowrap">
+                                    <button class="btn btn-outline-primary btn-sm me-2"
+                                            type="button"
+                                            title="Copy period down"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyForward(p.id)">
+                                            <i class="fas fa-angle-double-down"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            type="button"
+                                            v-show="index>0"
+                                            title="Copy previous period"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyPrevious(p.id)">
+                                            <i class="fas fa-clone"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        
+                    </table>                    
+                </div>
+            </div>
+        </div>  
+
+        <div class="row justify-content-center mt-3">
+            <div class="col-md-auto text-center">
+
+                    <button class="btn btn-outline-success me-2"
+                            type="button"
+                            title="Add period"
+                            v-bind:disabled="session.started || reconnecting || working"
+                            v-on:click="sendAddParameterSetPayBlock(1)">
+                        Add <i class="fas fa-plus"></i>
+                    </button>
+
+                    <button class="btn btn-outline-danger"
+                            type="button"
+                            title="Remove period"
+                            v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
+                            v-on:click="sendAddParameterSetPayBlock(-1)">
+                        Delete <i class="fas fa-minus"></i>
+                    </button>
+        
+            </div>
+        </div>
+        
+    </div>                    
+</div> 

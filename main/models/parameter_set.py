@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.db.utils import IntegrityError
+from django.core.serializers.json import DjangoJSONEncoder
 
 from main.globals import get_random_hex_color
 
@@ -34,8 +35,10 @@ class ParameterSet(models.Model):
     consent_form = models.CharField(verbose_name='Consent Form File Name', max_length = 100, default="file_name.pdf")    #consent for file name
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
+    json_for_session = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set 
+
     timestamp = models.DateTimeField(auto_now_add= True)
-    updated= models.DateTimeField(auto_now= True)
+    updated = models.DateTimeField(auto_now= True)
 
     def __str__(self):
         return str(self.id)
@@ -88,17 +91,29 @@ class ParameterSet(models.Model):
             self.parameter_set_zone_minutes.all().delete()
 
             for i in range(len(new_parameter_set_zone_minutes)):
-                    self.add_new_zone_minutes()
+                self.add_new_zone_minutes()
 
             for index, p in enumerate(self.parameter_set_zone_minutes.all()):                
                 p.from_dict(new_parameter_set_zone_minutes[index])
+
+            #pay blocks
+            new_parameter_set_pay_blocks = new_ps.get("parameter_set_pay_blocks", None)
+
+            self.parameter_set_pay_blocks_a.all().delete()
+
+            if new_parameter_set_pay_blocks:
+                for i in range(len(new_parameter_set_pay_blocks)):
+                    self.add_new_pay_block()
+
+                for index, p in enumerate(self.parameter_set_pay_blocks_a.all()):                
+                    p.from_dict(new_parameter_set_pay_blocks[index])
 
             #periods
             new_parameter_set_periods = new_ps.get("parameter_set_periods")
             self.parameter_set_periods.all().delete()
 
             for i in range(len(new_parameter_set_periods)):
-                    self.add_new_period()
+                self.add_new_period()
 
             for index, p in enumerate(self.parameter_set_periods.all()):                
                 p.from_dict(new_parameter_set_periods[index])
@@ -187,31 +202,76 @@ class ParameterSet(models.Model):
 
         for p in self.parameter_set_periods.all():
             p.setup()
+    
+    def add_new_pay_block(self):
+        '''
+        add new pay block
+        '''
 
-    def json(self):
+        pay_block_last = self.parameter_set_pay_blocks_a.all().last()
+
+        new_pay_block = main.models.ParameterSetPayBlock()
+        new_pay_block.parameter_set = self
+        new_pay_block.pay_block_number = pay_block_last.pay_block_number + 1 if pay_block_last else 1
+
+        new_pay_block.save()
+
+    def update_json_local(self):
+        '''
+        update json model
+        '''
+
+        self.json_for_session["id"] = self.id     
+
+        self.json_for_session["enable_chat"] = "True" if self.enable_chat else "False"
+        self.json_for_session["show_instructions"] = "True" if self.show_instructions else "False"
+        self.json_for_session["instruction_set"] = self.instruction_set.json_min()
+        self.json_for_session["graph_y_max"] = self.graph_y_max
+        self.json_for_session["group_size"] = self.group_size
+
+        self.json_for_session["consent_form"] = self.consent_form
+        self.json_for_session["consent_form_required"] = "True" if self.consent_form_required else "False"
+
+        self.json_for_session["help_doc_subject_set"] =  self.help_doc_subject_set.json() if self.help_doc_subject_set else {"id":None}
+
+        self.json_for_session["test_mode"] = "True" if self.test_mode else "False"
+
+        self.save()
+    
+    def update_json_fk(self, update_players=False, update_periods=False, update_zone_minutes=False, update_pay_blocks=False):
+        '''
+        update json model
+        '''
+
+        if update_players:
+            self.json_for_session["parameter_set_players"] = {p.id : p.json() for p in self.parameter_set_players.all()}
+            self.json_for_session["parameter_set_players_order"] = list(self.parameter_set_players.all().values_list('id', flat=True))
+
+        if update_periods:
+            self.json_for_session["parameter_set_periods"] = {p.id : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
+            self.json_for_session["parameter_set_periods_order"] = list(self.parameter_set_periods.all().values_list('id', flat=True))
+
+        if update_zone_minutes:
+            self.json_for_session["parameter_set_zone_minutes"] = {p.id : p.json() for p in self.parameter_set_zone_minutes.all()}
+            self.json_for_session["parameter_set_zone_minutes_order"] = list(self.parameter_set_zone_minutes.all().values_list('id', flat=True))
+
+        if update_pay_blocks:
+            self.json_for_session["parameter_set_pay_blocks"] = {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()}
+            self.json_for_session["parameter_set_pay_blocks_order"] = list(self.parameter_set_zone_minutes.all().values_list('id', flat=True))
+
+        self.save()
+
+    def json(self, update_required=False):
         '''
         return json object of model
         '''
-        return{
-            "id" : self.id,            
+        if not self.json_for_session or \
+           update_required:
+            self.json_for_session = {}
+            self.update_json_local()
+            self.update_json_fk(update_players=True, update_periods=True, update_zone_minutes=True, update_pay_blocks=True)
 
-            "enable_chat" : "True" if self.enable_chat else "False",
-            "show_instructions" : "True" if self.show_instructions else "False",
-            "instruction_set" : self.instruction_set.json_min(),
-            "graph_y_max" : self.graph_y_max,
-            "group_size" : self.group_size,
-
-            "parameter_set_players" : [p.json() for p in self.parameter_set_players.all()],
-            "parameter_set_periods" : [p.json() for p in self.parameter_set_periods.all().prefetch_related()],
-            "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
-
-            "consent_form" : self.consent_form,
-            "consent_form_required" : "True" if self.consent_form_required else "False",
-
-            "help_doc_subject_set" : self.help_doc_subject_set.json() if self.help_doc_subject_set else {"id":None},
-
-            "test_mode" : "True" if self.test_mode else "False",
-        }
+        return self.json_for_session
     
     def json_for_subject(self):
         '''

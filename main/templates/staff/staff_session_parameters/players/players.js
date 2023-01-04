@@ -5,25 +5,11 @@
     if(app.session.started) return;
     
     app.clearMainFormErrors();
-    app.cancelModal=true;
-    app.parametersetPlayerBeforeEdit = Object.assign({}, app.session.parameter_set.parameter_set_players[index]);
 
-    app.parametersetPlayerBeforeEditIndex = index;
-    app.current_parameter_set_player = app.session.parameter_set.parameter_set_players[index];
-
+    app.current_parameter_set_player =  Object.assign({}, app.session.parameter_set.parameter_set_players[index]);
     app.editParametersetPlayerModal.toggle();
 },
 
-/** hide edit parmeter set player
-*/
-hideEditParametersetPlayer:function(){
-    if(app.cancelModal)
-    {
-        Object.assign(app.session.parameter_set.parameter_set_players[app.parametersetPlayerBeforeEditIndex], app.parametersetPlayerBeforeEdit);
-
-        app.parametersetPlayerBeforeEdit=null;
-    }
-},
 
 /** update parameterset type settings
 */
@@ -31,30 +17,9 @@ sendUpdateParametersetPlayer(){
 
     if(app.session.started) return;
 
-    formData = {}
-
-    let parameter_set_players = app.session.parameter_set.parameter_set_players;
-
-    index=-1;
-    for(i=0;i<parameter_set_players.length;i++)
-    {
-        if(parameter_set_players[i].id == app.current_parameter_set_player.id)
-        {
-            index=i;
-            break;
-        }
-    }
-
-    for(i=0;i<app.parameterset_player_form_ids.length;i++)
-    {
-        v=app.parameterset_player_form_ids[i];
-        formData[v]=parameter_set_players[index][v];
-    }
-    
     app.working = true;
-    app.sendMessage("update_parameterset_player", {"sessionID" : app.sessionID,
-                                                   "paramterset_player_id" : app.current_parameter_set_player.id,
-                                                   "formData" : formData,});
+    app.sendMessage("update_parameterset_player", {"sessionID" : app.sessionID,                                                  
+                                                   "formData" : app.current_parameter_set_player,});
 },
 
 /** handle result of updating parameter set player
