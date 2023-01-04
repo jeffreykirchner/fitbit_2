@@ -260,7 +260,7 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
     async def add_parameterset_pay_block(self, event):
         '''
-        add a parameterset period
+        add a parameterset pay block
         '''
 
         message_data = {}
@@ -280,6 +280,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         message_data = {}
         message_data["status"] = await sync_to_async(take_update_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def add_parameterset_pay_block_payment(self, event):
+        '''
+        add a parameterset pay block payment
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_add_parameterset_pay_block_payment)(event["message_text"])
 
         message = {}
         message["messageType"] = "update_pay_block"
@@ -698,9 +713,9 @@ def take_add_parameterset_pay_block_payment(data):
         return
 
     if value == 1:
-        pay_block.add_new_pay_block_payment()
-    elif pay_block.parameter_set_pay_blocks_a.count() > 1:
-        pay_block.parameter_set.parameter_set_pay_blocks_a.last().delete()
+        pay_block.add_pay_block_payment()
+    elif pay_block.parameter_set_pay_block_payments_a.count() > 1:
+        pay_block.parameter_set.parameter_set_pay_block_payments_a.first().delete()
 
     pay_block.parameter_set.update_json_fk(update_pay_blocks=True)
 

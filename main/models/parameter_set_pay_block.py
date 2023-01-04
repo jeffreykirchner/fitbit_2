@@ -75,6 +75,20 @@ class ParameterSetPayBlock(models.Model):
         #         return p
 
         return None
+    
+    def add_pay_block_payment(self):
+        '''
+        add a new pay bock payment
+        '''
+        last_bock_payment = self.parameter_set_pay_block_payments_a.last()
+
+        block_payment = main.models.ParameterSetPayBlockPayment()
+        block_payment.parameter_set_pay_block = self
+
+        if last_bock_payment:
+            block_payment.zone_minutes = last_bock_payment.zone_minutes - 1
+
+        block_payment.save()
 
     def json(self):
         '''

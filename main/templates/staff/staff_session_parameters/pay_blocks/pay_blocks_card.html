@@ -28,6 +28,9 @@
                                     Payments
                                 </th>
                                 <th scope="col" class = "text-nowrap">
+                                    
+                                </th>
+                                <th scope="col" class = "text-nowrap">
                                     Copy
                                 </th>                       
                             </tr>
@@ -44,6 +47,22 @@
                                 </td>
                                 <td  class="player_table_cell text-nowrap">
                                    
+                                </td>
+                                <td  class="player_table_cell text-nowrap">
+                                    <button class="btn btn-outline-success btn-sm me-1"
+                                            type="button"
+                                            title="Add block payment"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendAddParameterSetPayBlockPayment(1, p)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm"
+                                            type="button"
+                                            title="Remove block payment"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendAddParameterSetPayBlockPayment(-1, p)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
                                 </td>
                                
                                 <td class="text-nowrap">

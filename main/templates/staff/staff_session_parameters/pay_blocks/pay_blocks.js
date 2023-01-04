@@ -39,3 +39,14 @@ sendUpdateParameterSetPayBlock(){
                                                       "formData" : app.current_parameter_set_pay_block,
                                                    });
 },
+
+/**
+ * add or remove value from number of periods
+ */
+sendAddParameterSetPayBlockPayment(value, payblock_id){
+    app.working = true;
+    app.sendMessage("add_parameterset_pay_block_payment", {"sessionID" : app.sessionID,
+                                                           "payblockID" : payblock_id,
+                                                           "value" : value,
+                                                   });
+},
