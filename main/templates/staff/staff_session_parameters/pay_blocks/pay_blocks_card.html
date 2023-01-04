@@ -33,14 +33,16 @@
                             </tr>
                         </thead>
                         <tbody id="period_list">
-                            <tr v-for="(p, index) in session.parameter_set.parameter_set_pay_blocks" v-bind:key="p.id">
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.pay_block_number]]
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_pay_blocks_order" 
+                                v-bind:key="p"
+                                :set="temp_p=session.parameter_set.parameter_set_pay_blocks[p]" >
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.pay_block_number]]
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.pay_block_type]]
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.pay_block_type]]
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                                <td  class="player_table_cell text-nowrap">
                                    
                                 </td>
                                
@@ -49,7 +51,7 @@
                                             type="button"
                                             title="Copy period down"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyForward(p.id)">
+                                            v-on:click="sendCopyForward(p)">
                                             <i class="fas fa-angle-double-down"></i>
                                     </button>
 
@@ -58,7 +60,7 @@
                                             v-show="index>0"
                                             title="Copy previous period"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyPrevious(p.id)">
+                                            v-on:click="sendCopyPrevious(p)">
                                             <i class="fas fa-clone"></i>
                                     </button>
                                 </td>

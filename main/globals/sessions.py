@@ -28,7 +28,7 @@ class PayBlockType(models.TextChoices):
     '''
     pay block types
     '''
-    NO_PAY = 'No Pay', _('No Pay')
-    AVERAGE = 'Average', _('Average')
-    TOTAL = 'Total', _('Total')
+    NO_ACTIVITY_PAY = 'No Activity Pay', _('No Activity Pay')
+    BLOCK_PAY = 'Block Pay', _('Block Pay')
+    DAILY_PAY = 'Daily Pay', _('Daily Pay')
 

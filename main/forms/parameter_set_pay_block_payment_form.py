@@ -6,7 +6,7 @@ from django import forms
 
 from main.models import ParameterSetPayBlockPayment
 
-class ParameterSetPayBlockForm(forms.ModelForm):
+class ParameterSetPayBlockPaymentForm(forms.ModelForm):
     '''
     parameterset pay block form
     '''

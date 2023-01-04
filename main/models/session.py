@@ -397,7 +397,6 @@ class Session(models.Model):
                 temp_group += 1
                 temp_counter = 0
 
-
     def json(self):
         '''
         return json object of model
@@ -436,6 +435,21 @@ class Session(models.Model):
             "is_last_period": is_last_period, 
             "pay_blocks" : self.get_pay_block_list(),
         }
+
+    def json_for_parameter_set(self):
+        '''
+        json for parameter set setup screen
+        '''
+
+        return{
+            "id":self.id,
+            "title":self.title,
+            "locked":self.locked,
+            "started":self.started,
+            "parameter_set": self.parameter_set.json(),
+        }
+
+
     
     def json_for_subject(self, session_player):
         '''

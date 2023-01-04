@@ -257,7 +257,7 @@ class ParameterSet(models.Model):
 
         if update_pay_blocks:
             self.json_for_session["parameter_set_pay_blocks"] = {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()}
-            self.json_for_session["parameter_set_pay_blocks_order"] = list(self.parameter_set_zone_minutes.all().values_list('id', flat=True))
+            self.json_for_session["parameter_set_pay_blocks_order"] = list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True))
 
         self.save()
 

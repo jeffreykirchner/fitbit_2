@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <form id="parametersetPeriodPaymentForm" v-on:submit.prevent="onSubmit">
-                    {% for i in parameterset_period_payment_form %}
+                    {% for i in parameterset_pay_block_payment_form %}
                     <div class="row">
                         <div class = "col col-md-10 offset-md-1">  
                             {{ i|as_crispy_field }}         

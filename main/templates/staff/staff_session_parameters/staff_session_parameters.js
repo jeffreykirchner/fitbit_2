@@ -14,19 +14,17 @@ var app = Vue.createApp({
                     first_load_done : false,          //true after software is loaded for the first time
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
-                    session : null, //{{session_json|safe}}                  
+                    session : null, //{{session_json|safe}}             
 
                     current_parameter_set_player : {},  //{{first_parameter_set_player_json|safe}}
                     current_parameter_set_period : {}, //{{first_parameter_set_period_json|safe}}
                     current_parameter_set_period_payment : {},  //{{first_parameter_set_period_payment_json|safe}}
                     current_parameter_set_zone_minutes : {},  //{{first_parameter_set_zone_minutes_json|safe}}               
                     current_parameter_set : {instruction_set : {id:0}, help_doc_subject_set : {id:0}},
+                    current_parameter_set_pay_block_payment : {},
+                    current_parameter_set_pay_block : {},
 
-                    parameterset_form_ids: {{parameterset_form_ids|safe}},
-                    parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
-                    parameterset_period_form_ids: {{parameterset_period_form_ids|safe}},
-                    parameterset_zone_minutes_form_ids: {{parameterset_zone_minutes_form_ids|safe}},
-                    parameterset_period_payment_form_ids: {{parameterset_period_payment_form_ids|safe}},
+                    form_ids: {{form_ids|safe}},
 
                     upload_file: null,
                     upload_file_name:'Choose File',
@@ -105,8 +103,8 @@ var app = Vue.createApp({
                 case "update_parameterset_zone_minutes":
                     app.takeUpdateZoneMinutes(messageData);
                     break;    
-                case "add_parameterset_pay_block":
-                    app.takeAddParameterSetPayBlock(messageData);
+                case "update_pay_block":
+                    app.takeUpdatePayBlock(messageData);
                     break; 
                 case "import_parameters":
                     app.takeImportParameters(messageData);
@@ -155,11 +153,13 @@ var app = Vue.createApp({
             
             if(!app.first_load_done)
             {
-                setTimeout(app.doFirstLoad, 500);
+                Vue.nextTick(() => {
+                    app.do_first_load();
+                });
             }
         },
 
-        doFirstLoad()
+        do_first_load()
         {
             app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false})
             app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false})
@@ -218,35 +218,7 @@ var app = Vue.createApp({
                 if(e) e.remove();
             }
 
-            s = app.parameterset_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_zone_minutes_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_player_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_period_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_period_payment_form_ids;
+            s = app.form_ids;
             for(var i in s)
             {
                 e = document.getElementById("id_errors_" + s[i]);

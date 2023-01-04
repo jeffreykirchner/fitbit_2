@@ -19,8 +19,8 @@ class ParameterSetPayBlock(models.Model):
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_pay_blocks_a")
 
-    pay_block_type = models.CharField(max_length=100, choices=PayBlockType.choices, default=PayBlockType.NO_PAY)          #type of payment system used
-    pay_block_number = models.IntegerField(verbose_name='Pay Block Number', default=1)                                           #group period together with the same group to be paid together
+    pay_block_type = models.CharField(max_length=100, choices=PayBlockType.choices, default=PayBlockType.NO_ACTIVITY_PAY)        #type of payment system used
+    pay_block_number = models.IntegerField(verbose_name='Pay Block Number', default=1)                                           #ordering index of payblocks
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now= True)
