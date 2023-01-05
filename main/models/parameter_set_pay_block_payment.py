@@ -16,10 +16,12 @@ class ParameterSetPayBlockPayment(models.Model):
 
     parameter_set_pay_block = models.ForeignKey(ParameterSetPayBlock, on_delete=models.CASCADE, related_name="parameter_set_pay_block_payments_a")
 
-    zone_minutes = models.IntegerField(verbose_name='Max Zone Minutes', default=1440)              #if <= this amount then in this bucket
+
+    zone_minutes = models.IntegerField(verbose_name='Max Zone Minutes', default=1440)                                #if <= this amount then in this bucket
     payment = models.DecimalField(verbose_name='Individual Payment', decimal_places=2, default=0, max_digits=5)      #amount individual earns reaching this activity level
     group_bonus = models.DecimalField(verbose_name='Group Payment', decimal_places=2, default=0, max_digits=5)       #amount group earns if reaching this acttvity level
     no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)                            #amount of fitbit earned by checking in today
+    label = models.CharField(verbose_name='Label Shown', max_length = 20, default="min to min")                      #label shown on display
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -61,9 +63,10 @@ class ParameterSetPayBlockPayment(models.Model):
 
             "id" : self.id,
 
+            "label" : self.label,
             "zone_minutes" : round(self.zone_minutes),
             "payment" : round(self.payment),
-            "group_bonus" : self.group_bonus,
+            "group_bonus" : round(self.group_bonus),
             "no_pay_percent" : self.no_pay_percent,
         }
     
@@ -76,6 +79,7 @@ class ParameterSetPayBlockPayment(models.Model):
 
             "id" : self.id,
 
+            "label" : self.label,
             "zone_minutes" : round(self.zone_minutes),
             "payment" : round(self.payment),
             "group_bonus" : self.group_bonus,

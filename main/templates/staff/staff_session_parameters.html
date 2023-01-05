@@ -68,18 +68,19 @@
     <div class="col-lg">   
         {%include "staff/staff_session_parameters/players/players_card.html"%}                  
     </div>          
-    <div class="col-lg">
-        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes_card.html"%}  
-    </div> 
+    
     <div class="col-lg">
         {%include "staff/staff_session_parameters/control/control_card.html"%}  
     </div>        
 </div>
 
 <div class="row justify-content-lg-center mb-4" v-cloak v-if="session">
-    <div class="col-lg">
+    <div class="col-lg-9">
         {%include "staff/staff_session_parameters/pay_blocks/pay_blocks_card.html"%}
     </div>
+    <div class="col-lg-3">
+        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes_card.html"%}  
+    </div> 
 </div>
 
 <div class="row justify-content-lg-center" v-cloak v-if="session">

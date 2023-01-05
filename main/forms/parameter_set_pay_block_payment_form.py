@@ -11,6 +11,9 @@ class ParameterSetPayBlockPaymentForm(forms.ModelForm):
     parameterset pay block form
     '''
 
+    label = forms.CharField(label='Label Displayed',
+                            widget=forms.TextInput(attrs={"v-model":"current_parameter_set_pay_block_payment.label",}))
+
     zone_minutes = forms.IntegerField(label="Zone Minutes",
                                         min_value=0,
                                         widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_pay_block_payment.zone_minutes",
@@ -36,7 +39,7 @@ class ParameterSetPayBlockPaymentForm(forms.ModelForm):
 
     class Meta:
         model = ParameterSetPayBlockPayment
-        fields = ['zone_minutes', 'payment', 'group_bonus', 'no_pay_percent']
+        fields = ['label', 'zone_minutes', 'payment', 'group_bonus', 'no_pay_percent']
     
    
     

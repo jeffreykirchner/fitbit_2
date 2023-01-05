@@ -80,13 +80,13 @@ class ParameterSetPayBlock(models.Model):
         '''
         add a new pay bock payment
         '''
-        last_bock_payment = self.parameter_set_pay_block_payments_a.last()
+        first_bock_payment = self.parameter_set_pay_block_payments_a.first()
 
         block_payment = main.models.ParameterSetPayBlockPayment()
         block_payment.parameter_set_pay_block = self
 
-        if last_bock_payment:
-            block_payment.zone_minutes = last_bock_payment.zone_minutes - 1
+        if first_bock_payment:
+            block_payment.zone_minutes = first_bock_payment.zone_minutes - 1
 
         block_payment.save()
 
@@ -101,7 +101,8 @@ class ParameterSetPayBlock(models.Model):
             "pay_block_type" : self.pay_block_type,
             "pay_block_number" : self.pay_block_number,
 
-            "parameter_set_pay_block_payments" : [p.json() for p in self.parameter_set_pay_block_payments_a.all()],
+            "parameter_set_pay_block_payments" : {p.id : p.json() for p in self.parameter_set_pay_block_payments_a.all()},
+            "parameter_set_pay_block_payments_order" : list(self.parameter_set_pay_block_payments_a.all().values_list('id', flat=True)),
         }
     
     def json_for_subject(self):

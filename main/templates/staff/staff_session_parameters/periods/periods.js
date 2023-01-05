@@ -79,7 +79,6 @@ takeAddParameterSetPeriod(messageData){
 sendUpdatePayment(){
     
     app.working = true;
-    app.cancelModal=false;
     app.sendMessage("update_parameterset_period_payment", {"sessionID" : app.sessionID,
                                                            "formData" : app.current_parameter_set_period_payment,});
 },
@@ -88,7 +87,6 @@ sendUpdatePayment(){
 */
 takeUpdatePayment(messageData){
 
-    app.cancelModal=false;
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -97,8 +95,7 @@ takeUpdatePayment(messageData){
         app.editParametersetPeriodPaymentModal.hide();            
     } 
     else
-    {
-        app.cancelModal=true;                           
+    {                     
         app.displayErrors(messageData.status.errors);
     } 
 },
@@ -108,7 +105,6 @@ takeUpdatePayment(messageData){
 sendCopyForward(id){
     
     app.working = true;
-    app.cancelModal=false;
     app.sendMessage("update_parameterset_period_copy_forward", {"sessionID" : app.sessionID,
                                                                 "id" : id,});
 },
@@ -128,7 +124,6 @@ takeCopyForward(messageData){
 sendCopyPrevious(id){
     
     app.working = true;
-    app.cancelModal=false;
     app.sendMessage("update_parameterset_period_copy_previous", {"sessionID" : app.sessionID,
                                                                  "id" : id,});
 },

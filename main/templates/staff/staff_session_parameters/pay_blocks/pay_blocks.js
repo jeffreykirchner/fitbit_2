@@ -18,6 +18,10 @@ takeUpdatePayBlock(messageData){
         app.editParametersetPayBlockModal.hide();
         app.editParametersetPayBlockPaymentModal.hide();
     } 
+    else
+    {                     
+        app.displayErrors(messageData.status.errors);
+    } 
 },
 
 /**show edit paramter set
@@ -30,6 +34,16 @@ showEditPayBlock:function(index){
     app.editParametersetPayBlockModal.toggle();
 },
 
+/**show edit paramter set
+ */
+showEditPayBlockPayment:function(index1, index2){
+    app.clearMainFormErrors();
+
+    app.current_parameter_set_pay_block_payment = Object.assign({}, app.session.parameter_set.parameter_set_pay_blocks[index1].parameter_set_pay_block_payments[index2]);
+
+    app.editParametersetPayBlockPaymentModal.toggle();
+},
+
 /**
  * add or remove value from number of periods
  */
@@ -37,6 +51,16 @@ sendUpdateParameterSetPayBlock(){
     app.working = true;
     app.sendMessage("update_parameterset_pay_block", {"sessionID" : app.sessionID,
                                                       "formData" : app.current_parameter_set_pay_block,
+                                                   });
+},
+
+/**
+ * add or remove value from number of periods
+ */
+sendUpdateParameterSetPayBlockPayment(){
+    app.working = true;
+    app.sendMessage("update_parameterset_pay_block_payment", {"sessionID" : app.sessionID,
+                                                              "formData" : app.current_parameter_set_pay_block_payment,
                                                    });
 },
 
