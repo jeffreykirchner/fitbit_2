@@ -19,8 +19,11 @@ class ParameterSetPayBlock(models.Model):
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_pay_blocks_a")
 
-    pay_block_type = models.CharField(max_length=100, choices=PayBlockType.choices, default=PayBlockType.NO_ACTIVITY_PAY)        #type of payment system used
+    pay_block_type = models.CharField(max_length=100, choices=PayBlockType.choices, default=PayBlockType.FIXED_PAY_ONLY)        #type of payment system used
     pay_block_number = models.IntegerField(verbose_name='Pay Block Number', default=1)                                           #ordering index of payblocks
+
+    fixed_pay = models.DecimalField(verbose_name='Individual Payment', decimal_places=2, default=0, max_digits=5)
+    no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now= True)
@@ -43,6 +46,8 @@ class ParameterSetPayBlock(models.Model):
         '''
 
         self.pay_block_type = source.get("pay_block_type")
+        self.fixed_pay = source.get("fixed_pay")
+        self.no_pay_percent = source.get("no_pay_percent")
 
         if update_block_number:
             self.pay_block_number = source.get("pay_block_number")
@@ -110,6 +115,9 @@ class ParameterSetPayBlock(models.Model):
             "pay_block_type" : self.pay_block_type,
             "pay_block_number" : self.pay_block_number,
 
+            "fixed_pay" : round(self.fixed_pay),
+            "no_pay_percent" : self.no_pay_percent,
+
             "parameter_set_pay_block_payments" : {p.id : p.json() for p in self.parameter_set_pay_block_payments_a.all()},
             "parameter_set_pay_block_payments_order" : list(self.parameter_set_pay_block_payments_a.all().values_list('id', flat=True)),
         }
@@ -124,8 +132,12 @@ class ParameterSetPayBlock(models.Model):
             "id" : self.id,
 
             "id" : self.id,
+
             "pay_block_type" : self.pay_block_type,
             "pay_block_number" : self.pay_block_number,
+
+            "fixed_pay" : round(self.fixed_pay),
+            "no_pay_percent" : self.no_pay_percent,
 
             "parameter_set_pay_block_payments" : [p.json() for p in self.parameter_set_pay_block_payments_a.all()],
         }

@@ -28,7 +28,7 @@ class PayBlockType(models.TextChoices):
     '''
     pay block types
     '''
-    NO_ACTIVITY_PAY = 'No Activity Pay', _('No Activity Pay')
+    FIXED_PAY_ONLY = 'Fixed Pay Only', _('Fixed Pay Only')
     BLOCK_PAY = 'Block Pay', _('Block Pay')
-    DAILY_PAY = 'Daily Pay', _('Daily Pay')
+    EARN_FITBIT = 'Earn Fitbit', _('Earn Fitbit')
 

@@ -17,9 +17,19 @@ class ParameterSetPayBlockForm(forms.ModelForm):
                                        choices=PayBlockType.choices,
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set_pay_block.pay_block_type",}))
 
+    fixed_pay = forms.DecimalField(label='Daily Fixed Payment',
+                                     min_value=0,
+                                     widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_pay_block.fixed_pay",
+                                                                     "step":"0.01"}))
+    
+    no_pay_percent = forms.DecimalField(label='Daily Fitbit Percent Earned',
+                                     min_value=0,
+                                     widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_pay_block.no_pay_percent",
+                                                                     "step":"0.01"}))
+
     class Meta:
         model = ParameterSetPayBlock
-        fields = ['pay_block_type',]
+        fields = ['pay_block_type', 'fixed_pay', 'no_pay_percent']
     
    
     

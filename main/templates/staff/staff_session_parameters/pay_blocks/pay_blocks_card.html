@@ -25,13 +25,16 @@
                                     Type
                                 </th>
                                 <th scope="col" class = "text-nowrap">
+                                    Daily Fixed Payment
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Daily Fitbit Percent Earned
+                                </th>
+                                <th scope="col" class = "text-nowrap">
                                     Payments for average AZM in block
-                                </th>
+                                </th>                                
                                 <th scope="col" class = "text-nowrap">
-                                    
-                                </th>
-                                <th scope="col" class = "text-nowrap">
-                                    Copy
+                                    Actions
                                 </th>                       
                             </tr>
                         </thead>
@@ -44,6 +47,12 @@
                                 </td>
                                 <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.pay_block_type]]
+                                </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    $[[temp_p.fixed_pay]]
+                                </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.no_pay_percent]]%
                                 </td>
                                 <td  class="text-nowrap">
                                    <div class="row">
@@ -58,7 +67,8 @@
                                         </div>
                                    </div>
                                 </td>
-                                <td  class="player_table_cell text-nowrap">
+                               
+                                <td class="text-nowrap">
                                     <button class="btn btn-outline-success btn-sm me-1"
                                             type="button"
                                             title="Add block payment"
@@ -66,17 +76,16 @@
                                             v-on:click="sendAddParameterSetPayBlockPayment(1, p)">
                                         <i class="fas fa-plus"></i>
                                     </button>
-                                    <button class="btn btn-outline-danger btn-sm"
+
+                                    <button class="btn btn-outline-danger btn-sm me-1"
                                             type="button"
                                             title="Remove block payment"
                                             v-bind:disabled="session.started || reconnecting || working"
                                             v-on:click="sendAddParameterSetPayBlockPayment(-1, p)">
                                         <i class="fas fa-minus"></i>
                                     </button>
-                                </td>
-                               
-                                <td class="text-nowrap">
-                                    <button class="btn btn-outline-primary btn-sm me-2"
+
+                                    <button class="btn btn-outline-primary btn-sm me-1"
                                             type="button"
                                             title="Copy period down"
                                             v-bind:disabled="session.started || reconnecting || working"
@@ -106,7 +115,7 @@
 
                     <button class="btn btn-outline-success me-2"
                             type="button"
-                            title="Add period"
+                            title="Add Block"
                             v-bind:disabled="session.started || reconnecting || working"
                             v-on:click="sendAddParameterSetPayBlock(1)">
                         Add <i class="fas fa-plus"></i>
@@ -114,7 +123,7 @@
 
                     <button class="btn btn-outline-danger"
                             type="button"
-                            title="Remove period"
+                            title="Remove Block"
                             v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
                             v-on:click="sendAddParameterSetPayBlock(-1)">
                         Delete <i class="fas fa-minus"></i>
