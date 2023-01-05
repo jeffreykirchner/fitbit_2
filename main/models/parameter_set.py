@@ -77,47 +77,38 @@ class ParameterSet(models.Model):
             
             self.parameter_set_players.all().delete()
 
-            for i in range(len(new_parameter_set_players)):
-                self.add_new_player()
-
             new_parameter_set_players = new_ps.get("parameter_set_players")
-            for index, p in enumerate(self.parameter_set_players.all()):                
-                p.from_dict(new_parameter_set_players[index])
+            for p in new_parameter_set_players:    
+                new_player = self.add_new_player()            
+                new_player.from_dict(new_parameter_set_players[p])
             
-
             #zone minutes
             new_parameter_set_zone_minutes = new_ps.get("parameter_set_zone_minutes")
 
             self.parameter_set_zone_minutes.all().delete()
 
-            for i in range(len(new_parameter_set_zone_minutes)):
-                self.add_new_zone_minutes()
-
-            for index, p in enumerate(self.parameter_set_zone_minutes.all()):                
-                p.from_dict(new_parameter_set_zone_minutes[index])
+            for p in new_parameter_set_zone_minutes:       
+                zone_minutes =  self.add_new_zone_minutes()         
+                zone_minutes.from_dict(new_parameter_set_zone_minutes[p])
 
             #pay blocks
             new_parameter_set_pay_blocks = new_ps.get("parameter_set_pay_blocks", None)
 
             self.parameter_set_pay_blocks_a.all().delete()
 
-            if new_parameter_set_pay_blocks:
-                for i in range(len(new_parameter_set_pay_blocks)):
-                    self.add_new_pay_block()
-
-                for index, p in enumerate(self.parameter_set_pay_blocks_a.all()):                
-                    p.from_dict(new_parameter_set_pay_blocks[index])
+            for p in new_parameter_set_pay_blocks:      
+                payblock = self.add_new_pay_block()          
+                payblock.from_dict(new_parameter_set_pay_blocks[p])
 
             #periods
             new_parameter_set_periods = new_ps.get("parameter_set_periods")
             self.parameter_set_periods.all().delete()
 
-            for i in range(len(new_parameter_set_periods)):
-                self.add_new_period()
+            for p in new_parameter_set_periods:    
+                new_period = self.add_new_period()           
+                new_period.from_dict(new_parameter_set_periods[p])
 
-            for index, p in enumerate(self.parameter_set_periods.all()):                
-                p.from_dict(new_parameter_set_periods[index])
-
+            self.json(update_required=True)
 
         except IntegrityError as exp:
             message = f"Failed to load parameter set: {exp}"
@@ -157,6 +148,8 @@ class ParameterSet(models.Model):
         player.display_color = get_random_hex_color()
 
         player.save()
+
+        return player
     
     def add_new_period(self):
         '''
@@ -174,6 +167,8 @@ class ParameterSet(models.Model):
 
         parameter_set_period.save()
         parameter_set_period.setup()
+
+        return parameter_set_period
     
     def add_new_zone_minutes(self):
         '''
@@ -202,6 +197,8 @@ class ParameterSet(models.Model):
 
         for p in self.parameter_set_periods.all():
             p.setup()
+        
+        return parameter_set_zone_minutes
     
     def add_new_pay_block(self):
         '''
@@ -215,6 +212,8 @@ class ParameterSet(models.Model):
         new_pay_block.pay_block_number = pay_block_last.pay_block_number + 1 if pay_block_last else 1
 
         new_pay_block.save()
+
+        return new_pay_block
 
     def update_json_local(self):
         '''

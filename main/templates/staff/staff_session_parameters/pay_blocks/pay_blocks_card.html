@@ -54,8 +54,7 @@
                                              v-on:click="showEditPayBlockPayment(p, p2)">                                                
                                                 <div class=""><u>[[temp_p2.label]]</u></div>
                                                 <div>Payment: [[temp_p2.payment]]</div>
-                                                <div>Group Bonus: [[temp_p2.group_bonus]]</div>
-                                                <div>Fitbit %: [[temp_p2.no_pay_percent]]</div>
+                                                <div>Group Bonus: [[temp_p2.group_bonus]]</div>                                               
                                         </div>
                                    </div>
                                 </td>
@@ -81,7 +80,7 @@
                                             type="button"
                                             title="Copy period down"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyForward(p)">
+                                            v-on:click="sendCopyForwardParameterSetPayBlock(p)">
                                             <i class="fas fa-angle-double-down"></i>
                                     </button>
 
@@ -90,7 +89,7 @@
                                             v-show="index>0"
                                             title="Copy previous period"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyPrevious(p)">
+                                            v-on:click="sendCopyPreviousParameterSetPayBlock(p)">
                                             <i class="fas fa-clone"></i>
                                     </button>
                                 </td>

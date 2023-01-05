@@ -16,7 +16,6 @@ class ParameterSetPayBlockPayment(models.Model):
 
     parameter_set_pay_block = models.ForeignKey(ParameterSetPayBlock, on_delete=models.CASCADE, related_name="parameter_set_pay_block_payments_a")
 
-
     zone_minutes = models.IntegerField(verbose_name='Max Zone Minutes', default=1440)                                #if <= this amount then in this bucket
     payment = models.DecimalField(verbose_name='Individual Payment', decimal_places=2, default=0, max_digits=5)      #amount individual earns reaching this activity level
     group_bonus = models.DecimalField(verbose_name='Group Payment', decimal_places=2, default=0, max_digits=5)       #amount group earns if reaching this acttvity level
@@ -47,6 +46,7 @@ class ParameterSetPayBlockPayment(models.Model):
         self.payment = source.get("payment")
         self.group_bonus = source.get("group_bonus")
         self.no_pay_percent = source.get("no_pay_percent")
+        self.label =  source.get("label")
 
         self.save()
         

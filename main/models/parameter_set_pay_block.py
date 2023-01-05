@@ -36,21 +36,28 @@ class ParameterSetPayBlock(models.Model):
             models.UniqueConstraint(fields=['pay_block_number', 'parameter_set'], name='unique_parameter_set_pay_block'),
         ]
 
-    def from_dict(self, source):
+    def from_dict(self, source, update_block_number=True):
         '''
         copy source values into this period
         source : dict object of parameterset period
         '''
 
         self.pay_block_type = source.get("pay_block_type")
-        self.pay_block_number = source.get("pay_block_number")
-        
 
+        if update_block_number:
+            self.pay_block_number = source.get("pay_block_number")
+        
         self.save()
 
-        new_parameter_set_block_payments = source.get("parameter_set_block_payments")
-        for index, p in enumerate(self.parameter_set_block_payments_a.all()):                
-                p.from_dict(new_parameter_set_block_payments[index])
+        new_parameter_set_block_payments = source.get("parameter_set_pay_block_payments")
+        new_parameter_set_block_payments_order = source.get("parameter_set_pay_block_payments_order")
+
+        self.parameter_set_pay_block_payments_a.all().delete()
+
+        if len(new_parameter_set_block_payments_order) > 0:
+            for p in new_parameter_set_block_payments:      
+                new_payblock_payment = self.add_pay_block_payment()       
+                new_payblock_payment.from_dict(new_parameter_set_block_payments[p])
 
         message = "Parameters loaded successfully."
 
@@ -89,6 +96,8 @@ class ParameterSetPayBlock(models.Model):
             block_payment.zone_minutes = first_bock_payment.zone_minutes - 1
 
         block_payment.save()
+
+        return block_payment
 
     def json(self):
         '''

@@ -81,10 +81,12 @@ class ParameterSetPeriod(models.Model):
         self.save()
 
         new_parameter_set_period_payments = source.get("parameter_set_period_payments")
-        for index, p in enumerate(self.parameter_set_period_pays_a.all()):                
-                p.from_dict(new_parameter_set_period_payments[index])
+        new_parameter_set_period_payments_order = source.get("parameter_set_period_payments_order")
+        for index, p in enumerate(self.parameter_set_period_pays_a.all()):   
+            temp_id = new_parameter_set_period_payments_order[index]
+            temp_v = new_parameter_set_period_payments[str(temp_id)]
+            p.from_dict(temp_v)
 
-        
         message = "Parameters loaded successfully."
 
         return message

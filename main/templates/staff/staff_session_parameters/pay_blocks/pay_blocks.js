@@ -74,3 +74,23 @@ sendAddParameterSetPayBlockPayment(value, payblock_id){
                                                            "value" : value,
                                                    });
 },
+
+/**
+ * add or remove value from number of periods
+ */
+sendCopyPreviousParameterSetPayBlock(payblock_id){
+    app.working = true;
+    app.sendMessage("copy_previous_parameterset_pay_block", {"sessionID" : app.sessionID,
+                                                             "payblockID" : payblock_id,                                                           
+                                                   });
+},
+
+/**
+* add or remove value from number of periods
+*/
+sendCopyForwardParameterSetPayBlock(payblock_id){
+   app.working = true;
+   app.sendMessage("copy_forward_parameterset_pay_block", {"sessionID" : app.sessionID,
+                                                            "payblockID" : payblock_id,                                                           
+                                                  });
+},
