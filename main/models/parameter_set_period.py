@@ -18,6 +18,7 @@ class ParameterSetPeriod(models.Model):
     '''
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_periods")
+    parameter_set_pay_block = models.ForeignKey('main.ParameterSetPayBlock', on_delete=models.CASCADE, related_name="parameter_set_periods_b", blank=True, null=True)
 
     period_number = models.IntegerField(verbose_name='Period Number', default=1)                                       #period number 1 to N
     period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY)              #type of payment system used
@@ -78,6 +79,10 @@ class ParameterSetPeriod(models.Model):
 
         self.pay_block = source.get("pay_block")
 
+        parameter_set_pay_block_source = source.get("parameter_set_pay_block")
+        if parameter_set_pay_block_source['id'] != -1:
+            self.parameter_set_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=parameter_set_pay_block_source['pay_block_number'])
+
         self.save()
 
         new_parameter_set_period_payments = source.get("parameter_set_period_payments")
@@ -115,6 +120,7 @@ class ParameterSetPeriod(models.Model):
         self.graph_2_start_period_number = source.graph_2_start_period_number
         self.graph_2_end_period_number = source.graph_2_end_period_number
         self.pay_block = source.pay_block
+        self.parameter_set_pay_block = source.parameter_set_pay_block
 
         for p_source in source.parameter_set_period_pays_a.all():
             p_target = self.parameter_set_period_pays_a.get(parameter_set_zone_minutes=p_source.parameter_set_zone_minutes)
@@ -159,6 +165,7 @@ class ParameterSetPeriod(models.Model):
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
             "pay_block" : self.pay_block,
+            "parameter_set_pay_block" : self.parameter_set_pay_block.json_for_parameter_set() if self.parameter_set_pay_block else {'id' : -1},
 
             "parameter_set_period_payments" : {p.id : p.json() for p in self.parameter_set_period_pays_a.all()},
             "parameter_set_period_payments_order" : list(self.parameter_set_period_pays_a.all().values_list('id', flat=True))
@@ -190,6 +197,7 @@ class ParameterSetPeriod(models.Model):
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
             "pay_block" : self.pay_block,
+            "parameter_set_pay_block" : self.parameter_set_pay_block.json_for_parameter_set() if self.parameter_set_pay_block else {'id' : -1},
 
             "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],
         }

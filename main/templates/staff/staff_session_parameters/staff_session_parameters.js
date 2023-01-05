@@ -14,12 +14,12 @@ var app = Vue.createApp({
                     first_load_done : false,          //true after software is loaded for the first time
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
-                    session : null, //{{session_json|safe}}             
+                    session : null,          
 
-                    current_parameter_set_player : {},  //{{first_parameter_set_player_json|safe}}
-                    current_parameter_set_period : {}, //{{first_parameter_set_period_json|safe}}
-                    current_parameter_set_period_payment : {},  //{{first_parameter_set_period_payment_json|safe}}
-                    current_parameter_set_zone_minutes : {},  //{{first_parameter_set_zone_minutes_json|safe}}               
+                    current_parameter_set_player : {},
+                    current_parameter_set_period : {parameter_set_pay_block : {id:0}}, 
+                    current_parameter_set_period_payment : {},  
+                    current_parameter_set_zone_minutes : {},               
                     current_parameter_set : {instruction_set : {id:0}, help_doc_subject_set : {id:0}},
                     current_parameter_set_pay_block_payment : {},
                     current_parameter_set_pay_block : {},

@@ -29,7 +29,7 @@ class ParameterSetPayBlock(models.Model):
     updated = models.DateTimeField(auto_now= True)
 
     def __str__(self):
-        return f"Period {self.period_number}"
+        return f"Pay Block {self.pay_block_number}"
 
     class Meta:
         verbose_name = 'Parameter Set Pay Block'
@@ -121,6 +121,14 @@ class ParameterSetPayBlock(models.Model):
             "parameter_set_pay_block_payments" : {p.id : p.json() for p in self.parameter_set_pay_block_payments_a.all()},
             "parameter_set_pay_block_payments_order" : list(self.parameter_set_pay_block_payments_a.all().values_list('id', flat=True)),
         }
+    
+    def json_for_parameter_set(self):
+        return{
+
+            "id" : self.id,
+            "pay_block_number" : self.pay_block_number,
+         }
+        
     
     def json_for_subject(self):
         '''

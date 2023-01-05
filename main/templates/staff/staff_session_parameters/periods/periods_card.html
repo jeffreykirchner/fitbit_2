@@ -85,7 +85,7 @@
                                     [[temp_p.graph_2_start_period_number]] to [[temp_p.graph_2_end_period_number]]
                                 </td> 
                                 <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
-                                    [[temp_p.pay_block]]
+                                    [[temp_p.parameter_set_pay_block.id != -1 ? temp_p.parameter_set_pay_block.pay_block_number : '---']]
                                 </td>                               
                                 <td v-for="(p2, index2) in temp_p.parameter_set_period_payments_order" 
                                     v-bind:key="p2.id" 

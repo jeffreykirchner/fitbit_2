@@ -76,6 +76,8 @@ class StaffSessionParametersView(SingleObjectMixin, View):
         
         if session.parameter_set.parameter_set_periods.count() == 0:
             session.parameter_set.add_new_period()
+            
+        parameterset_period_form.fields['parameter_set_pay_block'].queryset = session.parameter_set.parameter_set_pay_blocks_a.all()
 
         return render(request=request,
                       template_name=self.template_name,

@@ -524,18 +524,20 @@ def take_update_parameterset_period(data):
 
     try:        
         parameter_set_period = ParameterSetPeriod.objects.get(id=form_data["id"])
+        session = Session.objects.get(id=session_id)
     except ObjectDoesNotExist:
         logger.warning(f"take_update_parameterset_period paramterset_period, not found ID: {form_data['id']}")
         return
 
+    form_data['parameter_set_pay_block'] = form_data['parameter_set_pay_block']['id']
+
     form = ParameterSetPeriodForm(form_data, instance=parameter_set_period)
+    form.fields['parameter_set_pay_block'].queryset = session.parameter_set.parameter_set_pay_blocks_a.all()
 
     if form.is_valid():
         #print("valid form")             
         form.save()              
 
-       
-        session = Session.objects.get(id=session_id)
         session.parameter_set.update_json_fk(update_periods=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
@@ -610,17 +612,17 @@ def take_update_parameterset_period_payment(data):
 
     try:        
         parameter_set_period_payment = ParameterSetPeriodPayment.objects.get(id=form_data["id"])
+        session = Session.objects.get(id=session_id)
     except ObjectDoesNotExist:
         logger.warning(f"take_update_parameterset_period_payment paramterset_period_payment, not found ID: {form_data['id']}")
         return
 
     form = ParameterSetPeriodPaymentForm(form_data, instance=parameter_set_period_payment)
-
+   
     if form.is_valid():
         #print("valid form")             
         form.save()              
 
-        session = Session.objects.get(id=session_id)
         session.parameter_set.update_json_fk(update_periods=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
