@@ -577,7 +577,6 @@ class SessionPlayerPeriod(models.Model):
             "last_login" : self.last_login,
             "check_in" : self.check_in,
             "period_type" : self.session_period.parameter_set_period.period_type,
-            "pay_block" : self.session_period.parameter_set_period.pay_block,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
 
@@ -607,7 +606,6 @@ class SessionPlayerPeriod(models.Model):
             "check_in" : self.check_in,
             "check_in_forced" : self.check_in_forced,
             "period_type" : self.session_period.parameter_set_period.period_type,
-            "pay_block" : self.session_period.parameter_set_period.pay_block,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
 

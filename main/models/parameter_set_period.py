@@ -39,8 +39,6 @@ class ParameterSetPeriod(models.Model):
     graph_2_start_period_number = models.IntegerField(verbose_name='Graph 2 Start Period', default=1)                    #period number to start the graph on
     graph_2_end_period_number = models.IntegerField(verbose_name='Graph 2 End Period', default=1)                        #period number to end the graph on
 
-    pay_block = models.IntegerField(verbose_name='Pay Group', default=1)                                               #group period together with the same group to be paid together
-
     timestamp = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now= True)
 
@@ -119,7 +117,6 @@ class ParameterSetPeriod(models.Model):
         self.show_graph_2 = source.show_graph_2
         self.graph_2_start_period_number = source.graph_2_start_period_number
         self.graph_2_end_period_number = source.graph_2_end_period_number
-        self.pay_block = source.pay_block
         self.parameter_set_pay_block = source.parameter_set_pay_block
 
         for p_source in source.parameter_set_period_pays_a.all():
@@ -164,7 +161,6 @@ class ParameterSetPeriod(models.Model):
             "graph_2_start_period_number" : self.graph_2_start_period_number,
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
-            "pay_block" : self.pay_block,
             "parameter_set_pay_block" : self.parameter_set_pay_block.json_for_parameter_set() if self.parameter_set_pay_block else {'id' : -1},
 
             "parameter_set_period_payments" : {p.id : p.json() for p in self.parameter_set_period_pays_a.all()},
@@ -196,7 +192,6 @@ class ParameterSetPeriod(models.Model):
             "graph_2_start_period_number" : self.graph_2_start_period_number,
             "graph_2_end_period_number" : self.graph_2_end_period_number,
 
-            "pay_block" : self.pay_block,
             "parameter_set_pay_block" : self.parameter_set_pay_block.json_for_parameter_set() if self.parameter_set_pay_block else {'id' : -1},
 
             "parameter_set_period_payments" : [p.json() for p in self.parameter_set_period_pays_a.all()],

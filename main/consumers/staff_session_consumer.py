@@ -859,15 +859,15 @@ def take_get_pay_block(session_id, data):
 
     try:        
         session = Session.objects.get(id=session_id)
-        pay_block = data["pay_block"]
+        pay_block_number = data["pay_block"]
     except ObjectDoesNotExist:
         logger.warning(f"take_get_pay_block session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
     
-    session.back_fill_for_pay_block(pay_block)
+    session.back_fill_for_pay_block(pay_block_number)
 
     return {"value" : "success",
-            "pay_block_csv" : session.get_pay_block_csv(pay_block),}
+            "pay_block_csv" : session.get_pay_block_csv(pay_block_number),}
 
 def take_force_check_in(session_id, data):
     '''

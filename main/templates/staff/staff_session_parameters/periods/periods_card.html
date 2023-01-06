@@ -21,9 +21,9 @@
                                 <th scope="col" class = "text-nowrap">
                                     Day
                                 </th> 
-                                <th scope="col" class = "text-nowrap">
+                                <!-- <th scope="col" class = "text-nowrap">
                                     Type
-                                </th>
+                                </th> -->
                                 <th scope="col" class = "text-nowrap">
                                     Wrist Minutes
                                 </th>
@@ -42,10 +42,10 @@
                                 <th scope="col" class = "text-nowrap">
                                     Pay<br>Block
                                 </th>
-                                <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
+                                <!-- <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
                                     [[p.label]] <br>
                                     Individual/Group/%
-                                </th> 
+                                </th>  -->
                                 <th scope="col" class = "text-nowrap">
                                     Copy
                                 </th>                       
@@ -59,9 +59,9 @@
                                 <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[index+1]]
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                <!-- <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.period_type]]
-                                </td>
+                                </td> -->
                                 <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.minimum_wrist_minutes]]
                                 </td>
@@ -87,14 +87,14 @@
                                 <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.parameter_set_pay_block.id != -1 ? temp_p.parameter_set_pay_block.pay_block_number : '---']]
                                 </td>                               
-                                <td v-for="(p2, index2) in temp_p.parameter_set_period_payments_order" 
+                                <!-- <td v-for="(p2, index2) in temp_p.parameter_set_period_payments_order" 
                                     v-bind:key="p2.id" 
                                     v-on:click="showEditParametersetPeriodPayment(p, p2)" 
                                     class="player_table_cell text-nowrap"
                                     :set="temp_p2=temp_p.parameter_set_period_payments[p2]">
 
                                     $[[temp_p2.payment]] / $[[temp_p2.group_bonus]] / [[temp_p2.no_pay_percent]]%
-                                </td>
+                                </td> -->
                                 <td class="text-nowrap">
                                     <button class="btn btn-outline-primary btn-sm me-2"
                                             type="button"
