@@ -269,7 +269,7 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
     let marginX=app.marginX;
     let margin2=app.margin2;
 
-    let zone_minutes_list = app.session.parameter_set.parameter_set_zone_minutes;
+    //let zone_minutes_list = app.session.parameter_set.parameter_set_zone_minutes;
 
     ctx.save();
 
@@ -280,12 +280,18 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
     ctx.translate(marginY, h-marginX);
     ctx.moveTo(0, 0);
 
+    let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
+
     //lines
     ctx.beginPath();
 
-    for(let i=0;i<zone_minutes_list.length-1;i++)
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length-1;i++)
     {
-        y = app.convertToY(zone_minutes_list[i].zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes; //zone_minutes_list[i].zone_minutes+1
+        
+        y = app.convertToY(zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
 
         ctx.moveTo(0, y);
         ctx.lineTo(w-marginY-marginY, y);
@@ -306,11 +312,14 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
     ctx.textAlign = "right";
     ctx.lineCap = "round";
     
-    for(let i=0;i<zone_minutes_list.length-1;i++)
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length-1;i++)
     {
-        y = app.convertToY(zone_minutes_list[i].zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes; //zone_minutes_list[i].zone_minutes+1
+        
+        y = app.convertToY(zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
 
-        ctx.fillText(zone_minutes_list[i].zone_minutes+1, -8, y+4);
+        ctx.fillText(zone_minutes+1, -8, y+4);
         ctx.moveTo(-4, y);
         ctx.lineTo(0, y);
     }
@@ -320,7 +329,7 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
 
     ctx.restore(); 
 
-    //labels
+    //labels between lines
     ctx.save()
 
     ctx.translate(marginY, h-marginX);
@@ -332,31 +341,32 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
 
     if(!app.session.current_parameter_set_period) return;
 
-    let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
     let previous_zone_minutes = 0;
 
-    if(payments_list)
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length;i++)
     {
-        for(let i=0;i<payments_list.length;i++)
-        {
-            let current_zone_minutes = Math.min(payments_list[i].parameter_set_zone_minutes.zone_minutes + 1, 
-                                                app.session.parameter_set.graph_y_max);
-            let y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes; //zone_minutes_list[i].zone_minutes+1
+        let label = current_pay_block.parameter_set_pay_block_payments[index].label;
 
-            
-            ctx.fillText(payments_list[i].parameter_set_zone_minutes.label + " min.", w/2 - marginY, y+4);
+        let current_zone_minutes = Math.min(zone_minutes + 1, 
+                                            app.session.parameter_set.graph_y_max);
 
-            previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
-        }
+        let y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+
+        
+        ctx.fillText(label, w/2 - marginY, y+4);
+
+        previous_zone_minutes = zone_minutes + 1;
     }
-
+    
     ctx.restore();
 },
 
 /**
  * draw earnings on right side
  */
-drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
+drawEarnings(chartID, yMin, yMax, xMin, xMax)
 {
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
@@ -367,8 +377,6 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
     let marginY=app.marginY;
     let marginX=app.marginX;
     let margin2=app.margin2;
-
-    let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
 
     // axis
     ctx.beginPath();
@@ -386,30 +394,37 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
     ctx.textAlign = "left";
     ctx.lineCap = "round";
 
+    let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
     let previous_zone_minutes = 0;
 
-    for(let i=0;i<payments_list.length;i++)
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length;i++)
     {
-        let current_zone_minutes = Math.min(payments_list[i].parameter_set_zone_minutes.zone_minutes + 1, 
-                                            app.session.parameter_set.graph_y_max);
-        y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
-        
-        if (period_type=="Group Pay")
-        {
-        ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-        ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y-10);
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let pay_block_payment = current_pay_block.parameter_set_pay_block_payments[index];
 
-        ctx.fillStyle = "green";
-        ctx.fillText("$" + payments_list[i].group_bonus, w-marginY-marginY+4, y+10);
+        let current_zone_minutes = Math.min(pay_block_payment.zone_minutes + 1, app.session.parameter_set.graph_y_max);
+                                            
+        y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+        
+        if (current_pay_block.pay_block_type=="Block Pay Group")
+        {
+            ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+            ctx.fillText("$" + pay_block_payment.payment, w-marginY-marginY+4, y-10);
+
+            ctx.fillStyle = "green";
+            ctx.fillText("$" + pay_block_payment.group_bonus, w-marginY-marginY+4, y+10);
         }
         else
         {
             ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-            ctx.fillText("$" + payments_list[i].payment, w-marginY-marginY+4, y+4);
+            ctx.fillText("$" + pay_block_payment.payment, w-marginY-marginY+4, y+4);
         }
 
-        previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
+        previous_zone_minutes = pay_block_payment.zone_minutes + 1;
     }
+
+    let block_length = app.session.current_parameter_set_period.graph_2_end_period_number - app.session.current_parameter_set_period.graph_2_start_period_number + 1;
 
     ctx.restore();
 
@@ -420,7 +435,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax, period_type)
     ctx.save();
     ctx.translate(w-14, (h-marginX-margin2)/2+margin2);
     ctx.rotate(Math.PI/2);                                                              
-    ctx.fillText("Your Potential Zone Minute Earnings per Day", 0, 10);
+    ctx.fillText("Your " + block_length +  " Day Average Zone Minute Bonus", 0, 10);
     ctx.restore();
 },
 
@@ -634,6 +649,8 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     let tempXValue=xMin;     
     let xTickValue=xScale/parseFloat(xTickCount);
 
+    let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
     let session_player_partner = null;
 
     for(let i=0;i<app.session.session_players.length;i++)
@@ -685,7 +702,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
         if(app.session_player.session_player_periods_2[i].check_in)
         {   
-            if(app.session_player.session_player_periods_2[i].period_type == "No Pay")
+            if(app.session_player.session_player_periods_2[i].period_type == "Earn Fitbit")
             {
                 text1 = app.session_player.session_player_periods_2[i].earnings_no_pay_percent + '%';
             }
@@ -704,7 +721,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
         ctx.fillText(text1, tempX, h-marginX+40);
 
-        if(app.session_player.session_player_periods_2[i].period_type == "Group Pay")
+        if(app.session_player.session_player_periods_2[i].period_type == "Block Pay Group")
         {
             ctx.fillStyle = "green";
             ctx.fillText(text2, tempX, h-marginX+64);
@@ -715,7 +732,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
         if(session_player_partner.session_player_periods_2[i].check_in)
         {
-            if(app.session_player.session_player_periods_2[i].period_type == "No Pay")
+            if(app.session_player.session_player_periods_2[i].period_type == "Earn Fitbit")
             {
                 text1 = session_player_partner.session_player_periods_2[i].earnings_no_pay_percent + '%';
             }
@@ -741,7 +758,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.textAlign = "right";
     ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
 
-    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
         ctx.fillText("Fitbit", marginY-30, 28);
     }
@@ -752,7 +769,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
 
-    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
        ctx.fillText("My Fitbit", marginY-15, h-marginX+40);
     }
@@ -772,7 +789,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
 
-    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
         ctx.fillText("Sum="+Math.min(session_player_partner.current_block_earnings.earnings_no_pay_percent, 100)+"%", w - 5, 18);
     }
@@ -783,7 +800,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "right";
-    if(app.session.current_parameter_set_period.period_type == "No Pay")
+    if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
         ctx.fillText("Sum="+Math.min(app.session_player.current_block_earnings.earnings_no_pay_percent, 100)+'%', w - 5, h-marginX+40);
     }
@@ -831,7 +848,9 @@ updateGraph(){
 
     app.drawSetup("graph_id");
 
-    parameter_set_period = app.session.current_parameter_set_period;
+    let parameter_set_period = app.session.current_parameter_set_period;
+    let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
 
     app.drawAxis("graph_id", 
                  0, app.session.parameter_set.graph_y_max, 1,
@@ -842,11 +861,11 @@ updateGraph(){
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
-    if(parameter_set_period.period_type == "Group Pay" || parameter_set_period.period_type == "Individual Pay")
+    if(current_pay_block.pay_block_type == "Block Pay Group" || 
+       current_pay_block.pay_block_type == "Block Pay Individual")
     {
         app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
-                        parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
-                        parameter_set_period.period_type);
+                        parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
     }
     
     if(parameter_set_period.show_graph_1)

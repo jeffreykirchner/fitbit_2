@@ -102,6 +102,8 @@ class Session(models.Model):
 
         self.started = True
         self.finished = False     
+        
+        self.parameter_set.json_for_subject(update_required=True)
 
         session_periods = []
 
