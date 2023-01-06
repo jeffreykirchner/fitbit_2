@@ -661,14 +661,11 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
             break;
         }
     }
-
-    let show_team_pay_label = false;
     
     for(let i=0; i<=xTickCount; i++)
     {                                       
         let text1 = "";
-        let text2 = "";
-
+        
         if(i==0)
         {
             ctx.textAlign = "left";
@@ -710,24 +707,15 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
             {
                 text1 = '$' + app.session_player.session_player_periods_2[i].earnings_individual;
             }
-
-            text2 = '$' + app.session_player.session_player_periods_2[i].earnings_group;
         }
         else
         {
             text1 = "NP";
-            text2 = "NP";
         }
 
         ctx.fillText(text1, tempX, h-marginX+40);
 
-        if(app.session_player.session_player_periods_2[i].period_type == "Block Pay Group")
-        {
-            ctx.fillStyle = "green";
-            ctx.fillText(text2, tempX, h-marginX+64);
-            show_team_pay_label = true;
-        }
-
+        
         //partner
         ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
         if(session_player_partner.session_player_periods_2[i].check_in)
@@ -778,13 +766,6 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
         ctx.fillText("My Pay", marginY-25, h-marginX+40);
     }
 
-    if(show_team_pay_label)
-    {
-        ctx.fillStyle = "green";
-        ctx.fillText("Group", marginY-25, h-marginX+57);
-        ctx.fillText("Pay", marginY-30, h-marginX+70);
-    }
-
     //totals
     ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
     ctx.textAlign = "right";
@@ -807,13 +788,6 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     else
     {
         ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
-    }
-
-    if(show_team_pay_label)
-    {
-        ctx.fillStyle = "green";
-        ctx.textAlign = "right";
-        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.group_bonus, w - 5, h-marginX+64);
     }
 },
 
