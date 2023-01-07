@@ -38,7 +38,7 @@ var app = Vue.createApp({
 
                     //graph globals
                     marginY : 80,
-                    marginX : 75,
+                    marginX : 60,
                     margin2 : 35,
                     sizeW : 0,
                     sizeH : 0,
