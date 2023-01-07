@@ -530,7 +530,7 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
 /**
  * draw dot for todays zone minutes
  */
-drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
+drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
     var canvas = document.getElementById(chartID);
     var ctx = canvas.getContext('2d');           
 
@@ -549,12 +549,6 @@ drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
     ctx.moveTo(0, 0);
     ctx.lineWidth=markerWidth;
 
-    // ctx.font="bold 14px Georgia";
-    // ctx.textAlign = "left";
-    // ctx.lineCap = "round";
-    // ctx.strokeStyle="black";
-    // ctx.lineWidth=markerWidth;
-
     //draw group
     for(let i=0;i<app.session.session_players.length;i++)
     {
@@ -562,27 +556,24 @@ drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
 
         if(player.id != app.session_player.id)
         {
-            let today_zone_minutes = -1;
 
             for(let j=0;j<player.session_player_periods_2.length;j++)
             {
                 let session_player_period = player.session_player_periods_2[j];
 
-                if(session_player_period.period_number==app.session.current_period)
+                if(session_player_period.check_in)
                 {
-                    today_zone_minutes = session_player_period.zone_minutes;
-                    break;
+                    
+                    ctx.beginPath();
+                    x = app.convertToX(session_player_period.period_number, xMax, xMin, w-marginY-marginY, markerWidth);
+                    y = app.convertToY(session_player_period.zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
+                    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+                    ctx.fillStyle=player.parameter_set_player.display_color;
+                    ctx.fill();
+                    ctx.stroke();
                 }
                 
             }            
-
-            ctx.beginPath();
-            x = app.convertToX(app.session.current_period, xMax, xMin, w-marginY-marginY, markerWidth);
-            y = app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
-            ctx.arc(x, y, 6, 0, 2 * Math.PI);
-            ctx.fillStyle=player.parameter_set_player.display_color;
-            ctx.fill();
-            ctx.stroke();
         }
     }
 
@@ -593,29 +584,23 @@ drawTodaysZoneMinutes(chartID, yMin, yMax, xMin, xMax){
 
         if(player.id == app.session_player.id)
         {
-            let today_zone_minutes = -1;
 
             for(let j=0;j<player.session_player_periods_2.length;j++)
             {
                 let session_player_period = player.session_player_periods_2[j];
 
-                if(session_player_period.period_number==app.session.current_period)
+                if(session_player_period.check_in)
                 {
-                    today_zone_minutes = session_player_period.zone_minutes;
-                    break;
+                    ctx.beginPath();
+                    x = app.convertToX(session_player_period.period_number, xMax, xMin, w-marginY-marginY, markerWidth);
+                    y = app.convertToY(session_player_period.zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
+                    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+                    ctx.fillStyle=player.parameter_set_player.display_color;
+                    ctx.fill();
+                    ctx.stroke();
                 }
                 
             }            
-
-            ctx.beginPath();
-            x = app.convertToX(app.session.current_period, xMax, xMin, w-marginY-marginY, markerWidth);
-            y = app.convertToY(today_zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
-            ctx.arc(x, y, 6, 0, 2 * Math.PI);
-            ctx.fillStyle=player.parameter_set_player.display_color;
-            ctx.fill();
-            ctx.stroke();
-
-            break;
         }
     }
 
@@ -849,7 +834,7 @@ updateGraph(){
     app.drawZoneMinuteLines2("graph_id", 0, app.session.parameter_set.graph_y_max,
                             parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
     
-    app.drawTodaysZoneMinutes("graph_id", 0, app.session.parameter_set.graph_y_max,
+    app.drawZoneMinutes("graph_id", 0, app.session.parameter_set.graph_y_max,
                               parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
     app.drawPeriodEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
