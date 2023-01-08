@@ -98,7 +98,7 @@ class SessionPlayerPeriod(models.Model):
         '''
         
         self.zone_minutes = random.randrange(0, self.session_player.session.parameter_set.graph_y_max+10)
-
+        
         self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
         self.fitbit_heart_time_series = {"message":"filled with test data"}
 
@@ -108,6 +108,7 @@ class SessionPlayerPeriod(models.Model):
             self.check_in = True
 
         self.save()
+        self.calc_and_store_average_zone_minutes()
     
     def wrist_time_met(self):
         '''
@@ -352,9 +353,9 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
 
-    def pull_secondary_metrics(self, save_pull_time, result):
+    def process_metrics(self, save_pull_time, result):
         '''
-        pull extra metrics
+        process metrics
         '''
 
         logger = logging.getLogger(__name__)
@@ -362,34 +363,8 @@ class SessionPlayerPeriod(models.Model):
         if self.session_player.fitbit_user_id == "":
             return {"status" : "fail", "message" : "no fitbit user id"}
         
-        # if self.fitbit_profile:
-        #     logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
-        #     return {"status" : "fail", "message" : "Secondary metrics already pulled"}
-
-        # first_period_date = self.session_player.session.session_periods.first().period_date.strftime("%Y-%m-%d")
-        # last_period_date = self.session_player.session.session_periods.last().period_date.strftime("%Y-%m-%d")
 
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
-
-        #test date
-        #temp_s = "2021-1-25"
-
-        #data = {}
-
-        # if save_pull_time:
-        #     data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
-        #     data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
-
-        # data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
-        # data["fitbit_heart_time_series"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
-
-        # r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
-
-        # if r['status'] == 'fail':
-        #     logger.error(f'pull_secondary_metrics error: {r["message"]}')            
-        #     return {"status" : r['status'], "message" : r["message"]}
-
-        # result = r['result']
 
         try: 
             if save_pull_time:    
@@ -413,6 +388,8 @@ class SessionPlayerPeriod(models.Model):
                 self.last_login = datetime.now()
 
             self.save()
+            self.calc_and_store_average_zone_minutes()
+            
         except KeyError as e:
             logger.error(f"pull_secondary_metrics error: {e}")
             
@@ -423,15 +400,12 @@ class SessionPlayerPeriod(models.Model):
         check subject in for this period
         '''
 
-        # r = self.pull_secondary_metrics(save_pull_time)
-
-        # if r["status"] == "success":
-        #with transaction.atomic():
         self.check_in = True
         self.save()
 
+        self.calc_and_store_average_zone_minutes()
         self.calc_and_store_payment()
-            
+        
         return {"status" : "success"}
     
     def get_survey_link(self):
