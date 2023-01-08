@@ -39,6 +39,7 @@ class SessionPlayerPeriod(models.Model):
 
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
     #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
+    average_pay_block_zone_minutes = models.DecimalField(verbose_name='Average Zone Minutes', decimal_places=2, default=0, max_digits=6)
 
     check_in = models.BooleanField(verbose_name='Checked In', default=False)                     #true if player was able to check in this period
     check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)       #true if staff forces a check in
@@ -178,6 +179,8 @@ class SessionPlayerPeriod(models.Model):
             self.save()
             return {"value":"fail", "message" : "not checked in"}
 
+        self.calc_and_store_average_zone_minutes()
+
         self.earnings_individual = self.get_individual_parameter_set_payment()
         self.earnings_no_pay_percent = self.get_individual_parameter_set_no_pay_percent()
         self.save()
@@ -193,6 +196,21 @@ class SessionPlayerPeriod(models.Model):
 
         return {"value":"success", "message" : ""}
     
+    def calc_and_store_average_zone_minutes(self):
+        '''
+        calc and store the average zone minutes up to this point in the pay block
+        '''
+
+        zone_minutes_list = self.session_player \
+                                .session_player_periods_b \
+                                .filter(session_period__parameter_set_period__parameter_set_pay_block=self.session_period.parameter_set_period.parameter_set_pay_block) \
+                                .filter(check_in=True) \
+                                .filter(session_period__lte=self.session_period.period_number) \
+                                .values_list('zone_minutes', flat=True)
+
+        self.average_pay_block_zone_minutes = sum(zone_minutes_list) / self.session_period.period_number
+        self.save()
+
     def group_checked_in_today(self):
         '''
         return true if all group members have checked in
@@ -408,11 +426,11 @@ class SessionPlayerPeriod(models.Model):
         # r = self.pull_secondary_metrics(save_pull_time)
 
         # if r["status"] == "success":
-        with transaction.atomic():
-            self.check_in = True
-            self.save()
+        #with transaction.atomic():
+        self.check_in = True
+        self.save()
 
-            self.calc_and_store_payment()
+        self.calc_and_store_payment()
             
         return {"status" : "success"}
     
@@ -573,6 +591,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_total" : self.get_earning(),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             "zone_minutes" : self.zone_minutes,
+            "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
             "check_in" : self.check_in,
@@ -598,6 +617,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_total" : self.get_earning(),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             "zone_minutes" : self.zone_minutes,
+            "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
             "fitbit_resting_heart_rate" : self.fitbit_resting_heart_rate,
@@ -606,6 +626,7 @@ class SessionPlayerPeriod(models.Model):
             "check_in" : self.check_in,
             "check_in_forced" : self.check_in_forced,
             "period_type" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_type,
+            "pay_block_number" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_number,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
 
