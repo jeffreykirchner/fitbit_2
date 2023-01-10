@@ -455,7 +455,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax)
 
             if(session_player_period.period_number<app.session.current_period)
             {
-                dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
             }
         }
 
@@ -486,7 +486,7 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
                 if(session_player_period.period_number<app.session.current_period || 
                    (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
-                        dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                        dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
                     }
                 
             }
@@ -512,7 +512,7 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
                 if(session_player_period.period_number<app.session.current_period || 
                   (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
-                        dataSet.push({x:session_player_period.period_number, y:session_player_period.zone_minutes});
+                        dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
                     }
                 
             }

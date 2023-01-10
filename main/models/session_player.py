@@ -238,6 +238,12 @@ class SessionPlayer(models.Model):
 
         return earnings
     
+    def get_block_period_count(self, parameter_set_pay_block):
+        '''
+        return the number of periods in payblock
+        '''
+        return self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block).count()
+    
     def get_todays_session_player_period(self):
         '''
         return the session player period for today
@@ -691,9 +697,9 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,            
 
-            "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            "individual_earnings" : round(todays_session_player_period.earnings_individual) if todays_session_player_period else None,
             "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
-            "no_pay_percent" : todays_session_player_period.get_individual_parameter_set_no_pay_percent() if todays_session_player_period else False,
+            "no_pay_percent" : todays_session_player_period.earnings_no_pay_percent if todays_session_player_period else False,
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
@@ -756,9 +762,9 @@ class SessionPlayer(models.Model):
             #"group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
             "missed_check_ins" : self.get_current_missed_check_ins(),
 
-            #"individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            #"individual_earnings" : round(todays_session_player_period.get_individual_bonus_payment()) if todays_session_player_period else None,
             #"group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
-            #"no_pay_percent" : todays_session_player_period.get_individual_parameter_set_no_pay_percent() if todays_session_player_period else False,
+            #"no_pay_percent" : todays_session_player_period.get_no_pay_percent if todays_session_player_period else False,
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),

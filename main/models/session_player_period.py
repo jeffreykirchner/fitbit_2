@@ -33,10 +33,12 @@ class SessionPlayerPeriod(models.Model):
     session_period = models.ForeignKey(SessionPeriod, on_delete=models.CASCADE, related_name="session_player_periods_a")
     session_player = models.ForeignKey(SessionPlayer, on_delete=models.CASCADE, related_name="session_player_periods_b")
 
-    earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)     #earnings from individual activity this period
-    earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)               #earnings from group bonus this period
+    earnings_fixed = models.DecimalField(verbose_name='Fixed Pay Earnings', decimal_places=2, default=0, max_digits=5)           #earnings from fixed pay activity this period
     earnings_no_pay_percent = models.IntegerField(verbose_name='No Pay Fitbit Percent', default=0)                               #no pay fitbit percent
 
+    earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)     #earnings from individual activity this period
+    earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)               #earnings from group bonus this period
+    
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
     #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
     average_pay_block_zone_minutes = models.DecimalField(verbose_name='Average Zone Minutes', decimal_places=2, default=0, max_digits=6)
@@ -102,7 +104,7 @@ class SessionPlayerPeriod(models.Model):
         self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
         self.fitbit_heart_time_series = {"message":"filled with test data"}
 
-        if random.randrange(1,10) == 1 or not self.wrist_time_met():
+        if random.randrange(1,10) <= 2 or not self.wrist_time_met():
             self.check_in = False
         else:
             self.check_in = True
@@ -120,80 +122,64 @@ class SessionPlayerPeriod(models.Model):
         
         return False
         
-    def get_individual_parameter_set_payment(self):
+    def get_individual_bonus_payment(self):
         '''
-        calc and return individual earnings
+        calc and return individual bonus payment
         '''
-        # pervious_session_player_period = self.get_pervious_player_period()
 
-        # if not pervious_session_player_period:
-        #     return 0
+        block_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
 
-        period_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
-
-        if period_payment:
-            return period_payment.payment
+        if block_payment:
+            return block_payment.payment
 
         return 0
     
-    def get_individual_parameter_set_no_pay_percent(self):
+    def get_group_bonus_payment(self):
+        '''
+        calc and return group bonus payment
+        '''
+
+        zone_minutes = self.session_period.parameter_set_period.get_payment(self.get_lowest_group_zone_minutes())
+
+        block_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
+
+        if block_payment:
+            return block_payment.group_bonus
+
+        return 0
+
+    def get_fixed_pay(self):
         '''
         calc and return no pay percent
         '''
-        # pervious_session_player_period = self.get_pervious_player_period()
 
-        # if not pervious_session_player_period:
-        #     return 0
-
-        period_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
-
-        if period_payment:
-            return period_payment.no_pay_percent
-
-        return 0
+        return self.session_period.parameter_set_period.fixed_pay
     
-    def get_group_parameter_set_payment(self):
+    def get_no_pay_percent(self):
         '''
-        calc and return individual earnings
+        calc and return no pay percent
         '''
-        # pervious_session_player_period = self.get_pervious_player_period()
 
-        # if not pervious_session_player_period:
-        #     return 0
-
-        period_payment = self.session_period.parameter_set_period.get_payment(self.get_lowest_group_zone_minutes())
-
-        if period_payment:
-            return period_payment.group_bonus
-
-        return 0
+        return self.session_period.parameter_set_period.no_pay_percent
 
     def calc_and_store_payment(self):
         '''
         calculate and store payment
         '''
 
+        self.earnings_individual = self.get_individual_bonus_payment()
+        self.earnings_group = self.get_group_bonus_payment()
+
         if not self.check_in:
-            self.earnings_individual=0
-            self.earnings_group=0
+            self.earnings_fixed=0
             self.earnings_no_pay_percent=0
             self.save()
             return {"value":"fail", "message" : "not checked in"}
 
-        self.calc_and_store_average_zone_minutes()
+        self.earnings_fixed = self.get_fixed_pay()
+        self.earnings_no_pay_percent = self.get_no_pay_percent()
 
-        self.earnings_individual = self.get_individual_parameter_set_payment()
-        self.earnings_no_pay_percent = self.get_individual_parameter_set_no_pay_percent()
         self.save()
-
-        if self.group_checked_in_today():
-            e = self.get_group_parameter_set_payment()
-        else:
-            e = 0
-
-        g = main.models.SessionPlayerPeriod.objects.filter(session_period=self.session_period,
-                                                           session_player__group_number=self.session_player.group_number)
-        g.update(earnings_group=e)
 
         return {"value":"success", "message" : ""}
     
@@ -206,10 +192,22 @@ class SessionPlayerPeriod(models.Model):
                                 .session_player_periods_b \
                                 .filter(session_period__parameter_set_period__parameter_set_pay_block=self.session_period.parameter_set_period.parameter_set_pay_block) \
                                 .filter(check_in=True) \
-                                .filter(session_period__lte=self.session_period.period_number) \
+                                .filter(session_period__period_number__lte=self.session_period.period_number) \
                                 .values_list('zone_minutes', flat=True)
+        
+        zone_minutes_list = list(zone_minutes_list)
 
-        self.average_pay_block_zone_minutes = sum(zone_minutes_list) / self.session_period.period_number
+        block_period_count = self.session_player \
+                                 .session_player_periods_b \
+                                 .filter(session_period__parameter_set_period__parameter_set_pay_block=self.session_period.parameter_set_period.parameter_set_pay_block) \
+                                 .filter(session_period__period_number__lte=self.session_period.period_number) \
+                                 .count()
+
+        if block_period_count > 0:
+            self.average_pay_block_zone_minutes = sum(zone_minutes_list) / block_period_count
+        else:
+            self.average_pay_block_zone_minutes = 0
+
         self.save()
 
     def group_checked_in_today(self):
@@ -227,11 +225,14 @@ class SessionPlayerPeriod(models.Model):
     
     def get_lowest_group_zone_minutes(self):
         '''
-        return the lowest zone minute total from a group member this period
+        return the lowest zone minute total from a group member this pay block
         '''
+        
+        # session_player_periods = main.models.SessionPlayerPeriod.objects.filter(session_period__session=self.session_period.session) \
+        #                                                                 .filter(session_player__group_number=self.session_player.group_number) \
 
-        return self.session_period.session_player_periods_a.filter(session_player__group_number=self.session_player.group_number) \
-                                                           .order_by('zone_minutes').first().zone_minutes
+        # return self.session_period.session_player_periods_a \
+        #                                                    .order_by('zone_minutes').first().zone_minutes
 
     def get_pervious_player_period(self):
         '''
@@ -560,12 +561,14 @@ class SessionPlayerPeriod(models.Model):
             "period_number" : self.session_period.period_number,
             "period_day_of_week" : self.session_period.get_formatted_day_of_week(),
 
+            "earnings_fixed" : round(self.earnings_fixed),
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
             "earnings_total" : self.get_earning(),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
+
             "zone_minutes" : self.zone_minutes,
-            "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
+            "average_pay_block_zone_minutes" : round(self.average_pay_block_zone_minutes, 1),
             "fitbit_on_wrist_minutes" : self.fitbit_on_wrist_minutes,
             "last_login" : self.last_login,
             "check_in" : self.check_in,
@@ -586,10 +589,12 @@ class SessionPlayerPeriod(models.Model):
             "period_number" : self.session_period.period_number,
             "fitbit_formatted_date" : self.session_period.get_formatted_date(),
 
+            "earnings_fixed" : round(self.earnings_fixed),
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
             "earnings_total" : self.get_earning(),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
+            
             "zone_minutes" : self.zone_minutes,
             "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
