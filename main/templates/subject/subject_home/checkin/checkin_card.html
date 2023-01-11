@@ -66,11 +66,27 @@
                     [[session_player.no_pay_percent]]% of keeping your Fitbit
                 </span>
                 <span v-else>
-                    $[[session_player.individual_earnings]]
+                    $[[session_player.earnings_fixed]]
                 </span>
                 
             </div>
-        </div>      
+        </div>   
+        <div class="row" v-if="session.current_parameter_set_period.period_type=='Block Pay Group' || session.current_parameter_set_period.period_type=='Block Pay Individual'">
+            <div class="col text-end pe-1 text-nowrap">
+                Your current individual bonus:                 
+            </div>
+            <div class="col text-start ps-1">               
+                $[[session_player.earnings_fixed]]
+            </div>
+        </div> 
+        <div class="row" v-if="session.current_parameter_set_period.period_type=='Block Pay Group'">
+            <div class="col text-end pe-1 text-nowrap">
+                Your current group bonus:                 
+            </div>
+            <div class="col text-start ps-1">               
+                $[[session_player.earnings_fixed]]
+            </div>
+        </div>  
         <div class="row text-end fw-bold" v-if="session_player.survey_link != ''">            
             <div class="col mt-2">              
                 Complete the survey before check in: <a v-bind:href="session_player.survey_link">Open Survey</a>

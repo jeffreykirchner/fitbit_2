@@ -82,15 +82,6 @@ class ParameterSet(models.Model):
             for p in new_parameter_set_players:    
                 new_player = self.add_new_player()            
                 new_player.from_dict(new_parameter_set_players[p])
-            
-            #zone minutes
-            new_parameter_set_zone_minutes = new_ps.get("parameter_set_zone_minutes")
-
-            self.parameter_set_zone_minutes.all().delete()
-
-            for p in new_parameter_set_zone_minutes:       
-                zone_minutes =  self.add_new_zone_minutes()         
-                zone_minutes.from_dict(new_parameter_set_zone_minutes[p])
 
             #pay blocks
             new_parameter_set_pay_blocks = new_ps.get("parameter_set_pay_blocks", None)
@@ -122,10 +113,8 @@ class ParameterSet(models.Model):
         '''
         default setup
         '''    
-        if self.parameter_set_zone_minutes.count() == 0:
-            parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes()
-            parameter_set_zone_minutes.parameter_set = self
-            parameter_set_zone_minutes.save()
+
+        pass
 
         if self.parameter_set_periods.count() == 0:
             parameter_set_period = main.models.ParameterSetPeriod()
@@ -170,36 +159,6 @@ class ParameterSet(models.Model):
         parameter_set_period.setup()
 
         return parameter_set_period
-    
-    def add_new_zone_minutes(self):
-        '''
-        add new parameter set zone minutes
-        '''
-        logger = logging.getLogger(__name__) 
-
-        parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes()
-
-        new_zone_minutes = -1
-
-        for i in range(1441):
-            if self.parameter_set_zone_minutes.filter(zone_minutes=i).count() == 0:
-                new_zone_minutes = i
-                #logger.info(f'add_new_zone_minutes: new_zone_minutes {new_zone_minutes}')
-                break
-
-        if new_zone_minutes == -1:
-            logger.warning(f'add_new_zone_minutes: no slot found for parameter set {self.id}')
-            return
-
-        parameter_set_zone_minutes.parameter_set = self
-        parameter_set_zone_minutes.zone_minutes = new_zone_minutes
-
-        parameter_set_zone_minutes.save()
-
-        for p in self.parameter_set_periods.all():
-            p.setup()
-        
-        return parameter_set_zone_minutes
     
     def add_new_pay_block(self):
         '''
@@ -285,7 +244,6 @@ class ParameterSet(models.Model):
                 "show_instructions" : "True" if self.show_instructions else "False",
                 "test_mode" : self.test_mode,
                 "graph_y_max" : self.graph_y_max,
-                "parameter_set_zone_minutes" : [p.json() for p in self.parameter_set_zone_minutes.all()],
                 "consent_form" : self.consent_form,
                 "consent_form_required" : self.consent_form_required,
                 "parameter_set_pay_blocks" : {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()},

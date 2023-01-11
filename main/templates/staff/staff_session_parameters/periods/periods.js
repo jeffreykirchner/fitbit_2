@@ -63,17 +63,6 @@ takeAddParameterSetPeriod(messageData){
 },
 
 
-/**show edit parameter set period payment
- */
- showEditParametersetPeriodPayment(index, index2){
-    app.clearMainFormErrors();
-
-    app.current_parameter_set_period_payment = Object.assign({}, app.session.parameter_set.parameter_set_periods[index].parameter_set_period_payments[index2]);
-
-    app.editParametersetPeriodPaymentModal.toggle();
-},
-
-
 /** update parameterset period settings
 */
 sendUpdatePayment(){
@@ -83,22 +72,7 @@ sendUpdatePayment(){
                                                            "formData" : app.current_parameter_set_period_payment,});
 },
 
-/** handle result of updating parameter set period payment
-*/
-takeUpdatePayment(messageData){
 
-    app.clearMainFormErrors();
-
-    if(messageData.status.value == "success")
-    {
-        app.session.parameter_set = messageData.status.parameter_set;       
-        app.editParametersetPeriodPaymentModal.hide();            
-    } 
-    else
-    {                     
-        app.displayErrors(messageData.status.errors);
-    } 
-},
 
 /** update copy parameter set period forward
 */

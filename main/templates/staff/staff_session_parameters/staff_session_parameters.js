@@ -40,8 +40,6 @@ var app = Vue.createApp({
                     importParametersModal : null,
                     editParametersetPlayerModal : null,            
                     editParametersetPeriodModal : null,           
-                    editParametersetZoneMinutesModal : null,
-                    editParametersetPeriodPaymentModal : null,
 
                     //form paramters
                     session_import : null,
@@ -94,15 +92,6 @@ var app = Vue.createApp({
                 case "update_parameterset_period_copy_previous":
                     app.takeCopyPrevious(messageData);
                     break;
-                case "update_parameterset_period_payment":
-                    app.takeUpdatePayment(messageData);
-                    break;
-                case "add_parameterset_zone_minutes":
-                    app.takeAddParameterSetZoneMinutes(messageData);
-                    break;   
-                case "update_parameterset_zone_minutes":
-                    app.takeUpdateZoneMinutes(messageData);
-                    break;    
                 case "update_pay_block":
                     app.takeUpdatePayBlock(messageData);
                     break; 
@@ -161,14 +150,12 @@ var app = Vue.createApp({
 
         do_first_load()
         {
-            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false})
-            app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false})
-            app.editParametersetPlayerModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPlayerModal'), {keyboard: false})            
-            app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false})            
-            app.editParametersetZoneMinutesModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetZoneMinutesModal'), {keyboard: false})
-            app.editParametersetPeriodPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodPaymentModal'), {keyboard: false})
-            app.editParametersetPayBlockPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockPaymentModal'), {keyboard: false})
-            app.editParametersetPayBlockModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockModal'), {keyboard: false})
+            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false});
+            app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false});
+            app.editParametersetPlayerModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPlayerModal'), {keyboard: false});           
+            app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false});            
+            app.editParametersetPayBlockPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockPaymentModal'), {keyboard: false});
+            app.editParametersetPayBlockModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockModal'), {keyboard: false});
         },
 
         /** send winsock request to get session info
@@ -204,7 +191,6 @@ var app = Vue.createApp({
         {%include "staff/staff_session_parameters/control/control.js"%}
         {%include "staff/staff_session_parameters/players/players.js"%}
         {%include "staff/staff_session_parameters/periods/periods.js"%}
-        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes.js"%}
         {%include "staff/staff_session_parameters/pay_blocks/pay_blocks.js"%}
         {%include "js/help_doc.js"%}
     

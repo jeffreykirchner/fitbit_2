@@ -612,7 +612,7 @@ class SessionPlayer(models.Model):
         p = self.session.get_current_session_period()
         fixed_pay = "---"
         if p:
-            fixed_pay = round(p.parameter_set_period.parameter_set_period_pays_a.first().payment)
+            fixed_pay = round(p.parameter_set_period.parameter_set_pay_block.fixed_pay)
 
         partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
 
@@ -645,14 +645,14 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        for i in p["parameter_set_period_payments"]:
-            temp_p = p["parameter_set_period_payments"][i]
-            parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
+        # for i in p["parameter_set_period_payments"]:
+        #     temp_p = p["parameter_set_period_payments"][i]
+        #     parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
 
-            html = html + f"""<tr>
-                             <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
-                             <td class='text-center w-auto'>${temp_p['payment']}</td>
-                          </tr>"""
+        #     html = html + f"""<tr>
+        #                      <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
+        #                      <td class='text-center w-auto'>${temp_p['payment']}</td>
+        #                   </tr>"""
                 
         html = html + """</tbody></table></center>"""
         
@@ -678,14 +678,14 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        for i in p["parameter_set_period_payments"]:
-            temp_p = p["parameter_set_period_payments"][i]
-            parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
+        # for i in p["parameter_set_period_payments"]:
+        #     temp_p = p["parameter_set_period_payments"][i]
+        #     parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
 
-            html = html + f"""<tr>
-                             <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
-                             <td class='text-center w-auto'>${temp_p['group_bonus']}</td>
-                          </tr>"""
+        #     html = html + f"""<tr>
+        #                      <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
+        #                      <td class='text-center w-auto'>${temp_p['group_bonus']}</td>
+        #                   </tr>"""
                 
         html = html + """</tbody></table></center>"""
         
@@ -737,7 +737,7 @@ class SessionPlayer(models.Model):
             "consent_form_required" : self.consent_form_required,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
-            "connected_count" : self.connected_count,
+            #"connected_count" : self.connected_count,
 
             "parameter_set_player" : self.parameter_set_player.json(),
 

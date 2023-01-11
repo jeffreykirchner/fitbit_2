@@ -53,19 +53,25 @@ class SubjectHomeView(View):
 
         parameters = Parameters.objects.first()
 
-        subject_graph_help_doc = "Subject graph help fixed pay"
-        subject_check_in_help_doc = "Subject check in help fixed pay"
-        
+        subject_graph_help_doc = ""
+        subject_check_in_help_doc = ""
+
         if session_player_period_today:
-            if session_player_period_today.session_period.parameter_set_period.period_type == "Group Pay":
+
+            parmeter_set_pay_block = session_player_period_today.session_period.parameter_set_period.parameter_set_pay_block
+
+            if parmeter_set_pay_block.pay_block_type == "Block Pay Group":
                 subject_graph_help_doc = "Subject graph help group pay"
                 subject_check_in_help_doc = "Subject check in help group pay"
-            elif session_player_period_today.session_period.parameter_set_period.period_type == "No Pay":
-                subject_graph_help_doc = "Subject graph help no pay"
-                subject_check_in_help_doc = "Subject check in help no pay"
-            elif session_player_period_today.session_period.parameter_set_period.period_type == "Individual Pay":
+            elif parmeter_set_pay_block.pay_block_type == "Fixed Pay Only":
+                subject_graph_help_doc = "Subject graph help fixed pay"
+                subject_check_in_help_doc = "Subject check in help fixed pay"
+            elif parmeter_set_pay_block.pay_block_type == "Block Pay Individual":
                 subject_graph_help_doc = "Subject graph help individual pay"
                 subject_check_in_help_doc = "Subject check in help individual pay"
+            elif parmeter_set_pay_block.pay_block_type == "Earn Fitbit":
+                subject_graph_help_doc = "Subject graph help earn fitbit"
+                subject_check_in_help_doc = "Subject check in help earn fitbit"
 
         return render(request=request,
                       template_name=self.template_name,

@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 <!--Edit Period Modal -->
-<div class="modal fade" id="editParametersetPayBlockPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPeriodPaymentModalLabel" aria-hidden="true">
+<div class="modal fade" id="editParametersetPayBlockPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPayBlockPaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,7 +8,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="parametersetPeriodPaymentForm" v-on:submit.prevent="onSubmit">
+                <form id="parametersetPayBlockPaymentForm" v-on:submit.prevent="onSubmit">
                     {% for i in parameterset_pay_block_payment_form %}
                     <div class="row">
                         <div class = "col col-md-10 offset-md-1">  

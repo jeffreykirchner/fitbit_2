@@ -21,8 +21,6 @@ from main.forms import ImportParametersForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
-from main.forms import ParameterSetZoneMinutesForm
-from main.forms import ParameterSetPeriodPaymentForm
 from main.forms import ParameterSetPayBlockForm
 from main.forms import ParameterSetPayBlockPaymentForm
 
@@ -44,8 +42,6 @@ class StaffSessionParametersView(SingleObjectMixin, View):
 
         parameterset_player_form = ParameterSetPlayerForm()
         parameterset_period_form = ParameterSetPeriodForm()
-        parameterset_zone_minutes_form = ParameterSetZoneMinutesForm()
-        parameterset_period_payment_form = ParameterSetPeriodPaymentForm()
         parameterset_pay_block_form = ParameterSetPayBlockForm()
         parameterset_pay_block_payment_form = ParameterSetPayBlockPaymentForm()
 
@@ -58,12 +54,6 @@ class StaffSessionParametersView(SingleObjectMixin, View):
 
         for i in parameterset_period_form:
             form_ids.append(i.html_name)
-        
-        for i in parameterset_zone_minutes_form:
-            form_ids.append(i.html_name)
-        
-        for i in parameterset_period_payment_form:
-           form_ids.append(i.html_name)
         
         for i in parameterset_pay_block_form:
            form_ids.append(i.html_name)
@@ -88,8 +78,6 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "parameter_set_player_form" : parameterset_player_form,
                                "form_ids" : form_ids,
                                "parameterset_period_form" : parameterset_period_form,
-                               "parameterset_period_payment_form" : parameterset_period_payment_form,
-                               "parameterset_zone_minutes_form" : parameterset_zone_minutes_form,
                                "parameterset_pay_block_form" : parameterset_pay_block_form,
                                "parameterset_pay_block_payment_form" : parameterset_pay_block_payment_form,
                                "import_parameters_form" : ImportParametersForm(user=request.user,session_id=session.id),     

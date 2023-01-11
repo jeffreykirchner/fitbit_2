@@ -86,15 +86,7 @@
                                 </td> 
                                 <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.parameter_set_pay_block.id != -1 ? temp_p.parameter_set_pay_block.pay_block_number : '---']]
-                                </td>                               
-                                <!-- <td v-for="(p2, index2) in temp_p.parameter_set_period_payments_order" 
-                                    v-bind:key="p2.id" 
-                                    v-on:click="showEditParametersetPeriodPayment(p, p2)" 
-                                    class="player_table_cell text-nowrap"
-                                    :set="temp_p2=temp_p.parameter_set_period_payments[p2]">
-
-                                    $[[temp_p2.payment]] / $[[temp_p2.group_bonus]] / [[temp_p2.no_pay_percent]]%
-                                </td> -->
+                                </td>                              
                                 <td class="text-nowrap">
                                     <button class="btn btn-outline-primary btn-sm me-2"
                                             type="button"
