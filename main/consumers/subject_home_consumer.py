@@ -20,8 +20,6 @@ from django.db import transaction
 from main.consumers import SocketConsumerMixin
 from main.consumers import StaffSubjectUpdateMixin
 
-from main.forms import EndGameForm
-
 from main.models import Session
 from main.models import SessionPlayer
 from main.models import SessionPlayerChat

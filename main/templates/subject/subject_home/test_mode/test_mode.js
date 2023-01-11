@@ -29,19 +29,6 @@ doTestMode(){
     console.log("Do Test Mode");
     {%endif%}
 
-    if(this.end_game_modal_visible)
-    {
-        if(this.session_player.name == "")
-        {
-            document.getElementById("id_name").value =  this.randomString(5, 20);
-            document.getElementById("id_student_id").value =  this.randomNumber(1000, 10000);
-
-            this.sendName();
-        }
-
-        return;
-    }
-
     if(this.session.started &&
        this.session.parameter_set.test_mode
        )

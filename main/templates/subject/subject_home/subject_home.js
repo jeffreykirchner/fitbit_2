@@ -21,14 +21,9 @@ var app = Vue.createApp({
                     session_player : null, 
                     session : null,
 
-                    end_game_form_ids: {{end_game_form_ids|safe}},
-
                     chat_text : "",
                     chat_button_label : "Everyone",
                     chat_list_to_display : [],                //list of chats to display on screen
-
-                    end_game_modal_visible : false,
-                    avatar_choice_modal_visible : false,
 
                     instruction_pages : {{instruction_pages|safe}},
 
@@ -43,7 +38,6 @@ var app = Vue.createApp({
                     sizeW : 0,
                     sizeH : 0,
 
-                    endGameModal : null,
                     consentModal : null,
 
                 }},
@@ -187,11 +181,7 @@ var app = Vue.createApp({
 
         doFirstLoad()
         {
-
-            app.endGameModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('endGameModal'), {keyboard: false})
             app.consentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('consentModal'), {keyboard: false})
-
-            document.getElementById('endGameModal').addEventListener('hidden.bs.modal', app.hideEndGameModal);
 
             {%if session.parameter_set.test_mode%} setTimeout(this.doTestMode, this.randomNumber(1000 , 10000)); {%endif%}
     
@@ -232,8 +222,6 @@ var app = Vue.createApp({
         */
         takeUpdateResetExperiment(messageData){
             app.takeGetSession(messageData);
-
-            app.endGameModal.hide();
         },
 
         showConsentForm(){
@@ -274,19 +262,12 @@ var app = Vue.createApp({
         */
         takeUpdateNextPhase(messageData){
 
-            app.endGameModal.hide();
 
             this.session.current_experiment_phase = messageData.status.session.current_experiment_phase;
             this.session.session_players = messageData.status.session_players;
             this.session_player = messageData.status.session_player;
 
             app.updateChatDisplay();          
-        },
-
-        /** hide choice grid modal modal
-        */
-        hideEndGameModal(){
-            this.end_game_modal_visible=false;
         },
 
         //do nothing on when enter pressed for post
@@ -312,12 +293,6 @@ var app = Vue.createApp({
                 if(e) e.remove();
             }
 
-            s = this.end_game_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
         },
 
         /** display form error messages

@@ -19,5 +19,3 @@ from .session_player_name_etc_form import StaffEditNameEtcForm
 from .session_form_admin import SessionFormAdmin
 from .instruction_set_form_admin import InstructionSetFormAdmin
 from .instruction_form_admin import InstructionFormAdmin
-
-from .end_game_form import EndGameForm
