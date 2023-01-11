@@ -269,6 +269,14 @@ class Session(models.Model):
 
         for p in self.session_players.all():
             p.fill_with_test_data(period.period_number)
+        
+        for p in self.session_players.all():
+            for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+                p.calc_averages_for_block(i)
+
+        for p in self.session_players.all():
+            for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+                p.calc_payments_for_block(i)
 
     def is_before_first_period(self):
         '''

@@ -110,7 +110,7 @@ class SessionPlayerPeriod(models.Model):
             self.check_in = True
 
         self.save()
-        self.calc_and_store_average_zone_minutes()
+        
     
     def wrist_time_met(self):
         '''
