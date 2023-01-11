@@ -83,7 +83,7 @@ class ParameterSetPayBlock(models.Model):
         '''
 
         for p in self.parameter_set_pay_block_payments_a.all():
-            if minutes <= p.parameter_set_zone_minutes.zone_minutes:
+            if minutes <= p.zone_minutes:
                 return p
 
         return None

@@ -366,10 +366,12 @@ class Session(models.Model):
         '''
         back fill last day of a pay block
         '''
+
+        parameter_set_pay_block = self.parameter_set.parameter_set_pay_block__pay_block_number=pay_block_number
         
         for i in self.session_players.exclude(disabled=True):
 
-            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block__pay_block_number=pay_block_number, back_pull=False)
+            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block, back_pull=False)
 
             if pull_list:
 
@@ -377,9 +379,15 @@ class Session(models.Model):
 
                 i.pull_todays_metrics(p)
 
+            for p in pull_list:
                 if p.check_in:
                     p.take_check_in(False)
 
+        for i in self.session_players.exclude(disabled=True):
+            i.calc_averages_for_block(parameter_set_pay_block)
+        
+        for i in self.session_players.exclude(disabled=True):
+            i.calc_payments_for_block(parameter_set_pay_block)
 
     def get_group_channel_list(self, group_number):
         '''

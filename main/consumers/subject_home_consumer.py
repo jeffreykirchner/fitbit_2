@@ -408,7 +408,8 @@ def take_get_session_subject(session_player_id, data):
                     fitbit_error_message = "Sync your fitbit to your phone."
                 else:
                     fitbit_error_message = "Fitbit is not available, try again later."              
-
+            else:
+                session_player.calcs_for_payblock()
         return {"session" : session_player.session.json_for_subject(session_player), 
                 "show_fitbit_connect" : show_fitbit_connect,
                 "fitbit_error_message" : fitbit_error_message,

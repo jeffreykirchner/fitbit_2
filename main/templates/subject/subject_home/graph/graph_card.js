@@ -690,12 +690,12 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
             }
             else
             {
-                text1 = '$' + app.session_player.session_player_periods_2[i].earnings_individual;
+                text1 = '$' + app.session_player.session_player_periods_2[i].earnings_fixed;
             }
         }
         else
         {
-            text1 = "NP";
+            text1 = "";
         }
 
         ctx.fillText(text1, tempX, h-marginX+40);
@@ -711,12 +711,12 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
             }
             else
             {
-                text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_individual; 
+                text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_fixed; 
             }
         }
         else
         {
-            text1 = "NP";
+            text1 = "";
         }
 
         ctx.fillText(text1, tempX, 18);
@@ -761,7 +761,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     }
     else
     {
-        ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.individual, w - 5, 18);
+        ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.fixed, w - 5, 18);
     }
     
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
@@ -772,7 +772,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     }
     else
     {
-        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.individual, w - 5, h-marginX+40);
+        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.fixed, w - 5, h-marginX+40);
     }
 },
 

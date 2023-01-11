@@ -884,13 +884,18 @@ def take_force_check_in(session_id, data):
         logger.warning(f"take_force_check_in session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
 
-    
-
     r = session_player_period.take_check_in(False)
 
-    if r["status"] == "success":
+    if r["status"] == "success":        
         session_player_period.check_in_forced = True
         session_player_period.save()
+
+        pay_block = session_player_period.get_pay_block()
+
+        session_player_period.session_player.calc_averages_for_block(pay_block)
+
+        for i in session_player_period.session_player.get_group_members():
+            i.calc_payments_for_block(pay_block)
 
     return {"value" : "success",
             "session_player_period" : session_player_period.json_for_staff(),}

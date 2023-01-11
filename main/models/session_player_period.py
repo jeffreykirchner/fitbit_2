@@ -121,6 +121,13 @@ class SessionPlayerPeriod(models.Model):
             return True
         
         return False
+
+    def get_pay_block(self):
+        '''
+        return parameter set pay block for this period
+        '''
+
+        return self.session_period.parameter_set_period.parameter_set_pay_block
         
     def get_individual_bonus_payment(self):
         '''
@@ -139,9 +146,9 @@ class SessionPlayerPeriod(models.Model):
         calc and return group bonus payment
         '''
 
-        zone_minutes = self.session_period.parameter_set_period.get_payment(self.get_lowest_group_zone_minutes())
+        zone_minutes = self.get_lowest_group_average_zone_minutes()
 
-        block_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
+        block_payment = self.session_period.parameter_set_period.get_payment(zone_minutes)
 
         if block_payment:
             return block_payment.group_bonus
@@ -153,14 +160,14 @@ class SessionPlayerPeriod(models.Model):
         calc and return no pay percent
         '''
 
-        return self.session_period.parameter_set_period.fixed_pay
+        return self.get_pay_block().fixed_pay
     
     def get_no_pay_percent(self):
         '''
         calc and return no pay percent
         '''
 
-        return self.session_period.parameter_set_period.no_pay_percent
+        return self.get_pay_block().no_pay_percent
 
     def calc_and_store_payment(self):
         '''
@@ -183,6 +190,16 @@ class SessionPlayerPeriod(models.Model):
 
         return {"value":"success", "message" : ""}
     
+    def calc_and_store_payment_group(self):
+        '''
+        calculate and store payments for all group memebers this period 
+        '''
+        session_player_periods = main.models.SessionPlayerPeriod.objects.filter(session_period=self.session_period) \
+                                                             .filter(session_player__group_number=self.session_player.group_number)
+
+        for i in session_player_periods:
+            i.calc_and_store_payment()
+
     def calc_and_store_average_zone_minutes(self):
         '''
         calc and store the average zone minutes up to this point in the pay block
@@ -190,7 +207,7 @@ class SessionPlayerPeriod(models.Model):
 
         zone_minutes_list = self.session_player \
                                 .session_player_periods_b \
-                                .filter(session_period__parameter_set_period__parameter_set_pay_block=self.session_period.parameter_set_period.parameter_set_pay_block) \
+                                .filter(session_period__parameter_set_period__parameter_set_pay_block=self.get_pay_block()) \
                                 .filter(check_in=True) \
                                 .filter(session_period__period_number__lte=self.session_period.period_number) \
                                 .values_list('zone_minutes', flat=True)
@@ -199,7 +216,7 @@ class SessionPlayerPeriod(models.Model):
 
         block_period_count = self.session_player \
                                  .session_player_periods_b \
-                                 .filter(session_period__parameter_set_period__parameter_set_pay_block=self.session_period.parameter_set_period.parameter_set_pay_block) \
+                                 .filter(session_period__parameter_set_period__parameter_set_pay_block=self.get_pay_block()) \
                                  .filter(session_period__period_number__lte=self.session_period.period_number) \
                                  .count()
 
@@ -223,30 +240,22 @@ class SessionPlayerPeriod(models.Model):
         
         return True
     
-    def get_lowest_group_zone_minutes(self):
+    def get_lowest_group_average_zone_minutes(self):
         '''
-        return the lowest zone minute total from a group member this pay block
+        return the lowest aerage zone minute total from this day
         '''
         
-        # session_player_periods = main.models.SessionPlayerPeriod.objects.filter(session_period__session=self.session_period.session) \
-        #                                                                 .filter(session_player__group_number=self.session_player.group_number) \
-
-        # return self.session_period.session_player_periods_a \
-        #                                                    .order_by('zone_minutes').first().zone_minutes
-
-    def get_pervious_player_period(self):
-        '''
-        return the SessionPlayerPeriod that preceeded this one
-        '''
-
-        return self.session_player.session_player_periods_b.filter(session_period__period_number=self.session_period.period_number-1).first()
+        return self.session_period.session_player_periods_a.filter(session_player__group_number=self.session_player.group_number) \
+                                                           .filter(session_period=self.session_period) \
+                                                           .order_by('average_pay_block_zone_minutes').first().average_pay_block_zone_minutes   
+                                                                              
 
     def get_earning(self):
         '''
         get earnings from period
         '''
 
-        return self.earnings_individual + self.earnings_group
+        return self.earnings_fixed
     
     def get_formated_wrist_minutes(self):
         '''
@@ -389,7 +398,6 @@ class SessionPlayerPeriod(models.Model):
                 self.last_login = datetime.now()
 
             self.save()
-            self.calc_and_store_average_zone_minutes()
             
         except KeyError as e:
             logger.error(f"pull_secondary_metrics error: {e}")
@@ -564,7 +572,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_fixed" : round(self.earnings_fixed),
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
-            "earnings_total" : self.get_earning(),
+            "earnings_total" : round(self.get_earning()),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
 
             "zone_minutes" : self.zone_minutes,
@@ -575,7 +583,6 @@ class SessionPlayerPeriod(models.Model):
             "period_type" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_type,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
-
         }
     
     def json_for_staff(self):
@@ -592,7 +599,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_fixed" : round(self.earnings_fixed),
             "earnings_individual" : round(self.earnings_individual),
             "earnings_group" : round(self.earnings_group),
-            "earnings_total" : self.get_earning(),
+            "earnings_total" : round(self.get_earning()),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             
             "zone_minutes" : self.zone_minutes,
