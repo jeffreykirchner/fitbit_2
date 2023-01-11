@@ -249,7 +249,7 @@ class SessionPlayer(models.Model):
         earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block))
         earnings["fixed"] = round(self.get_pay_block_fixed_earnings(pay_block))
 
-        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"] + earnings["fixed"])
+        earnings["total"] = round(earnings["individual"]  + earnings["group_bonus"] + earnings["fixed"])
         earnings["earnings_no_pay_percent"] = self.get_pay_block_no_pay_percent()
 
         return earnings

@@ -134,7 +134,7 @@ class SessionPlayerPeriod(models.Model):
         calc and return individual bonus payment
         '''
 
-        block_payment = self.session_period.parameter_set_period.get_payment(self.zone_minutes)
+        block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
 
         if block_payment:
             return block_payment.payment
