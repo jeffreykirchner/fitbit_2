@@ -197,7 +197,7 @@ class ParameterSet(models.Model):
 
         self.save()
     
-    def update_json_fk(self, update_players=False, update_periods=False, update_zone_minutes=False, update_pay_blocks=False):
+    def update_json_fk(self, update_players=False, update_periods=False, update_pay_blocks=False):
         '''
         update json model
         '''
@@ -209,10 +209,6 @@ class ParameterSet(models.Model):
         if update_periods:
             self.json_for_session_json["parameter_set_periods"] = {p.id : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
             self.json_for_session_json["parameter_set_periods_order"] = list(self.parameter_set_periods.all().values_list('id', flat=True))
-
-        if update_zone_minutes:
-            self.json_for_session_json["parameter_set_zone_minutes"] = {p.id : p.json() for p in self.parameter_set_zone_minutes.all()}
-            self.json_for_session_json["parameter_set_zone_minutes_order"] = list(self.parameter_set_zone_minutes.all().values_list('id', flat=True))
 
         if update_pay_blocks:
             self.json_for_session_json["parameter_set_pay_blocks"] = {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()}
@@ -228,7 +224,7 @@ class ParameterSet(models.Model):
            update_required:
             self.json_for_session_json = {}
             self.update_json_local()
-            self.update_json_fk(update_players=True, update_periods=True, update_zone_minutes=True, update_pay_blocks=True)
+            self.update_json_fk(update_players=True, update_periods=True,  update_pay_blocks=True)
 
         return self.json_for_session_json
     

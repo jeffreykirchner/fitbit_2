@@ -54,6 +54,22 @@
         </div>
         <div class="row">
             <div class="col text-end pe-1 text-nowrap">
+                Your average zone minutes:
+            </div>
+            <div class="col text-start ps-1">
+                [[session_player.todays_average_zone_minutes]]
+            </div>
+        </div>
+        <div class="row" v-if="session.current_parameter_set_period.period_type=='Block Pay Group'">
+            <div class="col text-end pe-1 text-nowrap">
+                Your partner's average zone minutes:
+            </div>
+            <div class="col text-start ps-1">
+                [[session_player.groups_average_zone_minutes]]
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-end pe-1 text-nowrap">
                 <span v-if="session_player.checked_in_today">                   
                     Your earnings today:           
                 </span>
@@ -76,7 +92,7 @@
                 Your current individual bonus:                 
             </div>
             <div class="col text-start ps-1">               
-                $[[session_player.earnings_fixed]]
+                $[[session_player.individual_earnings]]
             </div>
         </div> 
         <div class="row" v-if="session.current_parameter_set_period.period_type=='Block Pay Group'">
@@ -84,7 +100,7 @@
                 Your current group bonus:                 
             </div>
             <div class="col text-start ps-1">               
-                $[[session_player.earnings_fixed]]
+                $[[session_player.group_earnings]]
             </div>
         </div>  
         <div class="row text-end fw-bold" v-if="session_player.survey_link != ''">            

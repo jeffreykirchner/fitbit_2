@@ -1,6 +1,8 @@
 '''
 parameterset period 
 '''
+import math
+
 from tinymce.models import HTMLField
 
 from django.db import models
@@ -127,7 +129,7 @@ class ParameterSetPeriod(models.Model):
         return payment given minutes
         '''
 
-        return self.parameter_set_pay_block.get_payment(minutes)
+        return self.parameter_set_pay_block.get_payment(math.floor(minutes))
 
     def json(self):
         '''

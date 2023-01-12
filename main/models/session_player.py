@@ -759,9 +759,9 @@ class SessionPlayer(models.Model):
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,            
 
             "earnings_fixed" : round(todays_session_player_period.get_fixed_pay()) if todays_session_player_period else None,
-            "individual_earnings" : round(todays_session_player_period.get_individual_bonus_payment()) if todays_session_player_period else None,
-            "group_earnings" : round(todays_session_player_period.get_group_bonus_payment()) if todays_session_player_period else False,
-            "no_pay_percent" : todays_session_player_period.get_no_pay_percent() if todays_session_player_period else False,
+            "individual_earnings" : round(todays_session_player_period.earnings_individual) if todays_session_player_period else None,
+            "group_earnings" : round(todays_session_player_period.earnings_group) if todays_session_player_period else False,
+            "no_pay_percent" : todays_session_player_period.get_no_pay_percent() if todays_session_player_period else False,            
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
@@ -771,6 +771,9 @@ class SessionPlayer(models.Model):
 
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+            "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "groups_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            
 
             "survey_link" : self.get_current_survey_link(),
         }
