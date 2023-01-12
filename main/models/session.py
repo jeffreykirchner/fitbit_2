@@ -186,7 +186,8 @@ class Session(models.Model):
 
         writer.writerow(["Session ID", "Period", "Player", "Group", 
                          "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
-                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "No Pay Percent", "Last Visit Time"])
+                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "No Pay Percent", "Last Visit Time",
+                         "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
             for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
@@ -362,17 +363,17 @@ class Session(models.Model):
         
         for i in self.session_players.exclude(disabled=True):
 
-            p = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number).last()
+            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number, back_pull=False)
 
-            if not p.back_pull:
+            if pull_list:
 
-                p.back_pull=True
-                p.save()
+                p = pull_list.last()
+
+                i.pull_todays_metrics(p)
 
                 if p.check_in:
                     p.take_check_in(False)
-                else:
-                    p.pull_secondary_metrics(False)
+
 
     def get_group_channel_list(self, group_number):
         '''

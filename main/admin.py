@@ -141,7 +141,7 @@ class ParameterSetPeriodInline(admin.TabularInline):
 
     model = ParameterSetPeriod
     fields = ['period_type', 'minimum_wrist_minutes', 'pay_block']
-    readonly_fields = ['period_type', 'minimum_wrist_minutes', 'pay_block']
+    readonly_fields = ['period_type', 'pay_block']
 
 @admin.register(ParameterSet)
 class ParameterSetAdmin(admin.ModelAdmin):

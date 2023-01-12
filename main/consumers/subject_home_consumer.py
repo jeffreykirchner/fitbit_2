@@ -409,7 +409,7 @@ def take_get_session_subject(session_player_id, data):
                 else:
                     fitbit_error_message = "Fitbit is not available, try again later."
             else:
-                session_player.pull_missing_metrics()
+                # session_player.pull_missing_metrics()
                 pass                
 
         return {"session" : session_player.session.json_for_subject(session_player), 

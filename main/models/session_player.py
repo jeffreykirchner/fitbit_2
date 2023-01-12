@@ -256,19 +256,41 @@ class SessionPlayer(models.Model):
 
         return self.session_player_periods_b.filter(session_period__period_number=current_session_period.period_number-1).first()
     
-    def pull_todays_metrics(self):
+    def pull_todays_metrics(self, todays_session_player_period=None):
         '''
         pull needed metrics from yesterday and today
         '''
         logger = logging.getLogger(__name__) 
         data = {}
+        session_player_periods_bp = []
 
-        todays_session_player_period = self.get_todays_session_player_period()   
-        yesterdays_session_player_period = self.get_yesterdays_session_player_period()     
+        if not todays_session_player_period:
+            todays_session_player_period = self.get_todays_session_player_period()    
 
         #if during session
         if todays_session_player_period:
-            r = todays_session_player_period.pull_secondary_metrics(True)
+
+            temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
+
+            data["devices"] = 'https://api.fitbit.com/1/user/-/devices.json'
+            data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
+
+            data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+            data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d.json'
+
+
+            session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
+                                                                     .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
+                                                                     .order_by("-session_period__period_number")[:5]
+            
+            for p in session_player_periods_bp:
+                temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
+
+                data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+                data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d.json'
+
+            r = get_fitbit_metrics(self.fitbit_user_id, data)
+
         else:
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
@@ -276,25 +298,96 @@ class SessionPlayer(models.Model):
                 self.process_fitbit_last_synced(r["result"]["devices"]["result"])
 
         if r["status"] == "fail" :
-            return r
+            return {"status" : r['status'], "message" : r["message"]}
                     
+        result = r["result"]
+        if todays_session_player_period:
+            todays_session_player_period.pull_secondary_metrics(save_pull_time=True,
+                                                                result={"devices" : result["devices"],
+                                                                        "fitbit_profile" : result["fitbit_profile"],
+                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
+                                                                        "fitbit_activities" : result["fitbit_activities_td"]})
         #check synced today
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
+
+        for p in session_player_periods_bp:
+            p.back_pull=True
+
+            p.pull_secondary_metrics(save_pull_time=False,
+                                     result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
+                                             "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+            p.save()
+
+            if p.check_in:
+                p.take_check_in(False)
+
+           
         
         #do back pull if needed
-        if yesterdays_session_player_period:
-            if not yesterdays_session_player_period.back_pull:
-                yesterdays_session_player_period.back_pull=True
-                yesterdays_session_player_period.save()
+        # if yesterdays_session_player_period:
+        #     if not yesterdays_session_player_period.back_pull:
+        #         yesterdays_session_player_period.back_pull=True
+        #         yesterdays_session_player_period.save()
 
-            if yesterdays_session_player_period.check_in:
-                yesterdays_session_player_period.take_check_in(False)
-            else:
-                yesterdays_session_player_period.pull_secondary_metrics(False)
+        #     if yesterdays_session_player_period.check_in:
+        #         yesterdays_session_player_period.take_check_in(False)
+        #     else:
+        #         yesterdays_session_player_period.pull_secondary_metrics(False)
                 
         return {"status" : "success", "message" : ""}
     
+    def pull_secondary_time_series(self):
+        '''
+        pull activity data at end of experiment
+        '''
+        logger = logging.getLogger(__name__)
+        
+        first_period_date = self.session.session_periods.first().period_date.strftime("%Y-%m-%d")
+        last_period_date = self.session.session_periods.last().period_date.strftime("%Y-%m-%d")
+
+        data = {}
+
+        data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{first_period_date}/{last_period_date}.json'
+
+        data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{first_period_date}/{last_period_date}.json'
+
+        r = get_fitbit_metrics(self.fitbit_user_id, data)
+
+        if r['status'] == 'fail':
+            logger.error(f'pull_secondary_time_series error: {r["message"]}')            
+            return {"status" : r['status'], "message" : r["message"]}
+        
+        result = r['result']
+        
+        session_player_periods = []
+        for index, p in enumerate(self.session_player_periods_b.all()):
+            p.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][index]["value"]
+            p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
+
+            p.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][index]["value"]
+            p.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][index]["value"]
+            p.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][index]["value"]
+            p.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][index]["value"]        
+
+            session_player_periods.append(p)
+        
+        main.models.SessionPlayerPeriod.objects.bulk_update(session_player_periods, ['fitbit_steps', 
+                                                                                     'fitbit_calories', 
+                                                                                     'fitbit_minutes_sedentary', 
+                                                                                     'fitbit_minutes_lightly_active',
+                                                                                     'fitbit_minutes_fairly_active',
+                                                                                     'fitbit_minutes_very_active'])
+
+       
+        
+
+        return {"status" : "success"}
+
     def pull_fitbit_last_synced(self):
         '''
         pull the last time a fitbit has been synced

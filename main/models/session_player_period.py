@@ -95,8 +95,8 @@ class SessionPlayerPeriod(models.Model):
         '''
         fill with test data
         '''
-
-        self.zone_minutes = random.randrange(0, 90)
+        
+        self.zone_minutes = random.randrange(0, self.session_player.session.parameter_set.graph_y_max+10)
 
         self.fitbit_on_wrist_minutes = random.randrange(max(self.session_period.parameter_set_period.minimum_wrist_minutes, 0), 1440)
         self.fitbit_heart_time_series = {"message":"filled with test data"}
@@ -334,7 +334,7 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
 
-    def pull_secondary_metrics(self, save_pull_time):
+    def pull_secondary_metrics(self, save_pull_time, result):
         '''
         pull extra metrics
         '''
@@ -348,54 +348,39 @@ class SessionPlayerPeriod(models.Model):
         #     logger.info(f"pull_secondary_metrics: Secondary metrics already pulled")
         #     return {"status" : "fail", "message" : "Secondary metrics already pulled"}
 
+        # first_period_date = self.session_player.session.session_periods.first().period_date.strftime("%Y-%m-%d")
+        # last_period_date = self.session_player.session.session_periods.last().period_date.strftime("%Y-%m-%d")
+
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
 
         #test date
         #temp_s = "2021-1-25"
 
-        data = {}
+        #data = {}
 
-        data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+        # if save_pull_time:
+        #     data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+        #     data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
 
-        if not settings.DEBUG:
-            data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{temp_s}/1d.json'
-            data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{temp_s}/1d.json'
+        # data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
+        # data["fitbit_heart_time_series"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
 
-            data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{temp_s}/1d.json'
-            data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{temp_s}/1d.json'
-            data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{temp_s}/1d.json'
-            data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{temp_s}/1d.json'
+        # r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
-        data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
-        data["fitbit_activities"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_s}&sort=asc&offset=0&limit=100'
-        #data["fitbit_sleep_time_series"] = f'https://api.fitbit.com/1.2/user/-/sleep/date/{temp_s}.json'
-        data["fitbit_heart_time_series"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'
+        # if r['status'] == 'fail':
+        #     logger.error(f'pull_secondary_metrics error: {r["message"]}')            
+        #     return {"status" : r['status'], "message" : r["message"]}
 
-        r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+        # result = r['result']
 
-        if r['status'] == 'fail':
-            logger.error(f'pull_secondary_metrics error: {r["message"]}')            
-            return {"status" : r['status'], "message" : r["message"]}
-
-        result = r['result']
-
-        try:       
-            self.session_player.process_fitbit_last_synced(result["devices"]["result"])
-
-            if not settings.DEBUG:
-                self.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][0]["value"]
-                self.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][0]["value"]
-
-                self.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][0]["value"]
-                self.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][0]["value"]
-                self.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][0]["value"]
-                self.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][0]["value"]        
+        try: 
+            if save_pull_time:    
+                self.session_player.process_fitbit_last_synced(result["devices"]["result"])
+                self.fitbit_profile = result["fitbit_profile"]["result"]
+                self.fitbit_age = self.fitbit_profile['user']['age']
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
-
-            self.fitbit_profile = result["fitbit_profile"]["result"]
-            self.fitbit_age = self.fitbit_profile['user']['age']
 
             #only store activities for this day
             fitbit_activities_raw = result["fitbit_activities"]["result"]
@@ -404,10 +389,6 @@ class SessionPlayerPeriod(models.Model):
             for i in fitbit_activities_raw["activities"]:
                 if temp_s in i["startTime"]:
                     self.fitbit_activities["activities"].append(i)           
-
-            #sleep
-            # self.fitbit_sleep_time_series = result["fitbit_sleep_time_series"]["result"]
-            # self.sleep_minutes = self.fitbit_sleep_time_series['summary']['totalMinutesAsleep']
 
             #store pull time           
             if save_pull_time:
@@ -424,16 +405,16 @@ class SessionPlayerPeriod(models.Model):
         check subject in for this period
         '''
 
-        r = self.pull_secondary_metrics(save_pull_time)
+        # r = self.pull_secondary_metrics(save_pull_time)
 
-        if r["status"] == "success":
-            with transaction.atomic():
-                self.check_in = True
-                self.save()
+        # if r["status"] == "success":
+        with transaction.atomic():
+            self.check_in = True
+            self.save()
 
-                self.calc_and_store_payment()
+            self.calc_and_store_payment()
             
-        return r
+        return {"status" : "success"}
     
     def get_survey_link(self):
         '''
@@ -495,6 +476,12 @@ class SessionPlayerPeriod(models.Model):
                          self.get_earning(),
                          self.earnings_no_pay_percent,
                          self.get_last_login_str(),
+                         self.fitbit_calories,
+                         self.fitbit_steps,
+                         self.fitbit_minutes_sedentary,
+                         self.fitbit_minutes_lightly_active,
+                         self.fitbit_minutes_fairly_active,
+                         self.fitbit_minutes_very_active,
                          ])
     
     def write_heart_rate_download_csv(self, writer):
