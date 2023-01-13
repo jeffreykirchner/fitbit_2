@@ -277,129 +277,147 @@ class TestSubjectConsumer(TestCase):
         session_player_5_p15.check_in=True
         session_player_5_p15.zone_minutes=15
         session_player_5_p15.save()
-        r=session_player_5_p15.calc_and_store_payment()
+        r=session_player_5.calcs_for_payblock(session_player_5_p15)
         self.assertEqual(r["value"], "success")
 
         session_player_5_p15 = session_player_5.session_player_periods_b.get(session_period__period_number=15)
+        self.assertEqual(session_player_5_p15.earnings_fixed, Decimal('3'))
         self.assertEqual(session_player_5_p15.earnings_individual, Decimal('0'))
         self.assertEqual(session_player_5_p15.earnings_group, Decimal('0'))
         self.assertEqual(session_player_5_p15.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_5_p15.average_pay_block_zone_minutes,  Decimal('15'))
 
         #30 -44 min
         session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
         session_player_5_p16.check_in=True
         session_player_5_p16.zone_minutes=35
         session_player_5_p16.save()
-        r=session_player_5_p16.calc_and_store_payment()
+        r=session_player_5.calcs_for_payblock(session_player_5_p16)
         self.assertEqual(r["value"], "success")
 
         session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
-        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('5'))
+        self.assertEqual(session_player_5_p16.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('30'))
         self.assertEqual(session_player_5_p16.earnings_group, Decimal('0'))
         self.assertEqual(session_player_5_p16.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_5_p16.average_pay_block_zone_minutes,  Decimal('25'))
 
         #45-59
         session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
         session_player_5_p17.check_in=True
         session_player_5_p17.zone_minutes=45
         session_player_5_p17.save()
-        r=session_player_5_p17.calc_and_store_payment()
+        r=session_player_5.calcs_for_payblock(session_player_5_p17)
         self.assertEqual(r["value"], "success")
 
         session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
-        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('7'))
+        self.assertEqual(session_player_5_p17.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('45'))
         self.assertEqual(session_player_5_p17.earnings_group, Decimal('0'))
         self.assertEqual(session_player_5_p17.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_5_p17.average_pay_block_zone_minutes,  Decimal('31.67'))
 
         #60+
         session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
-        session_player_5_p18.check_in=True
+        session_player_5_p18.check_in=False
         session_player_5_p18.zone_minutes=60
         session_player_5_p18.save()
-        r=session_player_5_p18.calc_and_store_payment()
+        r=session_player_5.calcs_for_payblock(session_player_5_p18)
         self.assertEqual(r["value"], "success")
 
         session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
-        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('9'))
+        self.assertEqual(session_player_5_p18.earnings_fixed, Decimal('0'))
+        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('30'))
         self.assertEqual(session_player_5_p18.earnings_group, Decimal('0'))
         self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_5_p18.average_pay_block_zone_minutes,  Decimal('23.75'))
 
         #player 6
         session_player_6_p15 = session_player_6.session_player_periods_b.get(session_period__period_number=15)
         session_player_6_p15.check_in=True
         session_player_6_p15.zone_minutes=29
         session_player_6_p15.save()
-        r=session_player_6_p15.calc_and_store_payment()
+        r=session_player_6.calcs_for_payblock(session_player_6_p15)
         self.assertEqual(r["value"], "success")
 
         session_player_6_p15 = session_player_6.session_player_periods_b.get(session_period__period_number=15)
-        self.assertEqual(session_player_6_p15.earnings_individual, Decimal('0'))
+        self.assertEqual(session_player_6_p15.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_6_p15.earnings_individual, Decimal('45'))
         self.assertEqual(session_player_6_p15.earnings_group, Decimal('0'))
         self.assertEqual(session_player_6_p15.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_6_p15.average_pay_block_zone_minutes,  Decimal('29'))
 
         #30 -44 min
         session_player_6_p16 = session_player_6.session_player_periods_b.get(session_period__period_number=16)
         session_player_6_p16.check_in=True
         session_player_6_p16.zone_minutes=44
         session_player_6_p16.save()
-        r=session_player_6_p16.calc_and_store_payment()
+        r=session_player_6.calcs_for_payblock(session_player_6_p16)
         self.assertEqual(r["value"], "success")
 
         session_player_6_p16 = session_player_6.session_player_periods_b.get(session_period__period_number=16)
-        self.assertEqual(session_player_6_p16.earnings_individual, Decimal('5'))
-        self.assertEqual(session_player_6_p16.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_6_p16.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_6_p16.earnings_individual, Decimal('60'))
+        self.assertEqual(session_player_6_p16.earnings_group, Decimal('15'))
         self.assertEqual(session_player_6_p16.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_6_p16.average_pay_block_zone_minutes,  Decimal('36.5'))
         
         #45-59
         session_player_6_p17 = session_player_6.session_player_periods_b.get(session_period__period_number=17)
         session_player_6_p17.check_in=True
         session_player_6_p17.zone_minutes=59
         session_player_6_p17.save()
-        r=session_player_6_p17.calc_and_store_payment()
+        r=session_player_6.calcs_for_payblock(session_player_6_p17)
         self.assertEqual(r["value"], "success")
 
         session_player_6_p17 = session_player_6.session_player_periods_b.get(session_period__period_number=17)
-        self.assertEqual(session_player_6_p17.earnings_individual, Decimal('7'))
-        self.assertEqual(session_player_6_p17.earnings_group, Decimal('4'))
+        self.assertEqual(session_player_6_p17.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_6_p17.earnings_individual, Decimal('60'))
+        self.assertEqual(session_player_6_p17.earnings_group, Decimal('23'))
         self.assertEqual(session_player_6_p17.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_6_p17.average_pay_block_zone_minutes,  Decimal('44'))
 
         #30 -44 min
         session_player_6_p18 = session_player_6.session_player_periods_b.get(session_period__period_number=18)
         session_player_6_p18.check_in=True
         session_player_6_p18.zone_minutes=31
         session_player_6_p18.save()
-        r=session_player_6_p18.calc_and_store_payment()
+        r=session_player_6.calcs_for_payblock(session_player_6_p18)
         self.assertEqual(r["value"], "success")
 
         session_player_6_p18 = session_player_6.session_player_periods_b.get(session_period__period_number=18)
-        self.assertEqual(session_player_6_p18.earnings_individual, Decimal('5'))
-        self.assertEqual(session_player_6_p18.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_6_p18.earnings_fixed, Decimal('3'))
+        self.assertEqual(session_player_6_p18.earnings_individual, Decimal('60'))
+        self.assertEqual(session_player_6_p18.earnings_group, Decimal('15'))
         self.assertEqual(session_player_6_p18.earnings_no_pay_percent, 0)
+        self.assertEqual(session_player_6_p18.average_pay_block_zone_minutes,  Decimal('40.75'))
 
         #check player 5
+        r=session_player_5.calcs_for_payblock(session_player_5_p15)
+
         session_player_5_p15 = session_player_5.session_player_periods_b.get(session_period__period_number=15)
         self.assertEqual(session_player_5_p15.earnings_individual, Decimal('0'))
         self.assertEqual(session_player_5_p15.earnings_group, Decimal('0'))
         self.assertEqual(session_player_5_p15.earnings_no_pay_percent, 0)
 
         session_player_5_p16 = session_player_5.session_player_periods_b.get(session_period__period_number=16)
-        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('5'))
-        self.assertEqual(session_player_5_p16.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_5_p16.earnings_individual, Decimal('30'))
+        self.assertEqual(session_player_5_p16.earnings_group, Decimal('15'))
         self.assertEqual(session_player_5_p16.earnings_no_pay_percent, 0)
 
         session_player_5_p17 = session_player_5.session_player_periods_b.get(session_period__period_number=17)
-        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('7'))
-        self.assertEqual(session_player_5_p17.earnings_group, Decimal('4'))
+        self.assertEqual(session_player_5_p17.earnings_individual, Decimal('45'))
+        self.assertEqual(session_player_5_p17.earnings_group, Decimal('23'))
         self.assertEqual(session_player_5_p17.earnings_no_pay_percent, 0)
 
         session_player_5_p18 = session_player_5.session_player_periods_b.get(session_period__period_number=18)
-        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('9'))
-        self.assertEqual(session_player_5_p18.earnings_group, Decimal('2'))
+        self.assertEqual(session_player_5_p18.earnings_individual, Decimal('30'))
+        self.assertEqual(session_player_5_p18.earnings_group, Decimal('15'))
         self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
 
         #check earnings block
-        self.assertEqual(session_player_5.get_block_earnings(3),{"individual":21,"group_bonus":8,"total":29,"earnings_no_pay_percent":0})
-        self.assertEqual(session_player_6.get_block_earnings(3),{"individual":17,"group_bonus":8,"total":25,"earnings_no_pay_percent":0})
+        self.assertEqual(session_player_5.get_block_earnings(2),{"fixed":9, "individual":0,"group_bonus":0,"total":9,"earnings_no_pay_percent":0})
+        self.assertEqual(session_player_6.get_block_earnings(2),{"fixed":12, "individual":0,"group_bonus":0,"total":12,"earnings_no_pay_percent":0})
     
     def test_pay_level_indvidual_pay(self):
         '''
@@ -572,17 +590,18 @@ class TestSubjectConsumer(TestCase):
 
         #player 7
         #zone minutes under 30 min
-        session_player_7_p57 = session_player_7.session_player_periods_b.get(session_period__period_number=57)
-        session_player_7_p57.check_in=True
-        session_player_7_p57.zone_minutes=15
-        session_player_7_p57.save()
+        session_player_7_p87 = session_player_7.session_player_periods_b.get(session_period__period_number=87)
+        session_player_7_p87.check_in=True
+        session_player_7_p87.zone_minutes=15
+        session_player_7_p87.save()
         r=session_player_7_p57.calc_and_store_payment()
         self.assertEqual(r["value"], "success")
 
-        session_player_7_p57 = session_player_7.session_player_periods_b.get(session_period__period_number=57)
-        self.assertEqual(session_player_7_p57.earnings_individual, Decimal('0'))
-        self.assertEqual(session_player_7_p57.earnings_group, Decimal('0'))
-        self.assertEqual(session_player_7_p57.earnings_no_pay_percent, 8)
+        session_player_7_p87 = session_player_7.session_player_periods_b.get(session_period__period_number=87)
+        self.assertEqual(session_player_7_p87.earnings_fixed, Decimal('0'))
+        self.assertEqual(session_player_7_p87.earnings_individual, Decimal('0'))
+        self.assertEqual(session_player_7_p87.earnings_group, Decimal('0'))
+        self.assertEqual(session_player_7_p87.earnings_no_pay_percent, 8)
 
         #30 -44 min
         session_player_7_p59 = session_player_7.session_player_periods_b.get(session_period__period_number=59)

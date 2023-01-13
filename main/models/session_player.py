@@ -345,7 +345,8 @@ class SessionPlayer(models.Model):
             if p.check_in:
                 p.take_check_in(False)
         
-        self.calc_averages_for_block(todays_session_player_period.get_pay_block())
+        if todays_session_player_period:
+            self.calc_averages_for_block(todays_session_player_period.get_pay_block())
                 
         return {"status" : "success", "message" : ""}
     
@@ -430,6 +431,8 @@ class SessionPlayer(models.Model):
 
         self.calc_averages_for_block(parameter_set_pay_block)
         self.calc_payments_for_block(parameter_set_pay_block)
+
+        return {"value" : "success", "message" : ""}
 
     def calc_averages_for_block(self, parameter_set_pay_block):
         '''
