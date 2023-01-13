@@ -333,16 +333,18 @@ takeForceCheckIn(messageData){
 
     if(messageData.status.value == "success")
     {             
-        let session_player = app.session.session_players[app.current_subject];
+        app.session.session_players[app.current_subject] =  messageData.status.session_player;
 
-        for(i=0;i<session_player.session_player_periods.length;i++)
-        {
-            if(session_player.session_player_periods[i].id == messageData.status.session_player_period.id)
-            {
-                session_player.session_player_periods[i] = messageData.status.session_player_period;
-                break;
-            }
-        }
+        //session_player =  messageData.status.session_player;
+
+        // for(i=0;i<session_player.session_player_periods.length;i++)
+        // {
+        //     if(session_player.session_player_periods[i].id == messageData.status.session_player_period.id)
+        //     {
+        //         session_player.session_player_periods[i] = messageData.status.session_player_period;
+        //         break;
+        //     }
+        // }
     } 
     else
     {

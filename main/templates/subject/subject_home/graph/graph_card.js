@@ -702,24 +702,27 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
         
         //partner
-        ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
-        if(session_player_partner.session_player_periods_2[i].check_in)
+        if(session_player_partner)
         {
-            if(app.session_player.session_player_periods_2[i].period_type == "Earn Fitbit")
+            ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+            if(session_player_partner.session_player_periods_2[i].check_in)
             {
-                text1 = session_player_partner.session_player_periods_2[i].earnings_no_pay_percent + '%';
+                if(app.session_player.session_player_periods_2[i].period_type == "Earn Fitbit")
+                {
+                    text1 = session_player_partner.session_player_periods_2[i].earnings_no_pay_percent + '%';
+                }
+                else
+                {
+                    text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_fixed; 
+                }
             }
             else
             {
-                text1 = '$' + session_player_partner.session_player_periods_2[i].earnings_fixed; 
+                text1 = "";
             }
-        }
-        else
-        {
-            text1 = "";
-        }
 
-        ctx.fillText(text1, tempX, 18);
+            ctx.fillText(text1, tempX, 18);
+        }
 
         tempX += ((w-marginY-marginY) / (xTickCount));
         tempXValue += xTickValue;
@@ -727,21 +730,25 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
     ctx.globalAlpha = 1;
     //labels
-    ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
-    ctx.textAlign = "right";
-    ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
+    if(session_player_partner)
+    {
+        ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+        ctx.textAlign = "right";
+        ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
 
-    if(current_pay_block.pay_block_type == "Earn Fitbit")
-    {
-        ctx.fillText("Fitbit", marginY-30, 28);
-    }
-    else
-    {
-        ctx.fillText("Pay", marginY-30, 28);
+        if(current_pay_block.pay_block_type == "Earn Fitbit")
+        {
+            ctx.fillText("Fitbit", marginY-30, 28);
+        }
+        else
+        {
+            ctx.fillText("Pay", marginY-30, 28);
+        }
     }
 
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
-
+    ctx.textAlign = "right";
+    
     if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
        ctx.fillText("My Fitbit", marginY-15, h-marginX+40);
@@ -752,18 +759,23 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     }
 
     //totals
-    ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
-    ctx.textAlign = "right";
+    //partner
+    if(session_player_partner)
+    {
+        ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+        ctx.textAlign = "right";
 
-    if(current_pay_block.pay_block_type == "Earn Fitbit")
-    {
-        ctx.fillText("Sum="+Math.min(session_player_partner.current_block_earnings.earnings_no_pay_percent, 100)+"%", w - 5, 18);
-    }
-    else
-    {
-        ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.fixed, w - 5, 18);
+        if(current_pay_block.pay_block_type == "Earn Fitbit")
+        {
+            ctx.fillText("Sum="+Math.min(session_player_partner.current_block_earnings.earnings_no_pay_percent, 100)+"%", w - 5, 18);
+        }
+        else
+        {
+            ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.fixed, w - 5, 18);
+        }
     }
     
+    //player
     ctx.fillStyle = app.session_player.parameter_set_player.display_color;
     ctx.textAlign = "right";
     if(current_pay_block.pay_block_type == "Earn Fitbit")

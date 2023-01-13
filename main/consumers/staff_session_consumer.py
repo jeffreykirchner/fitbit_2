@@ -898,7 +898,7 @@ def take_force_check_in(session_id, data):
             i.calc_payments_for_block(pay_block)
 
     return {"value" : "success",
-            "session_player_period" : session_player_period.json_for_staff(),}
+            "session_player" : session_player_period.session_player.json_for_staff(),}
 
 def take_load_full_subject(session_id, data):
     '''

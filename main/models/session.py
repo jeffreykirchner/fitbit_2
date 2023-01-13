@@ -109,6 +109,7 @@ class Session(models.Model):
 
         period_date = self.start_date
 
+        #create session periods
         for i, p in enumerate(self.parameter_set.parameter_set_periods.all()):
             session_periods.append(main.models.SessionPeriod(session=self, parameter_set_period=p, period_number=i+1, period_date=period_date))
             period_date += timedelta(days=1)
@@ -116,6 +117,15 @@ class Session(models.Model):
         #logger.info(f"Session Periods Created")
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
+
+        #set last day of each pay block parameter_set_periods_b
+        for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+            parameter_set_period = i.parameter_set_periods_b.last()
+
+            if parameter_set_period:
+                session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
+                session_period.is_last_period_in_block = True
+                session_period.save()
 
         self.current_experiment_phase = ExperimentPhase.RUN
 

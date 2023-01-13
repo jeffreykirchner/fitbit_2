@@ -22,6 +22,7 @@ from main.models import Parameters
 
 from main.globals import get_fitbit_metrics
 from main.globals import format_minutes
+from main.globals import PayBlockType
 
 import main
 
@@ -134,10 +135,14 @@ class SessionPlayerPeriod(models.Model):
         calc and return individual bonus payment
         '''
 
-        block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
+        pay_block_type = self.get_pay_block().pay_block_type
 
-        if block_payment:
-            return block_payment.payment
+        if pay_block_type == PayBlockType.BLOCK_PAY_GROUP or pay_block_type == PayBlockType.BLOCK_PAY_INDIVIDUAL: 
+
+            block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
+
+            if block_payment:
+                return block_payment.payment
 
         return 0
     
@@ -146,12 +151,16 @@ class SessionPlayerPeriod(models.Model):
         calc and return group bonus payment
         '''
 
-        zone_minutes = self.get_lowest_group_average_zone_minutes()
+        pay_block_type = self.get_pay_block().pay_block_type
 
-        block_payment = self.session_period.parameter_set_period.get_payment(zone_minutes)
+        if pay_block_type == PayBlockType.BLOCK_PAY_GROUP:
 
-        if block_payment:
-            return block_payment.group_bonus
+            zone_minutes = self.get_lowest_group_average_zone_minutes()
+
+            block_payment = self.session_period.parameter_set_period.get_payment(zone_minutes)
+
+            if block_payment:
+                return block_payment.group_bonus
 
         return 0
 
@@ -417,6 +426,24 @@ class SessionPlayerPeriod(models.Model):
         
         return {"status" : "success"}
     
+    def get_team_average(self, exclude_self=True):
+        '''
+        return the team's average AZM up to this point in the pay block
+        '''
+
+        group_members = self.session_player.get_group_members()
+
+        if group_members.count() == 2:
+
+            for i in group_members:
+                if i != self.session_player:
+                    i.calc_averages_for_block(self.get_pay_block())
+                    session_player_period = i.session_player_periods_b.get(session_period=self.session_period)
+
+                    return session_player_period.average_pay_block_zone_minutes
+
+        return None
+
     def get_survey_link(self):
         '''
         get survey link
@@ -447,6 +474,13 @@ class SessionPlayerPeriod(models.Model):
         tmz = pytz.timezone(prm.experiment_time_zone) 
 
         return  self.last_login.astimezone(tmz).strftime("%m/%d/%Y %I:%M:%S %p") 
+
+    def is_last_period_in_block(self):
+        '''
+        return true if this periods is the last in the payblock
+        '''
+
+        pass 
 
     def write_summary_download_csv(self, writer):
         '''
@@ -597,8 +631,8 @@ class SessionPlayerPeriod(models.Model):
             "fitbit_formatted_date" : self.session_period.get_formatted_date(),
 
             "earnings_fixed" : round(self.earnings_fixed),
-            "earnings_individual" : round(self.earnings_individual),
-            "earnings_group" : round(self.earnings_group),
+            "earnings_individual" : round(self.earnings_individual) if self.session_period.is_last_period_in_block else 0,
+            "earnings_group" : round(self.earnings_group) if self.session_period.is_last_period_in_block else 0,
             "earnings_total" : round(self.get_earning()),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             
@@ -607,6 +641,7 @@ class SessionPlayerPeriod(models.Model):
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
             "fitbit_resting_heart_rate" : self.fitbit_resting_heart_rate,
+
             "fitbit_age" : self.fitbit_age,    
             "last_login" : self.last_login,
             "check_in" : self.check_in,
@@ -615,5 +650,6 @@ class SessionPlayerPeriod(models.Model):
             "pay_block_number" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_number,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
+
 
         }

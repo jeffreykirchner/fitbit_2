@@ -258,8 +258,8 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
     //lines
     ctx.beginPath();
 
-    let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
-    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
+    //let current_pay_block_id = Object.keys(app.session.parameter_set.parameter_set_pay_blocks)[0]; 
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[app.session.parameter_set.parameter_set_pay_blocks_order[0]];
  
     for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length-1;i++)
     {

@@ -142,7 +142,7 @@ class ParameterSetPeriod(models.Model):
             "period_number" : self.period_number,
             "survey_required" : 1 if self.survey_required else 0,
             "survey_link" : self.survey_link,
-            "period_type" : self.parameter_set_pay_block.pay_block_type,
+            "period_type" : self.parameter_set_pay_block.pay_block_type if self.parameter_set_pay_block else None,
             "minimum_wrist_minutes" : self.minimum_wrist_minutes,
             "minimum_wrist_minutes_str" : format_minutes(self.minimum_wrist_minutes),
             "show_notice" : 1 if self.show_notice else 0,

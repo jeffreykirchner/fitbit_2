@@ -772,7 +772,7 @@ class SessionPlayer(models.Model):
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
             "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
-            "groups_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "groups_average_zone_minutes" : todays_session_player_period.get_team_average() if todays_session_player_period else "---",
             
 
             "survey_link" : self.get_current_survey_link(),
@@ -793,7 +793,9 @@ class SessionPlayer(models.Model):
 
         todays_session_player_period = self.get_todays_session_player_period()  
 
-        period_number = todays_session_player_period.session_period.period_number if todays_session_player_period else 0 
+        # if todays_session_player_period:
+        #     period_number = todays_session_player_period.session_period.period_number
+        # elif session. 
 
         return{
             "id" : self.id,      
@@ -819,7 +821,7 @@ class SessionPlayer(models.Model):
 
             "chat" : chat,
 
-            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.select_related('session_period').filter(session_period__period_number__lte=period_number)],
+            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.select_related('session_period')],
 
             # "current_block_earnings" : self.get_current_block_earnings(),
 

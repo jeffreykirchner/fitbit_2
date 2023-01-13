@@ -23,6 +23,8 @@ class SessionPeriod(models.Model):
     period_number = models.IntegerField()                        #period number from 1 to N
     period_date = models.DateField(default=now)                  #date of period
 
+    is_last_period_in_block = models.BooleanField(default=False, verbose_name="Last Period in block")     #true if last period in th block
+
     timestamp = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now= True)
 

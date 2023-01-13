@@ -2,7 +2,7 @@
 
 <!-- view subject Modal -->
 <div class="modal fade" id="viewSubjectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewSubjectModalLabel" aria-hidden="true">
-<div class="modal-dialog modal-xl">
+<div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">View Subject: [[session.session_players[current_subject].name]]</h5>
@@ -26,16 +26,22 @@
                                 Date
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
-                                Earnings Individual
+                                Daily Pay
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
-                                Earnings Group
+                                Bonus Individual
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Bonus Group
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 No Pay %
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
-                                Zone Minutes
+                                Daily AZM
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Average AZM
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Min BPM
@@ -70,7 +76,10 @@
                                 [[p.pay_block_number]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
-                            [[p.fitbit_formatted_date]]
+                                [[p.fitbit_formatted_date]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                $[[p.earnings_fixed]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 $[[p.earnings_individual]]
@@ -83,6 +92,9 @@
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.zone_minutes]]
+                            </td>
+                            <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.average_pay_block_zone_minutes]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.fitbit_min_heart_rate_zone_bpm]]
