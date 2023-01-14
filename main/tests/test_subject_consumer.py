@@ -411,8 +411,23 @@ class TestSubjectConsumer(TestCase):
         self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
 
         #check earnings block
-        self.assertEqual(session_player_5.get_block_earnings(2),{"fixed":9, "individual":0,"group_bonus":0,"total":9,"earnings_no_pay_percent":0})
-        self.assertEqual(session_player_6.get_block_earnings(2),{"fixed":12, "individual":0,"group_bonus":0,"total":12,"earnings_no_pay_percent":0})
+        session_player_5_p19 = session_player_5.session_player_periods_b.get(session_period__period_number=19)
+        session_player_5_p19.check_in=True
+        session_player_5_p19.zone_minutes=285
+        session_player_5_p19.save()
+        r=session_player_5.calcs_for_payblock(session_player_5_p19)
+        
+        session_player_6_p19 = session_player_6.session_player_periods_b.get(session_period__period_number=19)
+        session_player_6_p19.check_in=True
+        session_player_6_p19.zone_minutes=200
+        session_player_6_p19.save()
+        r=session_player_6.calcs_for_payblock(session_player_6_p19)
+
+        r=session_player_5.calcs_for_payblock(session_player_5_p19)
+        r=session_player_6.calcs_for_payblock(session_player_6_p19)
+
+        self.assertEqual(session_player_5.get_block_earnings(2),{"fixed":12, "individual":45,"group_bonus":15,"total":72,"earnings_no_pay_percent":0})
+        self.assertEqual(session_player_6.get_block_earnings(2),{"fixed":15, "individual":30,"group_bonus":15,"total":60,"earnings_no_pay_percent":0})
     
     def test_pay_level_indvidual_pay(self):
         '''
@@ -578,8 +593,20 @@ class TestSubjectConsumer(TestCase):
         self.assertEqual(session_player_5_p18.earnings_no_pay_percent, 0)
 
         #check earnings block
-        self.assertEqual(session_player_5.get_block_earnings(3),{"fixed":9, "individual":0,"group_bonus":0,"total":9,"earnings_no_pay_percent":0})
-        self.assertEqual(session_player_6.get_block_earnings(3),{"fixed":12, "individual":0,"group_bonus":0,"total":12,"earnings_no_pay_percent":0})
+        session_player_5_p33 = session_player_5.session_player_periods_b.get(session_period__period_number=33)
+        session_player_5_p33.check_in=True
+        session_player_5_p33.zone_minutes=285
+        session_player_5_p33.save()
+        r=session_player_5.calcs_for_payblock(session_player_5_p33)
+
+        session_player_6_p33 = session_player_6.session_player_periods_b.get(session_period__period_number=33)
+        session_player_6_p33.check_in=True
+        session_player_6_p33.zone_minutes=200
+        session_player_6_p33.save()
+        r=session_player_6.calcs_for_payblock(session_player_6_p33)
+
+        self.assertEqual(session_player_5.get_block_earnings(3),{"fixed":12, "individual":45,"group_bonus":0,"total":57,"earnings_no_pay_percent":0})
+        self.assertEqual(session_player_6.get_block_earnings(3),{"fixed":15, "individual":30,"group_bonus":0,"total":45,"earnings_no_pay_percent":0})
     
     def test_pay_level_no_pay(self):
         '''
