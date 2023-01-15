@@ -617,16 +617,22 @@ class SessionPlayer(models.Model):
         if p:
             fixed_pay = round(p.parameter_set_period.parameter_set_pay_block.fixed_pay)
 
-        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
+        p = self.get_todays_session_player_period()
 
         text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
         text = text.replace('#Group_Zone_Minutes#', self.group_zone_minutes_html())
         text = text.replace('#my_label#', self.parameter_set_player.label_html())
-        text = text.replace('#fixed_pay#', str(fixed_pay))
 
+        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
         if partner:
             text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
-        
+
+        if p:
+            pay_block = p.get_pay_block()
+
+            text = text.replace('#fixed_pay#', str(pay_block.fixed_pay))
+            text = text.replace('#earn_fitbit_percent#', str(pay_block.no_pay_percent))
+
         return text
 
     def individual_zone_mintutes_html(self):
@@ -634,12 +640,12 @@ class SessionPlayer(models.Model):
         return html table of individual zone minutes
         '''
 
-        p = self.session.get_current_session_period()
+        p = self.get_todays_session_player_period()
 
         if not p:
             return "Table not available"
 
-        p = p.parameter_set_period.json()
+        pay_block = p.get_pay_block()
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
@@ -648,14 +654,12 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        # for i in p["parameter_set_period_payments"]:
-        #     temp_p = p["parameter_set_period_payments"][i]
-        #     parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
-
-        #     html = html + f"""<tr>
-        #                      <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
-        #                      <td class='text-center w-auto'>${temp_p['payment']}</td>
-        #                   </tr>"""
+        for i in pay_block.parameter_set_pay_block_payments_a.all().order_by('-zone_minutes'):
+                
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i.label}</td>
+                             <td class='text-center w-auto'>${i.payment}</td>
+                          </tr>"""
                 
         html = html + """</tbody></table></center>"""
         
@@ -667,12 +671,12 @@ class SessionPlayer(models.Model):
         return html table of individual zone minutes
         '''
 
-        p = self.session.get_current_session_period()
+        p = self.get_todays_session_player_period()
 
         if not p:
             return "Table not available"
 
-        p = p.parameter_set_period.json()
+        pay_block = p.get_pay_block()
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
@@ -681,14 +685,12 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        # for i in p["parameter_set_period_payments"]:
-        #     temp_p = p["parameter_set_period_payments"][i]
-        #     parameter_set_zone_minutes = main.models.ParameterSetZoneMinutes.objects.get(id=temp_p['parameter_set_zone_minutes'])
-
-        #     html = html + f"""<tr>
-        #                      <td class='text-center w-auto'>{parameter_set_zone_minutes.label}</td>
-        #                      <td class='text-center w-auto'>${temp_p['group_bonus']}</td>
-        #                   </tr>"""
+        for i in pay_block.parameter_set_pay_block_payments_a.all().order_by('-zone_minutes'):
+                
+            html = html + f"""<tr>
+                             <td class='text-center w-auto'>{i.label}</td>
+                             <td class='text-center w-auto'>${i.group_bonus}</td>
+                          </tr>"""
                 
         html = html + """</tbody></table></center>"""
         
