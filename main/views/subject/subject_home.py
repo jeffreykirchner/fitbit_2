@@ -63,8 +63,8 @@ class SubjectHomeView(View):
                 subject_graph_help_doc = "Subject graph help individual pay"
                 subject_check_in_help_doc = "Subject check in help individual pay"
             elif parmeter_set_pay_block.pay_block_type == "Earn Fitbit":
-                subject_graph_help_doc = "Subject graph help earn fitbit"
-                subject_check_in_help_doc = "Subject check in help earn fitbit"
+                subject_graph_help_doc = "Subject graph help no pay"
+                subject_check_in_help_doc = "Subject check in help no pay"
 
         return render(request=request,
                       template_name=self.template_name,
