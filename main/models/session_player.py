@@ -649,7 +649,7 @@ class SessionPlayer(models.Model):
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
-                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Average Zone Minutes</th>
                             <th scope='col' class='text-center w-auto'>Payment</th>                            
                         </thead>
                         <tbody>"""
@@ -680,7 +680,7 @@ class SessionPlayer(models.Model):
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
-                            <th scope='col' class='text-center w-auto'>Zone Minutes</th>
+                            <th scope='col' class='text-center w-auto'>Average Zone Minutes</th>
                             <th scope='col' class='text-center w-auto'>Payment</th>                            
                         </thead>
                         <tbody>"""
