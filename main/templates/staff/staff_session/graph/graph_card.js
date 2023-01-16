@@ -234,96 +234,108 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
  */
  drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
  {
-     let canvas = document.getElementById(chartID);
-     let ctx = canvas.getContext('2d');
- 
-     let w = app.sizeW;
-     let h = app.sizeH;
- 
-     let marginY=app.marginY;
-     let marginX=app.marginX;
-     let margin2=app.margin2;
- 
-     let zone_minutes_list = app.session.parameter_set.parameter_set_zone_minutes;
- 
-     ctx.save();
- 
-     ctx.strokeStyle='LightGray';
-     ctx.setLineDash([15, 3, 3, 3]);
-     ctx.lineWidth=3;
- 
-     ctx.translate(marginY, h-marginX);
-     ctx.moveTo(0, 0);
- 
-     //lines
-     ctx.beginPath();
- 
-     for(let i=0;i<zone_minutes_list.length-1;i++)
-     {
-         y = app.convertToY(zone_minutes_list[i].zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
- 
-         ctx.moveTo(0, y);
-         ctx.lineTo(w-marginY-marginY, y);
-     }
- 
-     ctx.stroke();
-     ctx.closePath();
-     ctx.restore(); 
- 
-     // axis
-     ctx.save();
-     ctx.translate(marginY, h-marginX);
-     ctx.beginPath();
-     ctx.strokeStyle='Black';
-     ctx.lineWidth=3;
-     ctx.font="bold 14px Georgia";
-     ctx.fillStyle = "black";
-     ctx.textAlign = "right";
-     ctx.lineCap = "round";
-     
-     for(let i=0;i<zone_minutes_list.length-1;i++)
-     {
-         y = app.convertToY(zone_minutes_list[i].zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
- 
-         ctx.fillText(zone_minutes_list[i].zone_minutes+1, -8, y+4);
-         ctx.moveTo(-4, y);
-         ctx.lineTo(0, y);
-     }
- 
-     ctx.stroke();
-     ctx.closePath();
- 
-     ctx.restore(); 
- 
-     //labels
-     ctx.save()
- 
-     ctx.translate(marginY, h-marginX);
-     ctx.font="bold 14px Georgia";
-     ctx.fillStyle = "DimGray";
-     ctx.textAlign = "center";
-     ctx.lineCap = "round";
-     ctx.globalAlpha = 0.25; 
+    let canvas = document.getElementById(chartID);
+    let ctx = canvas.getContext('2d');
+
+    let w = app.sizeW;
+    let h = app.sizeH;
+
+    let marginY=app.marginY;
+    let marginX=app.marginX;
+    let margin2=app.margin2;
+
+    //let zone_minutes_list = app.session.parameter_set.parameter_set_zone_minutes;
     
-     if(!app.session.current_parameter_set_period) return;
+    ctx.save();
+
+    ctx.strokeStyle='LightGray';
+    ctx.setLineDash([15, 3, 3, 3]);
+    ctx.lineWidth=3;
+
+    ctx.translate(marginY, h-marginX);
+    ctx.moveTo(0, 0);
+
+    //lines
+    ctx.beginPath();
+
+    //let current_pay_block_id = Object.keys(app.session.parameter_set.parameter_set_pay_blocks)[0]; 
+    let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[app.session.parameter_set.parameter_set_pay_blocks_order[0]];
+ 
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length-1;i++)
+    {
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes;
+
+        y = app.convertToY(zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+
+        ctx.moveTo(0, y);
+        ctx.lineTo(w-marginY-marginY, y);
+    }
+
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore(); 
+
+    // axis
+    ctx.save();
+    ctx.translate(marginY, h-marginX);
+    ctx.beginPath();
+    ctx.strokeStyle='Black';
+    ctx.lineWidth=3;
+    ctx.font="bold 14px Georgia";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "right";
+    ctx.lineCap = "round";
+    
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length-1;i++)
+    {
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes;
+
+        y = app.convertToY(zone_minutes+1, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+
+        ctx.fillText(zone_minutes+1, -8, y+4);
+        ctx.moveTo(-4, y);
+        ctx.lineTo(0, y);
+    }
+
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.restore(); 
+
+    //labels
+    ctx.save()
+
+    ctx.translate(marginY, h-marginX);
+    ctx.font="bold 14px Georgia";
+    ctx.fillStyle = "DimGray";
+    ctx.textAlign = "center";
+    ctx.lineCap = "round";
+    ctx.globalAlpha = 0.25; 
+
+    if(!app.session.current_parameter_set_period) return;
 
     let payments_list = app.session.current_parameter_set_period.parameter_set_period_payments;
     let previous_zone_minutes = 0;
- 
-    if (payments_list)
+
+    for(let i=0;i<current_pay_block.parameter_set_pay_block_payments_order.length;i++)
     {
-        for(let i=0;i<payments_list.length;i++)
-        {
-            let current_zone_minutes = Math.min(payments_list[i].parameter_set_zone_minutes.zone_minutes + 1, 
-                                                app.session.parameter_set.graph_y_max);
-            let y = app.convertToY((current_zone_minutes+previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
-    
-            
-            ctx.fillText(payments_list[i].parameter_set_zone_minutes.label + " min.", w/2 - marginY, y+4);
-    
-            previous_zone_minutes = payments_list[i].parameter_set_zone_minutes.zone_minutes + 1;
-        }
+        let index = current_pay_block.parameter_set_pay_block_payments_order[i];
+        let zone_minutes = current_pay_block.parameter_set_pay_block_payments[index].zone_minutes; //zone_minutes_list[i].zone_minutes+1
+        let label = current_pay_block.parameter_set_pay_block_payments[index].label;
+
+        let current_zone_minutes = Math.min(zone_minutes + 1, 
+                                            app.session.parameter_set.graph_y_max);
+
+        let y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
+
+        
+        ctx.fillText(label, w/2 - marginY, y+4);
+
+        previous_zone_minutes = zone_minutes + 1;
     }
+    
  
      ctx.restore();
  },
@@ -395,12 +407,12 @@ updateGraph(){
 
     app.drawAxis("graph_id", 
                  0, app.session.parameter_set.graph_y_max, 1,
-                 1, app.session.parameter_set.parameter_set_periods.length, app.session.parameter_set.parameter_set_periods.length/7,
+                 1, app.session.parameter_set.parameter_set_periods_order.length, app.session.parameter_set.parameter_set_periods_order.length/7,
                  "Median Zone Minutes", "Day");
 
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
-                           1,  app.session.parameter_set.parameter_set_periods.length);
+                           1,  app.session.parameter_set.parameter_set_periods_order.length);
     
     app.drawMedianZoneMinutes("graph_id", 0, app.session.parameter_set.graph_y_max,
-                           1,  app.session.parameter_set.parameter_set_periods.length);
+                           1,  app.session.parameter_set.parameter_set_periods_order.length);
 },

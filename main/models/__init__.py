@@ -14,8 +14,8 @@ from .instruction import Instruction
 from .parameter_set import ParameterSet
 from .parameter_set_player import ParameterSetPlayer
 from .parameter_set_period import ParameterSetPeriod
-from .parameter_set_period_payment import ParameterSetPeriodPayment
-from .parameter_set_zone_minutes import ParameterSetZoneMinutes
+from .parameter_set_pay_block import ParameterSetPayBlock
+from .parameter_set_pay_block_payment import ParameterSetPayBlockPayment
 
 from .session import Session
 from .session_period import SessionPeriod

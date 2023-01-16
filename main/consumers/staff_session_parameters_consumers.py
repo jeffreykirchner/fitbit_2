@@ -18,14 +18,14 @@ from main.forms import SessionForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
-from main.forms import ParameterSetPeriodPaymentForm
-from main.forms import ParameterSetZoneMinutesForm
+from main.forms import ParameterSetPayBlockForm
+from main.forms import ParameterSetPayBlockPaymentForm
 
 from main.models import Session
 from main.models import ParameterSetPlayer
 from main.models import ParameterSetPeriod
-from main.models import ParameterSetPeriodPayment
-from main.models import ParameterSetZoneMinutes
+from main.models import ParameterSetPayBlock
+from main.models import ParameterSetPayBlockPayment
 
 import main
 
@@ -142,21 +142,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
-    async def update_parameterset_period_payment(self, event):
-        '''
-        update a parameterset period payment
-        '''
-
-        message_data = {}
-        message_data["status"] = await sync_to_async(take_update_parameterset_period_payment)(event["message_text"])
-
-        message = {}
-        message["messageType"] = "update_parameterset_period_payment"
-        message["messageData"] = message_data
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-    
     async def update_parameterset_period_copy_forward(self, event):
         '''
         update a parameterset period copy forward
@@ -187,36 +172,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
-    async def add_parameterset_zone_minutes(self, event):
-        '''
-        add a parameterset zone minutes
-        '''
-
-        message_data = {}
-        message_data["status"] = await sync_to_async(take_add_parameterset_zone_minutes)(event["message_text"])
-
-        message = {}
-        message["messageType"] = "add_parameterset_zone_minutes"
-        message["messageData"] = message_data
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-    
-    async def update_parameterset_zone_minutes(self, event):
-        '''
-        update a parameterset zone minutes
-        '''
-
-        message_data = {}
-        message_data["status"] = await sync_to_async(take_update_parameterset_zone_minutes)(event["message_text"])
-
-        message = {}
-        message["messageType"] = "update_parameterset_zone_minutes"
-        message["messageData"] = message_data
-
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
-  
     async def import_parameters(self, event):
         '''
         import parameters from another session
@@ -254,6 +209,96 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # logger = logging.getLogger(__name__) 
         # logger.info("Connection update")
 
+    async def add_parameterset_pay_block(self, event):
+        '''
+        add a parameterset pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_add_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_parameterset_pay_block(self, event):
+        '''
+        update a parameterset pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+    async def copy_previous_parameterset_pay_block(self, event):
+        '''
+        copy previous a parameterset pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_copy_previous_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def copy_forward_parameterset_pay_block(self, event):
+        '''
+        copy forward a parameterset pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_copy_forward_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def update_parameterset_pay_block_payment(self, event):
+        '''
+        update a parameterset pay block payment
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_update_parameterset_pay_block_payment)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def add_parameterset_pay_block_payment(self, event):
+        '''
+        add a parameterset pay block payment
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_add_parameterset_pay_block_payment)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
 def get_session(id_):
     '''
     return session with specified id
@@ -264,7 +309,7 @@ def get_session(id_):
 
     try:        
         session = Session.objects.get(id=id_)
-        return session.json()
+        return session.json_for_parameter_set()
     except ObjectDoesNotExist:
         logger.warning(f"get_session session, not found: {id_}")
         return {}
@@ -300,6 +345,7 @@ def take_update_parameterset(data):
         form.save()    
 
         session.auto_assign_groups()
+        session.parameter_set.update_json_local()
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -314,29 +360,24 @@ def take_update_parameterset_player(data):
     logger.info(f"Update parameterset player: {data}")
 
     session_id = data["sessionID"]
-    paramterset_player_id = data["paramterset_player_id"]
     form_data = data["formData"]
 
     session = Session.objects.get(id=session_id)
 
     try:        
-        parameter_set_player = ParameterSetPlayer.objects.get(id=paramterset_player_id)
+        parameter_set_player = ParameterSetPlayer.objects.get(id=form_data["id"])
     except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_type paramterset_player, not found ID: {paramterset_player_id}")
+        logger.warning(f"take_update_parameterset_type paramterset_player, not found ID: {form_data['id']}")
         return
     
     form_data_dict = form_data
 
-    # for field in form_data:            
-    #     form_data_dict[field["name"]] = field["value"]
-
-    logger.info(f'form_data_dict : {form_data_dict}')
-
     form = ParameterSetPlayerForm(form_data_dict, instance=parameter_set_player)
 
     if form.is_valid():
-        #print("valid form")             
-        form.save()              
+                 
+        form.save()
+        session.parameter_set.update_json_fk(update_players=True)             
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -361,6 +402,7 @@ def take_remove_parameterset_player(data):
                 session.parameter_set.parameter_set_players.last().delete()
 
         session.update_player_count()
+        session.parameter_set.update_json_fk(update_players=True)
     except ObjectDoesNotExist:
         logger.warning(f"take_remove_parameterset_player paramterset_player, not found")
         return
@@ -388,6 +430,7 @@ def take_add_parameterset_player(data):
 
     session.update_player_count()
     session.auto_assign_groups()
+    session.parameter_set.update_json_fk(update_players=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
@@ -415,6 +458,7 @@ def take_add_parameterset_period(data):
             session.parameter_set.parameter_set_periods.last().delete()
     
     session.update_end_date()
+    session.parameter_set.update_json_fk(update_periods=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
@@ -431,17 +475,21 @@ def take_update_parameterset_period(data):
 
     try:        
         parameter_set_period = ParameterSetPeriod.objects.get(id=form_data["id"])
+        session = Session.objects.get(id=session_id)
     except ObjectDoesNotExist:
         logger.warning(f"take_update_parameterset_period paramterset_period, not found ID: {form_data['id']}")
         return
 
+    form_data['parameter_set_pay_block'] = form_data['parameter_set_pay_block']['id']
+
     form = ParameterSetPeriodForm(form_data, instance=parameter_set_period)
+    form.fields['parameter_set_pay_block'].queryset = session.parameter_set.parameter_set_pay_blocks_a.all()
 
     if form.is_valid():
         #print("valid form")             
         form.save()              
 
-        session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_periods=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
@@ -470,6 +518,7 @@ def take_update_parameterset_period_copy_forward(data):
     for p in parameter_set_period_list:
         p.copy_forward(parameter_set_period)
    
+    session.parameter_set.update_json_fk(update_periods=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
 
@@ -497,44 +546,16 @@ def take_update_parameterset_period_copy_previous(data):
     else:
          logger.warning(f"update_parameterset_period_copy_previous paramterset_period, no prevous period ID: {data['id']}")
    
+    session.parameter_set.update_json_fk(update_periods=True)
+
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
-def take_update_parameterset_period_payment(data):
+def take_add_parameterset_pay_block(data):
     '''
-    update parameterset period payment
-    '''   
-    logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset period payment: {data}")
-
-    session_id = data["sessionID"]
-    # paramterset_period_id = data["paramterset_period_id"]
-    form_data = data["formData"]
-
-    try:        
-        parameter_set_period_payment = ParameterSetPeriodPayment.objects.get(id=form_data["id"])
-    except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_period_payment paramterset_period_payment, not found ID: {form_data['id']}")
-        return
-
-    form = ParameterSetPeriodPaymentForm(form_data, instance=parameter_set_period_payment)
-
-    if form.is_valid():
-        #print("valid form")             
-        form.save()              
-
-        session = Session.objects.get(id=session_id)
-
-        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
-                                
-    logger.info("Invalid parameterset period payment form")
-    return {"value" : "fail", "errors" : dict(form.errors.items())}
-
-def take_add_parameterset_zone_minutes(data):
-    '''
-    add a new parameter set zone minutes
+    add a new parameter set pay block
     '''
     logger = logging.getLogger(__name__) 
-    logger.info(f"Add parameterset zone minutes: {data}")
+    logger.info(f"Add parameterset pay block: {data}")
 
     session_id = data["sessionID"]
     value = data["value"]
@@ -542,45 +563,192 @@ def take_add_parameterset_zone_minutes(data):
     try:        
         session = Session.objects.get(id=session_id)
     except ObjectDoesNotExist:
-        logger.warning(f"take_update_take_update_parameterset session, not found ID: {session_id}")
+        logger.warning(f"take_add_parameterset_pay_block session, not found ID: {session_id}")
         return
 
     if value == 1:
-        session.parameter_set.add_new_zone_minutes()
-    elif session.parameter_set.parameter_set_zone_minutes.count()>1:
-        session.parameter_set.parameter_set_zone_minutes.first().delete()
+        session.parameter_set.add_new_pay_block()
+    elif session.parameter_set.parameter_set_pay_blocks_a.count() > 1:
+        session.parameter_set.parameter_set_pay_blocks_a.last().delete()
+
+    session.parameter_set.update_json_fk(update_pay_blocks=True)
 
     return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
-def take_update_parameterset_zone_minutes(data):
+def take_update_parameterset_pay_block(data):
     '''
-    update parameterset zone minutes
+    update parameterset pay block
     '''   
     logger = logging.getLogger(__name__) 
-    logger.info(f"Update parameterset zone minutes: {data}")
+    logger.info(f"Update parameterset pay block: {data}")
 
     session_id = data["sessionID"]
     # paramterset_period_id = data["paramterset_period_id"]
     form_data = data["formData"]
 
     try:        
-        parameter_set_zone_minutes = ParameterSetZoneMinutes.objects.get(id=form_data["id"])
+        parameter_set_pay_block = ParameterSetPayBlock.objects.get(id=form_data["id"])
     except ObjectDoesNotExist:
-        logger.warning(f"take_update_parameterset_zone_minutes paramterset_period, not found ID: {form_data['id']}")
+        logger.warning(f"take_update_parameterset_pay_block , not found ID: {form_data['id']}")
         return
 
-    form = ParameterSetZoneMinutesForm(form_data, instance=parameter_set_zone_minutes)
+    form = ParameterSetPayBlockForm(form_data, instance=parameter_set_pay_block)
 
     if form.is_valid():
         #print("valid form")             
         form.save()              
 
         session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_pay_blocks=True)
 
         return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
                                 
     logger.info("Invalid parameterset player form")
     return {"value" : "fail", "errors" : dict(form.errors.items())}
+
+def take_copy_previous_parameterset_pay_block(data):
+    '''
+    copy previous parameterset pay block
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Copy previous parameterset pay block: {data}")
+
+    session_id = data["sessionID"]
+    payblock_id = data["payblockID"]
+
+    try:        
+        parameter_set_pay_block = ParameterSetPayBlock.objects.get(id=payblock_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_copy_previous_parameterset_pay_block , not found ID: {payblock_id}")
+        return     
+
+    session = Session.objects.get(id=session_id)
+
+    if parameter_set_pay_block.pay_block_number>1:
+        parameter_set_pay_block_source = session.parameter_set.parameter_set_pay_blocks_a.all().get(pay_block_number=parameter_set_pay_block.pay_block_number-1)
+        parameter_set_pay_block.from_dict(parameter_set_pay_block_source.json(), False)        
+
+    session.parameter_set.update_json_fk(update_pay_blocks=True)
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}       
+
+def take_copy_forward_parameterset_pay_block(data):
+    '''
+    copy forward parameterset pay block
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Copy forward parameterset pay block: {data}")
+
+    session_id = data["sessionID"]
+    payblock_id = data["payblockID"]
+
+    try:        
+        parameter_set_pay_block = ParameterSetPayBlock.objects.get(id=payblock_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_copy_forward_parameterset_pay_block , not found ID: {payblock_id}")
+        return         
+
+    session = Session.objects.get(id=session_id)
+
+    parameter_set_pay_block_targets = session.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_number__gt=parameter_set_pay_block.pay_block_number)
+
+    temp_j = parameter_set_pay_block.json()
+
+    for p in parameter_set_pay_block_targets:
+        p.from_dict(temp_j, False) 
+
+    session.parameter_set.update_json_fk(update_pay_blocks=True)
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}              
+                            
+def take_update_parameterset_pay_block_payment(data):
+    '''
+    update parameterset pay block payment
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset pay block payment: {data}")
+
+    session_id = data["sessionID"]
+    # paramterset_period_id = data["paramterset_period_id"]
+    form_data = data["formData"]
+
+    try:        
+        parameter_set_pay_block_payment = ParameterSetPayBlockPayment.objects.get(id=form_data["id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_parameterset_pay_block_payment , not found ID: {form_data['id']}")
+        return
+
+    form = ParameterSetPayBlockPaymentForm(form_data, instance=parameter_set_pay_block_payment)
+
+    if form.is_valid():
+        #print("valid form")             
+        form.save()              
+
+        session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_pay_blocks=True)
+
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
+                                
+    logger.info("Invalid parameterset player form")
+    return {"value" : "fail", "errors" : dict(form.errors.items())}
+
+def take_update_parameterset_pay_block_payment(data):
+    '''
+    update parameterset pay block payment
+    '''   
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Update parameterset pay block payment: {data}")
+
+    session_id = data["sessionID"]
+    # paramterset_period_id = data["paramterset_period_id"]
+    form_data = data["formData"]
+
+    try:        
+        parameter_set_pay_block_payment = ParameterSetPayBlockPayment.objects.get(id=form_data["id"])
+    except ObjectDoesNotExist:
+        logger.warning(f"take_update_parameterset_pay_block_payment , not found ID: {form_data['id']}")
+        return
+
+    form = ParameterSetPayBlockPaymentForm(form_data, instance=parameter_set_pay_block_payment)
+
+    if form.is_valid():
+        #print("valid form")             
+        form.save()              
+
+        session = Session.objects.get(id=session_id)
+        session.parameter_set.update_json_fk(update_pay_blocks=True)
+
+        return {"value" : "success", "parameter_set" : session.parameter_set.json()}                      
+                                
+    logger.info("Invalid parameterset player form")
+    return {"value" : "fail", "errors" : dict(form.errors.items())}
+
+def take_add_parameterset_pay_block_payment(data):
+    '''
+    add a new parameter set pay block
+    '''
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Add parameterset pay block: {data}")
+
+    session_id = data["sessionID"]
+    pay_block_id = data["payblockID"]
+    value = data["value"]
+
+    try:        
+        pay_block = ParameterSetPayBlock.objects.get(id=pay_block_id)
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_add_parameterset_pay_block_payment session, not found ID: {pay_block_id}")
+        return
+
+    if value == 1:
+        pay_block.add_pay_block_payment()
+    elif pay_block.parameter_set_pay_block_payments_a.count() > 0:
+        pay_block.parameter_set_pay_block_payments_a.first().delete()
+
+    pay_block.parameter_set.update_json_fk(update_pay_blocks=True)
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
 
 def take_import_parameters(data):
     '''

@@ -14,19 +14,17 @@ var app = Vue.createApp({
                     first_load_done : false,          //true after software is loaded for the first time
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
-                    session : null, //{{session_json|safe}}                  
-                    valuecost_modal_label:'Edit Value or Cost',
+                    session : null,          
 
-                    current_parameter_set_player : {},  //{{first_parameter_set_player_json|safe}}
-                    current_parameter_set_period : {}, //{{first_parameter_set_period_json|safe}}
-                    current_parameter_set_period_payment : {},  //{{first_parameter_set_period_payment_json|safe}}
-                    current_parameter_set_zone_minutes : {},  //{{first_parameter_set_zone_minutes_json|safe}}               
+                    current_parameter_set_player : {},
+                    current_parameter_set_period : {parameter_set_pay_block : {id:0}}, 
+                    current_parameter_set_period_payment : {},  
+                    current_parameter_set_zone_minutes : {},               
+                    current_parameter_set : {instruction_set : {id:0}, help_doc_subject_set : {id:0}},
+                    current_parameter_set_pay_block_payment : {},
+                    current_parameter_set_pay_block : {},
 
-                    parameterset_form_ids: {{parameterset_form_ids|safe}},
-                    parameterset_player_form_ids: {{parameterset_player_form_ids|safe}},
-                    parameterset_period_form_ids: {{parameterset_period_form_ids|safe}},
-                    parameterset_zone_minutes_form_ids: {{parameterset_zone_minutes_form_ids|safe}},
-                    parameterset_period_payment_form_ids: {{parameterset_period_payment_form_ids|safe}},
+                    form_ids: {{form_ids|safe}},
 
                     upload_file: null,
                     upload_file_name:'Choose File',
@@ -42,8 +40,6 @@ var app = Vue.createApp({
                     importParametersModal : null,
                     editParametersetPlayerModal : null,            
                     editParametersetPeriodModal : null,           
-                    editParametersetZoneMinutesModal : null,
-                    editParametersetPeriodPaymentModal : null,
 
                     //form paramters
                     session_import : null,
@@ -96,15 +92,9 @@ var app = Vue.createApp({
                 case "update_parameterset_period_copy_previous":
                     app.takeCopyPrevious(messageData);
                     break;
-                case "update_parameterset_period_payment":
-                    app.takeUpdatePayment(messageData);
-                    break;
-                case "add_parameterset_zone_minutes":
-                    app.takeAddParameterSetZoneMinutes(messageData);
-                    break;   
-                case "update_parameterset_zone_minutes":
-                    app.takeUpdateZoneMinutes(messageData);
-                    break;     
+                case "update_pay_block":
+                    app.takeUpdatePayBlock(messageData);
+                    break; 
                 case "import_parameters":
                     app.takeImportParameters(messageData);
                     break;
@@ -152,25 +142,20 @@ var app = Vue.createApp({
             
             if(!app.first_load_done)
             {
-                setTimeout(app.doFirstLoad, 500);
+                Vue.nextTick(() => {
+                    app.do_first_load();
+                });
             }
         },
 
-        doFirstLoad()
+        do_first_load()
         {
-            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false})
-            app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false})
-            app.editParametersetPlayerModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPlayerModal'), {keyboard: false})            
-            app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false})            
-            app.editParametersetZoneMinutesModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetZoneMinutesModal'), {keyboard: false})
-            app.editParametersetPeriodPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodPaymentModal'), {keyboard: false})
-            
-            document.getElementById('editParametersetModal').addEventListener('hidden.bs.modal', app.hideEditParameterset);
-            document.getElementById('importParametersModal').addEventListener('hidden.bs.modal', app.hideImportParameters);
-            document.getElementById('editParametersetPlayerModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPlayer);
-            document.getElementById('editParametersetPeriodModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriod);
-            document.getElementById('editParametersetZoneMinutesModal').addEventListener('hidden.bs.modal', app.hideEditParametersetZoneMinutes);
-            document.getElementById('editParametersetPeriodPaymentModal').addEventListener('hidden.bs.modal', app.hideEditParametersetPeriodPayment);
+            app.editParametersetModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetModal'), {keyboard: false});
+            app.importParametersModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importParametersModal'), {keyboard: false});
+            app.editParametersetPlayerModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPlayerModal'), {keyboard: false});           
+            app.editParametersetPeriodModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPeriodModal'), {keyboard: false});            
+            app.editParametersetPayBlockPaymentModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockPaymentModal'), {keyboard: false});
+            app.editParametersetPayBlockModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editParametersetPayBlockModal'), {keyboard: false});
         },
 
         /** send winsock request to get session info
@@ -206,7 +191,7 @@ var app = Vue.createApp({
         {%include "staff/staff_session_parameters/control/control.js"%}
         {%include "staff/staff_session_parameters/players/players.js"%}
         {%include "staff/staff_session_parameters/periods/periods.js"%}
-        {%include "staff/staff_session_parameters/zone_minutes/zone_minutes.js"%}
+        {%include "staff/staff_session_parameters/pay_blocks/pay_blocks.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages
@@ -219,35 +204,7 @@ var app = Vue.createApp({
                 if(e) e.remove();
             }
 
-            s = app.parameterset_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_zone_minutes_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_player_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_period_form_ids;
-            for(var i in s)
-            {
-                e = document.getElementById("id_errors_" + s[i]);
-                if(e) e.remove();
-            }
-
-            s = app.parameterset_period_payment_form_ids;
+            s = app.form_ids;
             for(var i in s)
             {
                 e = document.getElementById("id_errors_" + s[i]);

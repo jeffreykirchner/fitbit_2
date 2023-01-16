@@ -859,15 +859,15 @@ def take_get_pay_block(session_id, data):
 
     try:        
         session = Session.objects.get(id=session_id)
-        pay_block = data["pay_block"]
+        pay_block_number = data["pay_block"]
     except ObjectDoesNotExist:
         logger.warning(f"take_get_pay_block session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
     
-    session.back_fill_for_pay_block(pay_block)
+    session.back_fill_for_pay_block(pay_block_number)
 
     return {"value" : "success",
-            "pay_block_csv" : session.get_pay_block_csv(pay_block),}
+            "pay_block_csv" : session.get_pay_block_csv(pay_block_number),}
 
 def take_force_check_in(session_id, data):
     '''
@@ -884,16 +884,21 @@ def take_force_check_in(session_id, data):
         logger.warning(f"take_force_check_in session, not found: {session_id}")
         return {"value":"fail", "result":"session not found"}
 
-    
-
     r = session_player_period.take_check_in(False)
 
-    if r["status"] == "success":
+    if r["status"] == "success":        
         session_player_period.check_in_forced = True
         session_player_period.save()
 
+        pay_block = session_player_period.get_pay_block()
+
+        session_player_period.session_player.calc_averages_for_block(pay_block)
+
+        for i in session_player_period.session_player.get_group_members():
+            i.calc_payments_for_block(pay_block)
+
     return {"value" : "success",
-            "session_player_period" : session_player_period.json_for_staff(),}
+            "session_player" : session_player_period.session_player.json_for_staff(),}
 
 def take_load_full_subject(session_id, data):
     '''

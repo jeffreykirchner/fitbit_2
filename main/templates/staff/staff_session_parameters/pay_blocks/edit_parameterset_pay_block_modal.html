@@ -1,15 +1,15 @@
 {% load crispy_forms_tags %}
 <!--Edit Period Modal -->
-<div class="modal fade" id="editParametersetPeriodPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPeriodPaymentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="editParametersetPayBlockModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPeriodModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="parametersetPeriodPaymentForm" v-on:submit.prevent="onSubmit">
-                    {% for i in parameterset_period_payment_form %}
+                <form id="parametersetPeriodForm" v-on:submit.prevent="onSubmit">
+                    {% for i in parameterset_pay_block_form %}
                     <div class="row">
                         <div class = "col col-md-10 offset-md-1">  
                             {{ i|as_crispy_field }}         
@@ -22,7 +22,7 @@
                 
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "sendUpdatePayment()"
+                        v-on:click = "sendUpdateParameterSetPayBlock()"
                         v-bind:disabled="reconnecting || working || session.started">
                     Update <i class="fas fa-sign-in-alt"></i>
                 </button>

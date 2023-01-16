@@ -164,42 +164,55 @@ class SessionPlayer(models.Model):
         '''
         return the individual earnings from the specified pay_block
         '''
-        total = 0
-        
-        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block,
-                                                                        check_in=True)
 
-        for p in pay_group_player_periods:
-            total += p.earnings_individual
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
 
-        return total
+        if session_player_periods:                                                             
+            return session_player_periods.last().earnings_individual
+       
+        return 0
 
     def get_pay_block_bonus_earnings(self, pay_block):
         '''
         return the group bonus earnings from the specified pay_block
         '''    
-        total = 0
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
 
-        pay_group_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block,
-                                                                        check_in=True)
+        if session_player_periods:                                                      
+            return session_player_periods.last().earnings_group
+        
+        return 0
+    
+    def get_pay_block_fixed_earnings(self, pay_block):
+        '''
+        return fixed pay for 
+        '''
 
-        for p in pay_group_player_periods:
-            total += p.earnings_group
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
+                                                              .filter(check_in=True) \
+                                                              .values_list('earnings_fixed', flat=True)
 
-        return total
+        if session_player_periods:
+            session_player_periods = list(session_player_periods)
+
+            return sum(session_player_periods)
+        
+        return 0
     
     def get_pay_block_no_pay_percent(self):
         '''
         return the total no pay percent from all blocks
         '''
-        total = 0
+
+        session_player_periods = self.session_player_periods_b.filter(check_in=True)\
+                                                              .values_list('earnings_no_pay_percent', flat=True)            
+
+        if session_player_periods:
+            session_player_periods = list(session_player_periods)
+
+            return sum(session_player_periods)
         
-        pay_group_player_periods = self.session_player_periods_b.filter(check_in=True)
-
-        for p in pay_group_player_periods:
-            total += p.earnings_no_pay_percent
-
-        return total
+        return 0
 
     def get_current_block_earnings(self):
         '''
@@ -210,6 +223,7 @@ class SessionPlayer(models.Model):
 
         earnings = {"individual":"0", 
                     "group_bonus":"0", 
+                    "fixed":"0",
                     "total":"0",
                     "earnings_no_pay_percent":"0",
                     "range": {"start_day":{}, "end_day":{}}}
@@ -217,7 +231,7 @@ class SessionPlayer(models.Model):
         if not current_session_period:
             return earnings
 
-        pay_block = current_session_period.parameter_set_period.pay_block
+        pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
 
         earnings = self.get_block_earnings(pay_block)
         earnings["range"] = self.session.get_pay_block_range(pay_block)
@@ -233,10 +247,18 @@ class SessionPlayer(models.Model):
 
         earnings["individual"] = round(self.get_pay_block_individual_earnings(pay_block))
         earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block))
-        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"])
+        earnings["fixed"] = round(self.get_pay_block_fixed_earnings(pay_block))
+
+        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"] + earnings["fixed"])
         earnings["earnings_no_pay_percent"] = self.get_pay_block_no_pay_percent()
 
         return earnings
+    
+    def get_block_period_count(self, parameter_set_pay_block):
+        '''
+        return the number of periods in payblock
+        '''
+        return self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block).count()
     
     def get_todays_session_player_period(self):
         '''
@@ -302,38 +324,29 @@ class SessionPlayer(models.Model):
                     
         result = r["result"]
         if todays_session_player_period:
-            todays_session_player_period.pull_secondary_metrics(save_pull_time=True,
-                                                                result={"devices" : result["devices"],
-                                                                        "fitbit_profile" : result["fitbit_profile"],
-                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
-                                                                        "fitbit_activities" : result["fitbit_activities_td"]})
-        #check synced today
+            todays_session_player_period.process_metrics(save_pull_time=True,
+                                                         result={"devices" : result["devices"],
+                                                                 "fitbit_profile" : result["fitbit_profile"],
+                                                                 "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
+                                                                 "fitbit_activities" : result["fitbit_activities_td"]})
+
+        #check synced today before storing yesterdays back pull
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
 
         for p in session_player_periods_bp:
             p.back_pull=True
 
-            p.pull_secondary_metrics(save_pull_time=False,
-                                     result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
-                                             "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+            p.process_metrics(save_pull_time=False,
+                              result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
+                                      "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
             p.save()
 
             if p.check_in:
                 p.take_check_in(False)
-
-           
         
-        #do back pull if needed
-        # if yesterdays_session_player_period:
-        #     if not yesterdays_session_player_period.back_pull:
-        #         yesterdays_session_player_period.back_pull=True
-        #         yesterdays_session_player_period.save()
-
-        #     if yesterdays_session_player_period.check_in:
-        #         yesterdays_session_player_period.take_check_in(False)
-        #     else:
-        #         yesterdays_session_player_period.pull_secondary_metrics(False)
+        if todays_session_player_period:
+            self.calc_averages_for_block(todays_session_player_period.get_pay_block())
                 
         return {"status" : "success", "message" : ""}
     
@@ -402,6 +415,44 @@ class SessionPlayer(models.Model):
             return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
         else:
             return {"status" : "fail", "message" : r["message"]}
+
+    def calcs_for_payblock(self, session_player_period=None):
+        '''
+        calc averages and payments for pay block
+        '''
+
+        if not session_player_period:
+            session_player_period = self.get_todays_session_player_period()
+
+        if not session_player_period:
+            return
+
+        parameter_set_pay_block = session_player_period.get_pay_block()
+
+        self.calc_averages_for_block(parameter_set_pay_block)
+        self.calc_payments_for_block(parameter_set_pay_block)
+
+        return {"value" : "success", "message" : ""}
+
+    def calc_averages_for_block(self, parameter_set_pay_block):
+        '''
+        calc player periods averages for a specified time block
+        '''
+
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block)
+
+        for i in session_player_periods:
+            i.calc_and_store_average_zone_minutes()
+    
+    def calc_payments_for_block(self, parameter_set_pay_block):
+        '''
+        calc player payments for a specified time block
+        '''
+
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block)
+
+        for i in session_player_periods:
+            i.calc_and_store_payment()
 
     def process_fitbit_last_synced(self, r):
         '''
@@ -502,31 +553,6 @@ class SessionPlayer(models.Model):
             return True
 
         return False
-
-    def pull_missing_metrics(self):
-        '''
-        pull metrics subject missed
-        '''
-        logger = logging.getLogger(__name__)       
-
-        if not self.fitbit_synced_today():
-            logger.info(f"pull_missing_metrics: Error not synced today, player {self.id}")
-            return
-
-        today = todays_date().date()
-        
-        missing_player_period = self.session_player_periods_b.filter(fitbit_heart_time_series__isnull=True) \
-                                                             .filter(session_period__period_date__lt=today) \
-                                                             .last()
-
-        if not missing_player_period:
-            logger.info(f"pull_missing_metrics: No missing periods, player {self.id}")
-            return
-        
-        logger.info(f"pull_missing_metrics: player {self.id}, period {missing_player_period.session_period.period_number}")
-        
-        #missing_player_period.pull_fitbit_heart_time_series()
-        missing_player_period.pull_secondary_metrics(False)
     
     def get_current_survey_link(self):
         '''
@@ -589,18 +615,24 @@ class SessionPlayer(models.Model):
         p = self.session.get_current_session_period()
         fixed_pay = "---"
         if p:
-            fixed_pay = round(p.parameter_set_period.parameter_set_period_pays_a.first().payment)
+            fixed_pay = round(p.parameter_set_period.parameter_set_pay_block.fixed_pay)
 
-        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
+        p = self.get_todays_session_player_period()
 
         text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
-        text = text.replace('#Group_Zone_Minutes#', self.group_zone_mintutes_html())
+        text = text.replace('#Group_Zone_Minutes#', self.group_zone_minutes_html())
         text = text.replace('#my_label#', self.parameter_set_player.label_html())
-        text = text.replace('#fixed_pay#', str(fixed_pay))
 
+        partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
         if partner:
             text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
-        
+
+        if p:
+            pay_block = p.get_pay_block()
+
+            text = text.replace('#fixed_pay#', str(pay_block.fixed_pay))
+            text = text.replace('#earn_fitbit_percent#', str(pay_block.no_pay_percent))
+
         return text
 
     def individual_zone_mintutes_html(self):
@@ -608,12 +640,12 @@ class SessionPlayer(models.Model):
         return html table of individual zone minutes
         '''
 
-        p = self.session.get_current_session_period()
+        p = self.get_todays_session_player_period()
 
         if not p:
             return "Table not available"
 
-        p = p.parameter_set_period.json()
+        pay_block = p.get_pay_block()
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
@@ -622,10 +654,11 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        for i in p["parameter_set_period_payments"]:
+        for i in pay_block.parameter_set_pay_block_payments_a.all().order_by('-zone_minutes'):
+                
             html = html + f"""<tr>
-                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
-                             <td class='text-center w-auto'>${i['payment']}</td>
+                             <td class='text-center w-auto'>{i.label}</td>
+                             <td class='text-center w-auto'>${i.payment}</td>
                           </tr>"""
                 
         html = html + """</tbody></table></center>"""
@@ -633,17 +666,17 @@ class SessionPlayer(models.Model):
 
         return html
     
-    def group_zone_mintutes_html(self):
+    def group_zone_minutes_html(self):
         '''
         return html table of individual zone minutes
         '''
 
-        p = self.session.get_current_session_period()
+        p = self.get_todays_session_player_period()
 
         if not p:
             return "Table not available"
 
-        p = p.parameter_set_period.json()
+        pay_block = p.get_pay_block()
 
         html = f"""<center><table class='table table-hover table-condensed table-responsive-md w-auto'>
                         <thead>
@@ -652,16 +685,24 @@ class SessionPlayer(models.Model):
                         </thead>
                         <tbody>"""
 
-        for i in p["parameter_set_period_payments"]:
+        for i in pay_block.parameter_set_pay_block_payments_a.all().order_by('-zone_minutes'):
+                
             html = html + f"""<tr>
-                             <td class='text-center w-auto'>{i['parameter_set_zone_minutes']['label']}</td>
-                             <td class='text-center w-auto'>${i['group_bonus']}</td>
+                             <td class='text-center w-auto'>{i.label}</td>
+                             <td class='text-center w-auto'>${i.group_bonus}</td>
                           </tr>"""
                 
         html = html + """</tbody></table></center>"""
         
 
         return html
+
+    def get_group_members(self):
+        '''
+        return other players in group
+        '''
+
+        return self.session.session_players.filter(group_number=self.group_number)
 
     def json(self, get_chat=True):
         '''
@@ -701,7 +742,7 @@ class SessionPlayer(models.Model):
             "consent_form_required" : self.consent_form_required,
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
-            "connected_count" : self.connected_count,
+            #"connected_count" : self.connected_count,
 
             "parameter_set_player" : self.parameter_set_player.json(),
 
@@ -722,9 +763,10 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,            
 
-            "individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
-            "group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
-            "no_pay_percent" : todays_session_player_period.get_individual_parameter_set_no_pay_percent() if todays_session_player_period else False,
+            "earnings_fixed" : round(todays_session_player_period.get_fixed_pay()) if todays_session_player_period else None,
+            "individual_earnings" : round(todays_session_player_period.earnings_individual) if todays_session_player_period else None,
+            "group_earnings" : round(todays_session_player_period.earnings_group) if todays_session_player_period else False,
+            "no_pay_percent" : todays_session_player_period.get_no_pay_percent() if todays_session_player_period else False,            
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
@@ -734,6 +776,9 @@ class SessionPlayer(models.Model):
 
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+            "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "groups_average_zone_minutes" : todays_session_player_period.get_team_average() if todays_session_player_period else "---",
+            
 
             "survey_link" : self.get_current_survey_link(),
         }
@@ -753,7 +798,9 @@ class SessionPlayer(models.Model):
 
         todays_session_player_period = self.get_todays_session_player_period()  
 
-        period_number = todays_session_player_period.session_period.period_number if todays_session_player_period else 0 
+        # if todays_session_player_period:
+        #     period_number = todays_session_player_period.session_period.period_number
+        # elif session. 
 
         return{
             "id" : self.id,      
@@ -779,7 +826,7 @@ class SessionPlayer(models.Model):
 
             "chat" : chat,
 
-            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.select_related('session_period').filter(session_period__period_number__lte=period_number)],
+            "session_player_periods" : [i.json_for_staff() for i in self.session_player_periods_b.select_related('session_period')],
 
             # "current_block_earnings" : self.get_current_block_earnings(),
 
@@ -787,9 +834,9 @@ class SessionPlayer(models.Model):
             #"group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
             "missed_check_ins" : self.get_current_missed_check_ins(),
 
-            #"individual_earnings" : round(todays_session_player_period.get_individual_parameter_set_payment()) if todays_session_player_period else None,
+            #"individual_earnings" : round(todays_session_player_period.get_individual_bonus_payment()) if todays_session_player_period else None,
             #"group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
-            #"no_pay_percent" : todays_session_player_period.get_individual_parameter_set_no_pay_percent() if todays_session_player_period else False,
+            #"no_pay_percent" : todays_session_player_period.get_no_pay_percent if todays_session_player_period else False,
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),

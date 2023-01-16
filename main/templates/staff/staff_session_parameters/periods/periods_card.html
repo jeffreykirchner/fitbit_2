@@ -1,7 +1,7 @@
 <div class="card" v-show="first_load_done">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">
-           Days ([[session.parameter_set.parameter_set_periods.length]])
+           Days ([[Object.keys(session.parameter_set.parameter_set_periods).length]])
         </span>  
         
         <span class="float-end">
@@ -22,9 +22,6 @@
                                     Day
                                 </th> 
                                 <th scope="col" class = "text-nowrap">
-                                    Type
-                                </th>
-                                <th scope="col" class = "text-nowrap">
                                     Wrist Minutes
                                 </th>
                                 <th scope="col" class = "text-nowrap">
@@ -42,57 +39,50 @@
                                 <th scope="col" class = "text-nowrap">
                                     Pay<br>Block
                                 </th>
-                                <th v-for="(p, index) in session.parameter_set.parameter_set_zone_minutes" v-bind:key="p.id" scope="col" class = "text-nowrap">
-                                    [[p.label]] <br>
-                                    Individual/Group/%
-                                </th> 
                                 <th scope="col" class = "text-nowrap">
                                     Copy
                                 </th>                       
                             </tr>
                         </thead>
                         <tbody id="period_list">
-                            <tr v-for="(p, index) in session.parameter_set.parameter_set_periods" v-bind:key="p.id">
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_periods_order" 
+                                v-bind:key="p.id" 
+                                :set="temp_p=session.parameter_set.parameter_set_periods[p]">
+
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
                                     [[index+1]]
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.period_type]]
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.minimum_wrist_minutes]]
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.minimum_wrist_minutes]]
-                                </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.survey_required==1">Yes</span>
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    <span v-if="temp_p.survey_required==1">Yes</span>
                                     <span v-else></span>
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.show_notice==1">Yes</span>
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    <span v-if="temp_p.show_notice==1">Yes</span>
                                     <span v-else></span>
                                 </td> 
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.show_graph_1==1">Yes</span>
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    <span v-if="temp_p.show_graph_1==1">Yes</span>
                                     <span v-else>No</span> /
-                                    <span v-if="p.show_graph_2==1">Yes</span>
+                                    <span v-if="temp_p.show_graph_2==1">Yes</span>
                                     <span v-else>No</span>
 
                                 </td>
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    <span v-if="p.show_graph_1==1">[[p.graph_1_start_period_number]] to [[p.graph_1_end_period_number]]</span><span v-else>---</span> and 
-                                    [[p.graph_2_start_period_number]] to [[p.graph_2_end_period_number]]
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    <span v-if="temp_p.show_graph_1==1">[[temp_p.graph_1_start_period_number]] to [[temp_p.graph_1_end_period_number]]</span><span v-else>---</span> and 
+                                    [[temp_p.graph_2_start_period_number]] to [[temp_p.graph_2_end_period_number]]
                                 </td> 
-                                <td v-on:click="showEditParametersetPeriod(index)" class="player_table_cell text-nowrap">
-                                    [[p.pay_block]]
-                                </td>                               
-                                <td v-for="(p, index2) in p.parameter_set_period_payments" v-bind:key="p.id" v-on:click="showEditParametersetPeriodPayment(index, index2)" class="player_table_cell text-nowrap">
-                                    $[[p.payment]] / $[[p.group_bonus]] / [[p.no_pay_percent]]%
-                                </td>
+                                <td v-on:click="showEditParametersetPeriod(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.parameter_set_pay_block.id != -1 ? temp_p.parameter_set_pay_block.pay_block_number : '---']]
+                                </td>                              
                                 <td class="text-nowrap">
                                     <button class="btn btn-outline-primary btn-sm me-2"
                                             type="button"
                                             title="Copy period down"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyForward(p.id)">
+                                            v-on:click="sendCopyForward(p)">
                                             <i class="fas fa-angle-double-down"></i>
                                     </button>
 
@@ -101,7 +91,7 @@
                                             v-show="index>0"
                                             title="Copy previous period"
                                             v-bind:disabled="session.started || reconnecting || working"
-                                            v-on:click="sendCopyPrevious(p.id)">
+                                            v-on:click="sendCopyPrevious(p)">
                                             <i class="fas fa-clone"></i>
                                     </button>
                                 </td>
@@ -114,7 +104,7 @@
                 <div class="row mt-3">
                     <div class="col-md-auto">
                         <div class="input-group mb-3">
-                            <button class="btn btn-outline-success btn-sm"
+                            <button class="btn btn-outline-success"
                                     type="button"
                                     title="Add period"
                                     v-bind:disabled="session.started || reconnecting || working"
@@ -124,7 +114,7 @@
 
                             <input v-model="increment_period" type="number" min="1" max="100" class="form-control text-center" v-bind:disabled="session.started || reconnecting || working">
 
-                            <button class="btn btn-outline-danger btn-sm"
+                            <button class="btn btn-outline-danger"
                                     type="button"
                                     title="Remove period"
                                     v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"

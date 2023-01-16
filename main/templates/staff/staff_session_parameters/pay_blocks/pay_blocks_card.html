@@ -1,0 +1,136 @@
+<div class="card" v-show="first_load_done">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">
+           Pay Blocks ([[Object.keys(session.parameter_set.parameter_set_pay_blocks).length]])
+        </span>  
+        
+        <span class="float-end">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Parameters Pay Blocks')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>
+    </div>
+    <div class="card-body">        
+        <div class="row justify-content-center">
+            <!-- player settings -->
+            <div class="col-md-auto text-center">                
+                <div class="table-responsive">
+                    <table class="table table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th scope="col" class = "text-nowrap">
+                                    Block Number
+                                </th> 
+                                <th scope="col" class = "text-nowrap">
+                                    Type
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Daily Fixed Payment
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Daily Fitbit Percent Earned
+                                </th>
+                                <th scope="col" class = "text-nowrap">
+                                    Payments for average AZM in block
+                                </th>                                
+                                <th scope="col" class = "text-nowrap">
+                                    Actions
+                                </th>                       
+                            </tr>
+                        </thead>
+                        <tbody id="period_list">
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_pay_blocks_order" 
+                                v-bind:key="p + '_pay_blocks'"
+                                :set="temp_p=session.parameter_set.parameter_set_pay_blocks[p]" >
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.pay_block_number]]
+                                </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.pay_block_type]]
+                                </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    $[[temp_p.fixed_pay]]
+                                </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.no_pay_percent]]%
+                                </td>
+                                <td  class="text-nowrap">
+                                   <div class="row">
+                                        <div v-for="(p2, index2) in temp_p.parameter_set_pay_block_payments_order" 
+                                             v-bind:key="p2+'_pay_block_payments'"
+                                             :set="temp_p2=temp_p.parameter_set_pay_block_payments[p2]"
+                                             class="col player_table_cell"
+                                             v-on:click="showEditPayBlockPayment(p, p2)">                                                
+                                                <div class=""><u>[[temp_p2.label]]</u></div>
+                                                <div>Payment: [[temp_p2.payment]]</div>
+                                                <div>Group Bonus: [[temp_p2.group_bonus]]</div>                                               
+                                        </div>
+                                   </div>
+                                </td>
+                               
+                                <td class="text-nowrap">
+                                    <button class="btn btn-outline-success btn-sm me-1"
+                                            type="button"
+                                            title="Add block payment"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendAddParameterSetPayBlockPayment(1, p)">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-danger btn-sm me-1"
+                                            type="button"
+                                            title="Remove block payment"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendAddParameterSetPayBlockPayment(-1, p)">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-primary btn-sm me-1"
+                                            type="button"
+                                            title="Copy period down"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyForwardParameterSetPayBlock(p)">
+                                            <i class="fas fa-angle-double-down"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            type="button"
+                                            v-show="index>0"
+                                            title="Copy previous period"
+                                            v-bind:disabled="session.started || reconnecting || working"
+                                            v-on:click="sendCopyPreviousParameterSetPayBlock(p)">
+                                            <i class="fas fa-clone"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        
+                    </table>                    
+                </div>
+            </div>
+        </div>  
+
+        <div class="row justify-content-center mt-3">
+            <div class="col-md-auto text-center">
+
+                    <button class="btn btn-outline-success me-2"
+                            type="button"
+                            title="Add Block"
+                            v-bind:disabled="session.started || reconnecting || working"
+                            v-on:click="sendAddParameterSetPayBlock(1)">
+                        Add <i class="fas fa-plus"></i>
+                    </button>
+
+                    <button class="btn btn-outline-danger"
+                            type="button"
+                            title="Remove Block"
+                            v-bind:disabled="session.started || reconnecting || working || session.parameter_set.parameter_set_periods.length <= 1"
+                            v-on:click="sendAddParameterSetPayBlock(-1)">
+                        Delete <i class="fas fa-minus"></i>
+                    </button>
+        
+            </div>
+        </div>
+        
+    </div>                    
+</div> 

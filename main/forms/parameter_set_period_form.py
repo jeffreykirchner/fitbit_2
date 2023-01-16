@@ -9,6 +9,8 @@ from main.models import ParameterSetPeriod
 
 from main.globals import PeriodType
 
+import main
+
 class ParameterSetPeriodForm(forms.ModelForm):
     '''
     parameterset period edit form
@@ -22,9 +24,9 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                         choices=((1, 'Yes'), (0,'No')),
                                         widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.survey_required"}))
     
-    period_type = forms.ChoiceField(label='Period Type',
-                                       choices=PeriodType.choices,
-                                       widget=forms.Select(attrs={"v-model":"current_parameter_set_period.period_type",}))
+    # period_type = forms.ChoiceField(label='Period Type',
+    #                                    choices=PeriodType.choices,
+    #                                    widget=forms.Select(attrs={"v-model":"current_parameter_set_period.period_type",}))
     
     minimum_wrist_minutes = forms.IntegerField(label="Minimum Wrist Minutes",
                                       min_value=0,
@@ -76,19 +78,24 @@ class ParameterSetPeriodForm(forms.ModelForm):
                                                                                    "step":"1",
                                                                                    "min":"1"}))
     
-    pay_block = forms.IntegerField(label="Payment Block",
-                                   min_value=1,
-                                   widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.pay_block",
-                                                                   "step":"1",
-                                                                   "min":"1"}))
+    # pay_block = forms.IntegerField(label="Payment Block",
+    #                                min_value=1,
+    #                                widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_period.pay_block",
+    #                                                                "step":"1",
+    #                                                                "min":"1"}))
+
+    parameter_set_pay_block = forms.ModelChoiceField(label='Pay Block',          
+                                   empty_label=None,                          
+                                   queryset=main.models.ParameterSetPayBlock.objects.none(),
+                                   widget=forms.Select(attrs={"v-model":"current_parameter_set_period.parameter_set_pay_block.id"}))
 
     class Meta:
         model=ParameterSetPeriod
-        fields =['period_type', 'minimum_wrist_minutes', 'survey_required', 'survey_link',  
+        fields =[ 'minimum_wrist_minutes', 'survey_required', 'survey_link',  
                  'show_notice', 'notice_text',  
                  'show_graph_1', 'graph_1_start_period_number', 'graph_1_end_period_number',
                  'show_graph_2', 'graph_2_start_period_number', 'graph_2_end_period_number', 
-                 'pay_block', ]
+                 'parameter_set_pay_block']
     
     def clean_survey_link(self):
         

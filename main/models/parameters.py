@@ -21,7 +21,7 @@ class Parameters(models.Model):
     software_version =  models.CharField(max_length = 100, default="1.00")                  #version number of software
 
     timestamp = models.DateTimeField(auto_now_add=True)
-    updated= models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "Site Parameters"
