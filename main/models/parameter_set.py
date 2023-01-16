@@ -66,10 +66,15 @@ class ParameterSet(models.Model):
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = new_ps.get("consent_form_required")
 
-            self.instruction_set = InstructionSet.objects.get(label=new_ps.get("instruction_set")["label"])
 
-            if new_ps.get("help_doc_subject_set")["id"]:
-                self.help_doc_subject_set = HelpDocSubjectSet.objects.get(label=new_ps.get("help_doc_subject_set")["label"])
+            instruction_sets = InstructionSet.objects.filter(label=new_ps.get("instruction_set")["label"])
+
+            if instruction_sets:
+                self.instruction_set = instruction_sets.first()
+
+            help_doc_subject_sets = HelpDocSubjectSet.objects.filter(label=new_ps.get("help_doc_subject_set")["label"])
+            if help_doc_subject_sets:
+                self.help_doc_subject_set = help_doc_subject_sets.first()
 
             self.save()
 

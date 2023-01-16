@@ -488,13 +488,28 @@ class SessionPlayerPeriod(models.Model):
         '''
         # ["Session ID", "Period", "Player", "Group", 
         #                  "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
-        #                  "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])                    "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+        #                  "Checked In", "Checked In Forced", "fixed pay", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])                    "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
+
+        earnings_individual = 0
+        earnings_group = 0
+        earnings_total = 0
+        no_pay_total = 0
+
+        if self.session_period.is_last_period_in_block:
+            v = self.session_player.get_block_earnings(self.get_pay_block())
+            earnings_individual = v["individual"]
+            earnings_group = v["group_bonus"]
+            earnings_total = v["total"]
+            no_pay_total = v["earnings_no_pay_percent"]
 
         writer.writerow([self.session_period.session.id,
+                         self.get_pay_block().pay_block_type,
+                         self.get_pay_block().pay_block_number,
                          self.session_period.period_number,
                          self.session_player.player_number,
                          self.session_player.group_number,
                          self.zone_minutes,
+                         self.average_pay_block_zone_minutes,
                          #self.sleep_minutes,
                          self.fitbit_minutes_heart_peak,
                          self.fitbit_minutes_heart_cardio,
@@ -506,10 +521,12 @@ class SessionPlayerPeriod(models.Model):
                          self.fitbit_on_wrist_minutes,
                          self.check_in,
                          self.check_in_forced,
-                         self.earnings_individual,
-                         self.earnings_group,
-                         self.get_earning(),
+                         self.earnings_fixed,
+                         earnings_individual,
+                         earnings_group,
+                         earnings_total,
                          self.earnings_no_pay_percent,
+                         no_pay_total,
                          self.get_last_login_str(),
                          self.fitbit_calories,
                          self.fitbit_steps,
@@ -531,8 +548,9 @@ class SessionPlayerPeriod(models.Model):
         if self.fitbit_heart_time_series:
             time_dict = {}
 
-            for i in self.fitbit_heart_time_series["activities-heart-intraday"]["dataset"]:
-                time_dict[i["time"]] = i["value"] 
+            if self.fitbit_heart_time_series.get("activities-heart-intraday", False):
+                for i in self.fitbit_heart_time_series["activities-heart-intraday"]["dataset"]:
+                    time_dict[i["time"]] = i["value"] 
 
             for i in range(1440):
                 v.append(time_dict.get(str(timedelta(minutes=i)), ""))
