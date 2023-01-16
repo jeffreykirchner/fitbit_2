@@ -21,8 +21,8 @@ from main.forms import ImportParametersForm
 from main.forms import ParameterSetForm
 from main.forms import ParameterSetPlayerForm
 from main.forms import ParameterSetPeriodForm
-from main.forms import ParameterSetZoneMinutesForm
-from main.forms import  ParameterSetPeriodPaymentForm
+from main.forms import ParameterSetPayBlockForm
+from main.forms import ParameterSetPayBlockPaymentForm
 
 class StaffSessionParametersView(SingleObjectMixin, View):
     '''
@@ -42,35 +42,32 @@ class StaffSessionParametersView(SingleObjectMixin, View):
 
         parameterset_player_form = ParameterSetPlayerForm()
         parameterset_period_form = ParameterSetPeriodForm()
-        parameterset_zone_minutes_form = ParameterSetZoneMinutesForm()
-        parameterset_period_payment_form = ParameterSetPeriodPaymentForm()
+        parameterset_pay_block_form = ParameterSetPayBlockForm()
+        parameterset_pay_block_payment_form = ParameterSetPayBlockPaymentForm()
 
-        parameterset_form_ids=[]
+        form_ids=[]
         for i in ParameterSetForm():
-            parameterset_form_ids.append(i.html_name)
+            form_ids.append(i.html_name)
 
-        parameterset_player_form_ids=[]
         for i in parameterset_player_form:
-            parameterset_player_form_ids.append(i.html_name)
+            form_ids.append(i.html_name)
 
-        parameterset_period_form_ids=[]
         for i in parameterset_period_form:
-            parameterset_period_form_ids.append(i.html_name)
+            form_ids.append(i.html_name)
         
-        parameterset_zone_minutes_form_ids=[]
-        for i in parameterset_zone_minutes_form:
-            parameterset_zone_minutes_form_ids.append(i.html_name)
-        
-        parameterset_period_payment_form_ids=[]
-        for i in parameterset_period_payment_form:
-            parameterset_period_payment_form_ids.append(i.html_name)
+        for i in parameterset_pay_block_form:
+           form_ids.append(i.html_name)
 
-        
+        for i in parameterset_pay_block_payment_form:
+           form_ids.append(i.html_name)
+
         if session.parameter_set.parameter_set_players.count() == 0:
             session.parameter_set.add_new_player()
         
         if session.parameter_set.parameter_set_periods.count() == 0:
             session.parameter_set.add_new_period()
+            
+        parameterset_period_form.fields['parameter_set_pay_block'].queryset = session.parameter_set.parameter_set_pay_blocks_a.all()
 
         return render(request=request,
                       template_name=self.template_name,
@@ -79,23 +76,14 @@ class StaffSessionParametersView(SingleObjectMixin, View):
                                "id" : session.id,
                                "parameter_set_form" : ParameterSetForm(),
                                "parameter_set_player_form" : parameterset_player_form,
-                               "parameterset_form_ids" : parameterset_form_ids,
-                               "parameterset_player_form_ids" : parameterset_player_form_ids,
+                               "form_ids" : form_ids,
                                "parameterset_period_form" : parameterset_period_form,
-                               "parameterset_period_form_ids" : parameterset_period_form_ids,
-                               "parameterset_period_payment_form" : parameterset_period_payment_form,
-                               "parameterset_period_payment_form_ids" : parameterset_period_payment_form_ids,
-                               "parameterset_zone_minutes_form" : parameterset_zone_minutes_form,
-                               "parameterset_zone_minutes_form_ids" : parameterset_zone_minutes_form_ids,
+                               "parameterset_pay_block_form" : parameterset_pay_block_form,
+                               "parameterset_pay_block_payment_form" : parameterset_pay_block_payment_form,
                                "import_parameters_form" : ImportParametersForm(user=request.user,session_id=session.id),     
                                "websocket_path" : self.websocket_path,
                                "page_key" : f'{self.websocket_path}-{session.id}',
                                "session" : session,
-                            #    "session_json":json.dumps(session.json(), cls=DjangoJSONEncoder),
-                            #    "first_parameter_set_player_json":json.dumps(session.parameter_set.parameter_set_players.first().json(), cls=DjangoJSONEncoder),
-                            #    "first_parameter_set_period_json":json.dumps(session.parameter_set.parameter_set_periods.first().json(), cls=DjangoJSONEncoder),
-                            #    "first_parameter_set_period_payment_json":json.dumps(session.parameter_set.parameter_set_periods.first().parameter_set_period_pays_a.first().json(), cls=DjangoJSONEncoder),
-                            #    "first_parameter_set_zone_minutes_json":json.dumps(session.parameter_set.parameter_set_zone_minutes.first().json(), cls=DjangoJSONEncoder),
                                })
     
     @method_decorator(login_required)

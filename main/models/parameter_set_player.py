@@ -19,7 +19,7 @@ class ParameterSetPlayer(models.Model):
     display_color = models.CharField(max_length = 300, default = '#000000', verbose_name = 'Graph Color')  
 
     timestamp = models.DateTimeField(auto_now_add= True)
-    updated= models.DateTimeField(auto_now= True)
+    updated = models.DateTimeField(auto_now= True)
 
     def __str__(self):
         return str(self.id)

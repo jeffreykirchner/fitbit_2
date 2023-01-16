@@ -1,7 +1,7 @@
 <div class="card" v-show="first_load_done">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">
-            Players ([[session.parameter_set.parameter_set_players.length]]) 
+            Players ([[Object.keys(session.parameter_set.parameter_set_players).length]]) 
         </span>      
 
         <span class="float-end">
@@ -32,15 +32,15 @@
                             </tr>
                         </thead>
                         <tbody id="player_list">
-                            <tr v-for="(p, index) in session.parameter_set.parameter_set_players" v-bind:key="p.id">
-                                <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell">
+                            <tr v-for="(p, index) in session.parameter_set.parameter_set_players_order" v-bind:key="p.id">
+                                <td v-on:click="showEditParametersetPlayer(p)" class="player_table_cell">
                                     [[index+1]]
                                 </td>
-                                <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell">
-                                    [[p.id_label]]
+                                <td v-on:click="showEditParametersetPlayer(p)" class="player_table_cell">
+                                    [[session.parameter_set.parameter_set_players[p].id_label]]
                                 </td>
-                                <td v-on:click="showEditParametersetPlayer(index)" class="player_table_cell" v-bind:style="{color : p.display_color}">
-                                    [[p.display_color]]
+                                <td v-on:click="showEditParametersetPlayer(p)" class="player_table_cell" v-bind:style="{color : session.parameter_set.parameter_set_players[p].display_color}">
+                                    [[session.parameter_set.parameter_set_players[p].display_color]]
                                 </td>
                             </tr>
                         </tbody>

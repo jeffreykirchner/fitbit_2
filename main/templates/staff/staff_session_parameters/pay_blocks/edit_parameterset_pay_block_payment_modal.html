@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
-<!--Edit Active Minutes Modal -->
-<div class="modal fade" id="editParametersetZoneMinutesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetZoneMinutesModalLabel" aria-hidden="true">
+<!--Edit Period Modal -->
+<div class="modal fade" id="editParametersetPayBlockPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editParametersetPayBlockPaymentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,8 +8,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="parametersetZoneMinutesForm" v-on:submit.prevent="onSubmit">
-                    {% for i in parameterset_zone_minutes_form %}
+                <form id="parametersetPayBlockPaymentForm" v-on:submit.prevent="onSubmit">
+                    {% for i in parameterset_pay_block_payment_form %}
                     <div class="row">
                         <div class = "col col-md-10 offset-md-1">  
                             {{ i|as_crispy_field }}         
@@ -18,12 +18,12 @@
                     {% endfor %}
                 </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" v-if="session">
                 
                 <button type="button"
                         class="btn btn-outline-primary"
-                        v-on:click = "sendUpdateZoneMinutes()"
-                        v-bind:disabled="reconnecting || working">
+                        v-on:click = "sendUpdateParameterSetPayBlockPayment()"
+                        v-bind:disabled="reconnecting || working || session.started">
                     Update <i class="fas fa-sign-in-alt"></i>
                 </button>
             </div>

@@ -61,7 +61,7 @@ class Session(models.Model):
     soft_delete =  models.BooleanField(default=False)                            #hide session if true
 
     timestamp = models.DateTimeField(auto_now_add=True)
-    updated= models.DateTimeField(auto_now=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -102,11 +102,14 @@ class Session(models.Model):
 
         self.started = True
         self.finished = False     
+        
+        self.parameter_set.json_for_subject(update_required=True)
 
         session_periods = []
 
         period_date = self.start_date
 
+        #create session periods
         for i, p in enumerate(self.parameter_set.parameter_set_periods.all()):
             session_periods.append(main.models.SessionPeriod(session=self, parameter_set_period=p, period_number=i+1, period_date=period_date))
             period_date += timedelta(days=1)
@@ -114,6 +117,15 @@ class Session(models.Model):
         #logger.info(f"Session Periods Created")
         
         main.models.SessionPeriod.objects.bulk_create(session_periods)
+
+        #set last day of each pay block parameter_set_periods_b
+        for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+            parameter_set_period = i.parameter_set_periods_b.last()
+
+            if parameter_set_period:
+                session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
+                session_period.is_last_period_in_block = True
+                session_period.save()
 
         self.current_experiment_phase = ExperimentPhase.RUN
 
@@ -184,9 +196,9 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Period", "Player", "Group", 
-                         "Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
-                         "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "No Pay Percent", "Last Visit Time",
+        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Group", 
+                         "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
+                         "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
                          "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
@@ -267,6 +279,14 @@ class Session(models.Model):
 
         for p in self.session_players.all():
             p.fill_with_test_data(period.period_number)
+        
+        for p in self.session_players.all():
+            for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+                p.calc_averages_for_block(i)
+
+        for p in self.session_players.all():
+            for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+                p.calc_payments_for_block(i)
 
     def is_before_first_period(self):
         '''
@@ -304,7 +324,7 @@ class Session(models.Model):
         return the day range of the pay_block
         '''
 
-        session_periods = self.session_periods.filter(parameter_set_period__pay_block=pay_block)
+        session_periods = self.session_periods.filter(parameter_set_period__parameter_set_pay_block=pay_block)
 
         if session_periods:
             return {"start_day" : session_periods.first().json(),
@@ -313,27 +333,30 @@ class Session(models.Model):
             return {"start_day" : {},
                     "end_day" : {}}
 
-    def get_pay_block(self, pay_block_number):
+    def get_pay_block(self, pay_block):
         '''
         return dict of payblocks
         '''
 
-        pay_block = {"block_number" : pay_block_number,
-                     "range" : self.get_pay_block_range(pay_block_number),
-                     "payments" : []} 
+        pay_block_json = {"block_number" : pay_block.pay_block_number,
+                          "range" : self.get_pay_block_range(pay_block),
+                          "payments" : []} 
 
         for p in self.session_players.exclude(disabled=True):
 
-            payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block_number)}
-            pay_block["payments"].append(payment)
+            payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block)}
+            pay_block_json["payments"].append(payment)
 
-        return pay_block
+        return pay_block_json
     
     def get_pay_block_csv(self, pay_block_number):
         '''
         return pay block in csv format
         '''
-        pay_block = self.get_pay_block(pay_block_number)
+
+        pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=pay_block_number)
+
+        pay_block = self.get_pay_block(pay_block)
 
         output = io.StringIO()
         writer = csv.writer(output, quoting=csv.QUOTE_NONE)
@@ -350,9 +373,10 @@ class Session(models.Model):
 
         pay_blocks = {}
 
-        for p in self.parameter_set.parameter_set_periods.all():
-            if not pay_blocks.get(str(p.pay_block), False):
-                pay_blocks[str(p.pay_block)] = self.get_pay_block(p.pay_block)
+        for p in self.parameter_set.parameter_set_pay_blocks_a.all():
+
+            if not pay_blocks.get(p.pay_block_number, False):
+                pay_blocks[p.pay_block_number] = self.get_pay_block(p)
 
         return pay_blocks
     
@@ -360,10 +384,12 @@ class Session(models.Model):
         '''
         back fill last day of a pay block
         '''
+
+        parameter_set_pay_block = self.parameter_set.parameter_set_pay_block__pay_block_number=pay_block_number
         
         for i in self.session_players.exclude(disabled=True):
 
-            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__pay_block=pay_block_number, back_pull=False)
+            pull_list = i.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block, back_pull=False)
 
             if pull_list:
 
@@ -371,9 +397,15 @@ class Session(models.Model):
 
                 i.pull_todays_metrics(p)
 
+            for p in pull_list:
                 if p.check_in:
                     p.take_check_in(False)
 
+        for i in self.session_players.exclude(disabled=True):
+            i.calc_averages_for_block(parameter_set_pay_block)
+        
+        for i in self.session_players.exclude(disabled=True):
+            i.calc_payments_for_block(parameter_set_pay_block)
 
     def get_group_channel_list(self, group_number):
         '''
@@ -396,7 +428,6 @@ class Session(models.Model):
             if temp_counter == self.parameter_set.group_size:
                 temp_group += 1
                 temp_counter = 0
-
 
     def json(self):
         '''
@@ -436,7 +467,20 @@ class Session(models.Model):
             "is_last_period": is_last_period, 
             "pay_blocks" : self.get_pay_block_list(),
         }
-    
+
+    def json_for_parameter_set(self):
+        '''
+        json for parameter set setup screen
+        '''
+
+        return{
+            "id":self.id,
+            "title":self.title,
+            "locked":self.locked,
+            "started":self.started,
+            "parameter_set": self.parameter_set.json(),
+        }
+
     def json_for_subject(self, session_player):
         '''
         json object for subject screen

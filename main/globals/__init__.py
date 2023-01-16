@@ -6,6 +6,7 @@ from .send_email import send_mass_email_service
 
 from .sessions import ExperimentPhase
 from .sessions import PeriodType
+from .sessions import PayBlockType
 
 from .random_hex_color import get_random_hex_color
 

@@ -20,8 +20,6 @@ from django.db import transaction
 from main.consumers import SocketConsumerMixin
 from main.consumers import StaffSubjectUpdateMixin
 
-from main.forms import EndGameForm
-
 from main.models import Session
 from main.models import SessionPlayer
 from main.models import SessionPlayerChat
@@ -405,13 +403,11 @@ def take_get_session_subject(session_player_id, data):
                     show_fitbit_connect = True
                     fitbit_error_message = "Connect your fitbit the app."
                 elif value["message"] == "Not synced today":
-                    fitbit_error_message = "Sync your fitbit to your phone."
+                    fitbit_error_message = "Sync your fitbit to your phone and refresh."
                 else:
-                    fitbit_error_message = "Fitbit is not available, try again later."
+                    fitbit_error_message = "Fitbit is not available, try again later."              
             else:
-                # session_player.pull_missing_metrics()
-                pass                
-
+                session_player.calcs_for_payblock()
         return {"session" : session_player.session.json_for_subject(session_player), 
                 "show_fitbit_connect" : show_fitbit_connect,
                 "fitbit_error_message" : fitbit_error_message,
