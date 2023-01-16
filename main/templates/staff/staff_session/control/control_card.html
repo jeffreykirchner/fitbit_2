@@ -100,9 +100,9 @@
             </div>
         </div>
 
-        {%if DEBUG%}
+        
         <!-- fill with test data -->
-        <div class="row mt-2" v-show="session.started && !session.locked">
+        <div class="row mt-2" v-show="session.started && !session.locked && session.parameter_set.test_mode=='True'">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-warning"
@@ -113,6 +113,6 @@
                 </button>
             </div>
         </div>
-        {%endif%}
+       
     </div>                    
 </div> 
