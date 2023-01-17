@@ -897,6 +897,7 @@ class SessionPlayer(models.Model):
 
             "login_link" : reverse('subject_home', kwargs={'player_key': self.player_key}),
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
+            "fitbit_user_id" : self.fitbit_user_id,
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
