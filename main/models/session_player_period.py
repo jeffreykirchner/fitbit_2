@@ -507,6 +507,7 @@ class SessionPlayerPeriod(models.Model):
                          self.get_pay_block().pay_block_number,
                          self.session_period.period_number,
                          self.session_player.player_number,
+                         self.session_player.recruiter_id_private,
                          self.session_player.group_number,
                          self.zone_minutes,
                          self.average_pay_block_zone_minutes,
@@ -543,6 +544,7 @@ class SessionPlayerPeriod(models.Model):
         v = [self.session_period.session.id,
              self.session_period.period_number,
              self.session_player.player_number,
+             self.session_player.recruiter_id_private,
              self.session_player.group_number]
 
         if self.fitbit_heart_time_series:
@@ -561,7 +563,7 @@ class SessionPlayerPeriod(models.Model):
         '''
         take csv writer and add row
         '''
-    #    ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time"]
+    #    ["Session ID", "Period", "Player", "Recruiter id", "Group", "Activity", "Zone Minutes", "Start Time", "End Time"]
        
 
         if self.fitbit_activities:
@@ -570,6 +572,7 @@ class SessionPlayerPeriod(models.Model):
                 v = [self.session_period.session.id,
                         self.session_period.period_number,
                         self.session_player.player_number,
+                        self.session_player.recruiter_id_private,
                         self.session_player.group_number]
                 
                 v.append(a["activityName"])
