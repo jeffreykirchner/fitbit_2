@@ -268,6 +268,27 @@ class Session(models.Model):
 
         return output.getvalue()
     
+    def get_playerlist_csv(self):
+        '''
+        return the player list in csv format
+        '''
+
+        output = io.StringIO()
+
+        writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+
+        for i in self.session_players.all():
+            v = [i.name,
+                 "",
+                 i.email, 
+                 i.student_id, 
+                 i.recruiter_id_private, 
+                 i.recruiter_id_public]
+
+            writer.writerow(v)
+
+        return output.getvalue()
+
     def fill_with_test_data(self):
         '''
         fill session players with test data up to this point in the experiment

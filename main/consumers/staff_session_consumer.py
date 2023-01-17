@@ -346,6 +346,19 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def get_playerlist_csv(self, event):
+        '''
+        return player list in csv format
+        '''
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_get_playerlist_csv)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -940,5 +953,21 @@ def take_pull_time_series_data(session_id, data):
         i.pull_secondary_time_series()
 
     return {"value" : "success",}
+
+def take_get_playerlist_csv(session_id, data):
+    '''
+    get player list in a csv format
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_get_playerlist_csv: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_get_playerlist_csv session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    return {"value" : "success", "player_list_csv" : session.get_playerlist_csv()}
 
 

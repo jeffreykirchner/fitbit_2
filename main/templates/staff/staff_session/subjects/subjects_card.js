@@ -375,7 +375,7 @@ takeUpdateConsentForm(messageData){
 
 /** send request to pull time series data
 */
-senddPullTimeSeriesData(){
+sendPullTimeSeriesData(){
 
     app.working = true;
     app.time_series_pulled = false;
@@ -396,4 +396,31 @@ takesPullTimeSeriesData(messageData)
     {
 
     }
+},
+
+/**
+ * get pay block the server
+ */
+get_playerlist_csv(){
+    this.working = true;
+    this.player_list_copied = false;
+    app.sendMessage("get_playerlist_csv", {});
+},
+
+
+/**
+ * get pay block the server
+ */
+take_playerlist_csv(messageData){    
+
+    this.player_list_copied = true;
+
+    if(messageData.status.value == "success")
+    {
+        app.copyToClipboard(messageData.status.player_list_csv);      
+    } 
+    else
+    {
+        
+    } 
 },

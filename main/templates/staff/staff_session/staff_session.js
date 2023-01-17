@@ -31,6 +31,7 @@ var app = Vue.createApp({
                     payments_downloading : false,               //show spinner when payments downloading
                     payments_copied : false,                    //show after payments copied to clipboard
                     time_series_pulled : false,                 //show after time series data pulled
+                    player_list_copied :false,                  //show after player list copied
 
                     staffEditNameEtcForm : {name : "", student_id : "", email : "", id : -1},
                     sendMessageModalForm : {subject : "", text : ""},
@@ -164,6 +165,8 @@ var app = Vue.createApp({
                 case "pull_time_series_data":
                     app.takesPullTimeSeriesData(messageData);
                     break;
+                case "get_playerlist_csv":
+                    app.take_playerlist_csv(messageData);
             }
 
             this.first_load_done = true;
