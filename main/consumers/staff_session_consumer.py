@@ -785,9 +785,11 @@ def take_email_list(session_id, data):
             p = session.session_players.filter(player_number=counter).first()
 
             if p:
-                p.name = raw_list[i][0] + " " + raw_list[i][1]
+                p.name = raw_list[i][1] + " " + raw_list[i][0]
                 p.email = raw_list[i][2]
                 p.student_id = raw_list[i][3]
+                p.recruiter_id_private = raw_list[i][4]
+                p.recruiter_id_public = raw_list[i][5]
 
                 p.save()
             

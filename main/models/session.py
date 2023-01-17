@@ -185,6 +185,7 @@ class Session(models.Model):
             new_session_player.session = self
             new_session_player.parameter_set_player = i
             new_session_player.player_number = count + 1
+            new_session_player.player_key_backup = new_session_player.player_key
 
             new_session_player.save()
 
@@ -196,7 +197,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Group", 
+        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Recruiter ID", "Group", 
                          "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
                          "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
                          "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
@@ -215,7 +216,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Group"]
+        v = ["Session ID", "Period", "Player", "Recruiter ID", "Group"]
 
         for i in range(1440):
             v.append(str(timedelta(minutes=i)))
@@ -236,7 +237,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
+        v = ["Session ID", "Period", "Player", "Recruiter ID", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
 
         writer.writerow(v)
 

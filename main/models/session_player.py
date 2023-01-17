@@ -32,10 +32,14 @@ class SessionPlayer(models.Model):
     parameter_set_player = models.ForeignKey(ParameterSetPlayer, on_delete=models.CASCADE, related_name="session_players_paramterset")
 
     player_number = models.IntegerField(verbose_name='Player number', default=0)                        #player number, from 1 to N
-    player_key = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name = 'Player Key')      #login and channel key
+    player_key = models.UUIDField(default=uuid.uuid4, verbose_name = 'Player Key')                      #login and channel key
+    player_key_backup = models.UUIDField(default=uuid.uuid4, verbose_name = 'Player Key Backup')        #login and channel key orginally assigned
     connecting = models.BooleanField(default=False, verbose_name='Consumer is connecting')              #true when a consumer is connceting
     connected_count = models.IntegerField(verbose_name='Number of consumer connections', default=0)     #number of consumers connected to this subject
     channel_name = models.CharField(verbose_name='Django channels key', max_length = 1000, default="")  #key issued from django channels
+
+    recruiter_id_private = models.IntegerField(verbose_name='Recruiter ID Private', default=0)          #privatly assigned id number from recruiter
+    recruiter_id_public = models.UUIDField(default=uuid.uuid4, verbose_name = 'Recruiter ID Public')    #publicly assigned id number from recruiter
 
     name = models.CharField(verbose_name='Full Name', max_length = 100, default="", blank=True, null=True)            #subject's full name
     student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="", blank=True, null=True)     #subject's student ID number

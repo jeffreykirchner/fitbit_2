@@ -211,7 +211,9 @@ class SessionPlayerAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
     
-    readonly_fields = ['session', 'parameter_set_player', 'player_number']
+    readonly_fields = ['session', 'parameter_set_player', 'player_number', 'player_key',
+                       'player_key_backup' , 'fitbit_last_synced', 'fitbit_device', 'channel_name',
+                       'recruiter_id_private' ,'recruiter_id_public']
     inlines = [SessionPlayerPeriodInline, ]
 
 class sessionPeriodInline(admin.TabularInline):
