@@ -820,7 +820,9 @@ def take_fill_with_test_data(session_id, data):
     logger.info(f'take_take_fill_with_test_data: calc payments')
     
     return {"value" : "success",
-            "session_players" : [p.json() for p in session.session_players.all()]}
+            "session_players" : [p.json() for p in session.session_players.all()],
+            "median_zone_minutes" : [i.get_median_zone_minutes() for i in session.session_periods.all()],
+}
     
 def take_next_phase(session_id, data):
     '''

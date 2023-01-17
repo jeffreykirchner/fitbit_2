@@ -196,19 +196,27 @@ var app = Vue.createApp({
 
             app.session = session;
 
-            if(app.session.started)
-            {
-                setTimeout(app.updateGraph, 250);
-            }
-            else
-            {
+            // if(app.session.started)
+            // {
+            //     setTimeout(app.updateGraph, 250);
+            // }
+            // else
+            // {
                 
-            }
+            // }
 
             if(!app.first_load_done)
             {
-                setTimeout(app.doFirstLoad, 500);
+                // setTimeout(app.doFirstLoad, 500);
+                Vue.nextTick(() => {
+                    app.doFirstLoad();
+                });
             }
+
+            Vue.nextTick(() => {
+                app.updateGraph();
+            });
+           
             
             app.updatePhaseButtonText();    
         },

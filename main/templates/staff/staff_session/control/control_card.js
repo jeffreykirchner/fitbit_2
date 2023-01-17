@@ -238,9 +238,14 @@ fillWithTestData(){
     if(messageData.status.value == "success")
     {         
         this.session.session_players = messageData.status.session_players;
+        this.session.median_zone_minutes = messageData.status.median_zone_minutes;
     } 
     else
     {
        
     } 
+
+    Vue.nextTick(() => {
+        app.updateGraph();
+    });
 },
