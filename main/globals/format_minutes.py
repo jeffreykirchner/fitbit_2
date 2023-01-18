@@ -14,21 +14,21 @@ def format_minutes(minutes) -> str:
     v = f'{math.floor(minutes/60)}'
 
     if v == "1":
-        v += "hr "
+        v += " hr "
     else:
-        v += "hrs "
+        v += " hrs "
 
     if minutes%60 != 0 :
 
-        if v == "0hrs ":
+        if v == "0 hrs ":
             v = ""
 
         v += f' {minutes%60}'
 
         if minutes%60 == 1:
-            v += "min"
+            v += " min"
         else:
-             v += "mins"
+             v += " mins"
     
     #logger.info(f'format_minutes: {minutes}, {v}')
 
