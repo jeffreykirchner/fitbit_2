@@ -58,14 +58,15 @@ class ParameterSet(models.Model):
         status = "success"
 
         try:
-            self.enable_chat = new_ps.get("enable_chat")
-            self.show_instructions = new_ps.get("show_instructions")
+            self.enable_chat = True if new_ps.get("enable_chat") == "True" else False
+            self.show_instructions = True if new_ps.get("show_instructions") == "True" else False
             self.graph_y_max = new_ps.get("graph_y_max")
             self.group_size = new_ps.get("group_size")
 
             self.consent_form = new_ps.get("consent_form")
-            self.consent_form_required = new_ps.get("consent_form_required")
+            self.consent_form_required = True if new_ps.get("consent_form_required") == "True" else False
 
+            self.save()
 
             instruction_sets = InstructionSet.objects.filter(label=new_ps.get("instruction_set")["label"])
 
@@ -120,17 +121,6 @@ class ParameterSet(models.Model):
         '''    
 
         pass
-
-        if self.parameter_set_periods.count() == 0:
-            parameter_set_period = main.models.ParameterSetPeriod()
-            parameter_set_period.parameter_set = self
-            parameter_set_period.save()
-            parameter_set_period.setup()
-        
-        if self.parameter_set_players.count() == 0:
-            parameter_set_player = main.models.ParameterSetPlayer()
-            parameter_set_player.parameter_set = self
-            parameter_set_player.save()
 
     def add_new_player(self):
         '''
