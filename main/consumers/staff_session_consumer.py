@@ -8,6 +8,7 @@ import json
 import logging
 import re
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
@@ -841,9 +842,14 @@ def take_fill_with_test_data(session_id, data):
 
     logger.info(f'take_take_fill_with_test_data: data filled')
 
-    for player in session.session_players.all().prefetch_related("session_player_periods_b"):
+    for player in session.session_players.all():
         for session_period_player in player.session_player_periods_b.all():
             session_period_player.calc_and_store_payment()
+    
+    session_player_1 = session.session_players.first()
+    if session_player_1:
+        session_player_1.fitbit_user_id = settings.FITBIT_TEST_ACCOUNT
+        session_player_1.save()
     
     logger.info(f'take_take_fill_with_test_data: calc payments')
     

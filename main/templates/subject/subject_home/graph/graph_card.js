@@ -613,6 +613,8 @@ drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
  */
 drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
+    if(app.session_player.earnings_fixed==0 && app.session_player.no_pay_percent==0) return;
+
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
 
