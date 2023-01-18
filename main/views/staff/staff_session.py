@@ -21,6 +21,7 @@ from main.models import Parameters
 from main.forms import SessionForm
 from main.forms import SessionInvitationForm
 from main.forms import StaffEditNameEtcForm
+from main.forms import ImportParametersForm
 
 import main
 
@@ -53,6 +54,7 @@ class StaffSessionView(SingleObjectMixin, View):
                                "player_key" :  session.channel_key,                               
                                "id" : session.id,
                                "session_form" : SessionForm(),
+                               "import_session_form" : ImportParametersForm(),
                                "session_invitation_form" : SessionInvitationForm(),
                                "staff_edit_name_etc_form" : StaffEditNameEtcForm(),
                                "staff_edit_name_etc_form_ids" : staff_edit_name_etc_form_ids,

@@ -32,9 +32,11 @@ var app = Vue.createApp({
                     payments_copied : false,                    //show after payments copied to clipboard
                     time_series_pulled : false,                 //show after time series data pulled
                     player_list_copied :false,                  //show after player list copied
+                    session_imported : false,                   //show after as session has been imported
 
                     staffEditNameEtcForm : {name : "", student_id : "", email : "", id : -1},
                     sendMessageModalForm : {subject : "", text : ""},
+                    session_import : 0,
 
                     emailResult : "",                          //result of sending invitation emails
                     emailDefaultSubject : "{{parameters.invitation_subject}}",
@@ -56,6 +58,7 @@ var app = Vue.createApp({
                     editSessionModal : null,
                     sendMessageModal : null,
                     uploadEmailModal : null,
+                    importSessionModal : null,
                 }},
     methods: {
 
@@ -167,6 +170,10 @@ var app = Vue.createApp({
                     break;
                 case "get_playerlist_csv":
                     app.take_playerlist_csv(messageData);
+                    break;
+                case "import_session":
+                    app.take_import_session(messageData);
+                    break;
             }
 
             this.first_load_done = true;
@@ -233,11 +240,13 @@ var app = Vue.createApp({
             app.editSessionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editSessionModal'), {keyboard: false})            
             app.sendMessageModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('sendMessageModal'), {keyboard: false})            
             app.uploadEmailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('uploadEmailModal'), {keyboard: false})
+            app.importSessionModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('importSessionModal'), {keyboard: false})
 
             document.getElementById('editSubjectModal').addEventListener('hidden.bs.modal', app.hideEditSubject);
             document.getElementById('editSessionModal').addEventListener('hidden.bs.modal', app.hideEditSession);
             document.getElementById('sendMessageModal').addEventListener('hidden.bs.modal', app.hideSendInvitations);
             document.getElementById('uploadEmailModal').addEventListener('hidden.bs.modal', app.hideSendEmailList);
+            document.getElementById('importSessionModal').addEventListener('hidden.bs.modal', app.hideImportSession);
         },
 
         /**update text of move on button based on current state

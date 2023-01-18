@@ -451,6 +451,38 @@ class Session(models.Model):
                 temp_group += 1
                 temp_counter = 0
 
+    def import_connections(self, session_id):
+        '''
+        import player connections from another session
+        '''
+
+        try:
+            session_source = main.models.Session.objects.get(id=session_id)
+        except ObjectDoesNotExist:            
+            return {"value":"fail", "result":"session not found"}
+
+        for i in self.session_players.all():
+            player_source = session_source.session_players.filter(email=i.email)
+
+            if player_source:
+                player_source_first = player_source.first()
+                i.fitbit_user_id = player_source_first.fitbit_user_id
+
+                player_source_first.player_key_backup = player_source_first.player_key
+                player_source_first.save()
+
+                i.player_key_backup = i.player_key
+                i.save()
+
+                i.player_key = player_source_first.player_key
+                player_source_first.player_key = uuid.uuid4()
+
+                player_source_first.save()
+                i.save()
+        
+        return {"value":"success"}
+
+    
     def json(self):
         '''
         return json object of model
@@ -481,7 +513,7 @@ class Session(models.Model):
 
             "finished":self.finished,
             "parameter_set": self.parameter_set.json(),
-            "session_players":[i.json_min() for i in self.session_players.all().select_related('parameter_set_player')],
+            "session_players":[i.json_min() for i in self.session_players.all()],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),
