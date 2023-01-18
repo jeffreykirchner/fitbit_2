@@ -120,7 +120,16 @@ class ParameterSet(models.Model):
         default setup
         '''    
 
-        pass
+        if self.parameter_set_periods.count() == 0:
+            parameter_set_period = main.models.ParameterSetPeriod()
+            parameter_set_period.parameter_set = self
+            parameter_set_period.save()
+            parameter_set_period.setup()
+        
+        if self.parameter_set_players.count() == 0:
+            parameter_set_player = main.models.ParameterSetPlayer()
+            parameter_set_player.parameter_set = self
+            parameter_set_player.save()
 
     def add_new_player(self):
         '''
