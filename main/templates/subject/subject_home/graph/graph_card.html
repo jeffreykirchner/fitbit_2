@@ -5,7 +5,10 @@
             Activity and Payments
         </span>        
 
-        <span class="float-end">           
+        <span class="float-end">   
+            <span class="me-4" v-if="session_player.parameter_set_player">
+                You are <span v-bind:style="{'color':session_player.parameter_set_player.display_color}">[[session_player.parameter_set_player.id_label]]</span>
+            </span>
             <button type="button" class="btn btn-link ms-2" title="Show Help Doc" v-on:click="sendLoadHelpDocSubject('{{subject_graph_help_doc}}')">
                 <i class="far fa-question-circle"></i> 
             </button>

@@ -18,7 +18,7 @@ var app = Vue.createApp({
                     playerKey : "{{session_player.player_key}}",
                     owner_color : 0xA9DFBF,
                     other_color : 0xD3D3D3,
-                    session_player : null, 
+                    session_player : {parameter_set_player : {id_label:""}}, 
                     session : null,
 
                     chat_text : "",
