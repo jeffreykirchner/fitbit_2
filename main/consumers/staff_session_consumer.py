@@ -359,6 +359,19 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def import_session(self, event):
+        '''
+        import session connections from another session
+        '''
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_import_session)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -969,5 +982,23 @@ def take_get_playerlist_csv(session_id, data):
         return {"value":"fail", "result":"session not found"}
 
     return {"value" : "success", "player_list_csv" : session.get_playerlist_csv()}
+
+
+def take_import_session(session_id, data):
+    '''
+    import session connections
+    '''
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_import_session: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_get_playerlist_csv session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    session.import_connections(data["session_id"])
+
+    return {"value" : "success", "session_players" : [i.json_min() for i in session.session_players.all()]}
 
 

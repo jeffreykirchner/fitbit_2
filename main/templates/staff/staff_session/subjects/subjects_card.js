@@ -373,31 +373,6 @@ takeUpdateConsentForm(messageData){
     } 
 },
 
-/** send request to pull time series data
-*/
-sendPullTimeSeriesData(){
-
-    app.working = true;
-    app.time_series_pulled = false;
-    app.sendMessage("pull_time_series_data",
-                   {});
-},
-
-/**
- * take result of senddPullTimeSeriesData
- */
-takesPullTimeSeriesData(messageData)
-{
-    if(messageData.status.value == "success")
-    { 
-        app.time_series_pulled = true;
-    }
-    else
-    {
-
-    }
-},
-
 /**
  * get pay block the server
  */
@@ -418,6 +393,54 @@ take_playerlist_csv(messageData){
     if(messageData.status.value == "success")
     {
         app.copyToClipboard(messageData.status.player_list_csv);      
+    } 
+    else
+    {
+        
+    } 
+},
+
+/** show edit subject modal
+*/
+showImportSession(){
+    app.clearMainFormErrors();
+    this.cancelModal=true;
+    
+    app.importSessionModal.toggle();
+},
+
+/** hide edit subject modal
+*/
+hideImportSession(){
+    
+
+    if(this.cancelModal)
+    {      
+       
+    }
+},
+
+/**
+ * get pay block the server
+ */
+import_session(){
+    this.working = true;
+    this.session_imported = false;
+    app.sendMessage("import_session", {session_id:app.session_import});
+},
+
+
+/**
+ * get pay block the server
+ */
+take_import_session(messageData){    
+
+    this.session_imported = true;
+
+    if(messageData.status.value == "success")
+    {
+        app.session.session_players = messageData.status.session_players;   
+        app.importSessionModal.hide();   
     } 
     else
     {

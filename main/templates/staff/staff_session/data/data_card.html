@@ -3,6 +3,15 @@
         <span class="align-middle">Data</span>       
             
         <span class="float-end">
+            <button type="button" 
+                    class="btn btn-outline-primary" 
+                    title="Pull Time Series Data" 
+                    v-on:click="sendPullTimeSeriesData()" 
+                    v-bind:disabled="working"
+                    v-show="session.started">
+                Pull Activity Data <span v-if="time_series_pulled"><i class="fas fa-check"></i></span>
+            </button>
+
              <span v-if="data_downloading"><i class="fas fa-spinner fa-spin"></i></span>
 
              <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Data')">

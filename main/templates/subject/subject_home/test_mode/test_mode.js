@@ -29,28 +29,28 @@ doTestMode(){
     console.log("Do Test Mode");
     {%endif%}
 
-    if(this.session.started &&
-       this.session.parameter_set.test_mode
-       )
-    {
+    // if(this.session.started &&
+    //    this.session.parameter_set.test_mode
+    //    )
+    // {
         
-        switch (this.session.current_experiment_phase)
-        {
-            case "Selection":
-                this.doTestModeSelection();
-                break;
-            case "Instructions":
-                this.doTestModeInstructions();
-                break;
-            case "Run":
-                this.doTestModeRun();
-                break;
+    //     switch (this.session.current_experiment_phase)
+    //     {
+    //         case "Selection":
+    //             this.doTestModeSelection();
+    //             break;
+    //         case "Instructions":
+    //             this.doTestModeInstructions();
+    //             break;
+    //         case "Run":
+    //             this.doTestModeRun();
+    //             break;
             
-        }        
+    //     }        
        
-    }
+    // }
 
-    setTimeout(this.doTestMode, this.randomNumber(1000 , 10000));
+    // setTimeout(this.doTestMode, this.randomNumber(1000 , 10000));
 },
 
 /**
