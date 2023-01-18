@@ -64,6 +64,7 @@ jobs:
           FITBIT_MS_PASS : abc
           FITBIT_MS_URL : abc
           FITBIT_MS_REGISTRATION : abc
+          FITBIT_TEST_ACCOUNT : abc
           REDIS : abc
           SECRET_KEY: super_duper_secret_key
         run: python manage.py test
