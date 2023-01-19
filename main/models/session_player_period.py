@@ -458,10 +458,13 @@ class SessionPlayerPeriod(models.Model):
         link_string = f'{self.session_period.parameter_set_period.survey_link}?'
         link_string += f'session_id={self.session_player.session.id}&'
         link_string += f'player_id={self.session_player.player_number}&'
+        link_string += f'recruiter_id_public={self.session_player.recruiter_id_public}&'
+        link_string += f'recruiter_id_private={self.session_player.recruiter_id_private}&'
         link_string += f'period={self.session_period.period_number}&'
         link_string += f'activity_key={self.activity_key}&'
         link_string += f'session_name={self.session_period.session.title}&'
         link_string += f'return_link={p.site_url}&'
+        
 
         return link_string
 
