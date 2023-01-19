@@ -197,7 +197,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Recruiter ID", "Group", 
+        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Recruiter ID", "Label", "Group", 
                          "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
                          "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
                          "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])

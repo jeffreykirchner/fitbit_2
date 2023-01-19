@@ -511,6 +511,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_period.period_number,
                          self.session_player.player_number,
                          self.session_player.recruiter_id_private,
+                         self.session_player.parameter_set_player.id_label,
                          self.session_player.group_number,
                          self.zone_minutes,
                          self.average_pay_block_zone_minutes,
