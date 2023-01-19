@@ -249,3 +249,24 @@ fillWithTestData(){
         app.updateGraph();
     });
 },
+
+send_refresh_screens(messageData){
+    if (!confirm('Refresh the parameterset?')) {
+        return;
+    }
+
+    app.working = true;
+    app.sendMessage("refresh_screens", {});
+},
+
+take_refresh_screens(messageData){
+    if(messageData.value == "success")
+    {           
+        result = messageData.result
+        app.session = result.session;
+    } 
+    else
+    {
+       
+    }
+},
