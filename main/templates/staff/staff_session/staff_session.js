@@ -174,6 +174,9 @@ var app = Vue.createApp({
                 case "import_session":
                     app.take_import_session(messageData);
                     break;
+                case "refresh_screens":
+                    app.take_refresh_screens(messageData);
+                    break;
             }
 
             this.first_load_done = true;

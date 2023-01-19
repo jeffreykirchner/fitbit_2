@@ -372,6 +372,20 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         message["messageData"] = message_data
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def refresh_screens(self, event):
+        '''
+        refresh client and server screens
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_refresh_screens)(self.session_id,  event["message_text"])
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     #consumer updates
     async def update_start_experiment(self, event):
@@ -1006,5 +1020,25 @@ def take_import_session(session_id, data):
     session.import_connections(data["session_id"])
 
     return {"value" : "success", "session_players" : [i.json_min() for i in session.session_players.all()]}
+
+def take_refresh_screens(session_id, data):
+    '''
+    refresh screen
+    '''
+    logger = logging.getLogger(__name__)
+    logger.info(f'refresh screen: {session_id} {data}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+        session.parameter_set.json(update_required=True)
+        session.parameter_set.json_for_subject(update_required=True)
+
+    except ObjectDoesNotExist:
+        logger.warning(f"take_refresh_screens session not found: {session_id}")
+        return {"status":"fail", 
+                "message":"Session not found",
+                }
+
+    return {"value" : "success", "parameter_set" : session.json()}
 
 

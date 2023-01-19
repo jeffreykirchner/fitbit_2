@@ -73,7 +73,6 @@
         {%endif%}
 
         <!-- reset experiment -->
-        {%if user.is_staff%}
         <div class="row mt-2" v-show="session.started && !session.locked">
             <div class="col-md text-center">
                 <button type="button"
@@ -85,10 +84,9 @@
                 </button>
             </div>
         </div>
-        {%endif%}
         
         <!-- send invitations -->
-        <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
+        <div class="row mt-2" v-show="session.started && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
@@ -100,6 +98,21 @@
             </div>
         </div>
  
+         <!-- refresh clients -->
+         {%if user.is_staff%}
+         <div class="row mt-2" v-show="session.started">
+            <div class="col-md text-center">
+                <button type="button"
+                        class="btn btn-outline-warning"
+                        v-on:click = "send_refresh_screens()"
+                        title="Refresh Parameters"
+                        v-bind:disabled="reconnecting || working">
+                    Refresh Parameters <i class="fas fa-sync"></i>
+                </button>
+            </div>
+        </div>
+        {%endif%}
+
         <!-- fill with test data -->
         <div class="row mt-2" v-show="session.started && !session.locked && session.parameter_set.test_mode=='True'">
             <div class="col-md text-center">
