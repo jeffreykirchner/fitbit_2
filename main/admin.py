@@ -12,9 +12,12 @@ from main.forms import InstructionFormAdmin
 from main.forms import InstructionSetFormAdmin
 
 from main.models import Parameters
+
 from main.models import ParameterSet
 from main.models import ParameterSetPlayer
 from main.models import ParameterSetPeriod
+from main.models import ParameterSetPayBlock
+from main.models import ParameterSetPayBlockPayment
 
 from main.models import Session
 from main.models import SessionPlayer
@@ -97,6 +100,51 @@ class ParametersAdmin(admin.ModelAdmin):
 
     actions = []
 
+@admin.register(ParameterSetPayBlockPayment)
+class ParameterSetPayblockPaymentAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['parameter_set_pay_block']
+
+class ParameterSetPayblockPaymentInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = ParameterSetPayBlockPayment
+    fields = ['label', 'zone_minutes', 'payment', 'group_bonus' ,'no_pay_percent']
+
+@admin.register(ParameterSetPayBlock)
+class ParameterSetPayblockAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    readonly_fields = ['parameter_set']
+    inlines = [ParameterSetPayblockPaymentInline]
+
+class ParameterSetPayblockInline(admin.TabularInline):
+    def has_add_permission(self, request, obj=None):
+        return False
+      
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    show_change_link = True
+
+    model = ParameterSetPayBlock
+    fields = ['pay_block_type', 'pay_block_number', 'fixed_pay' ,'no_pay_percent']
+
 @admin.register(ParameterSetPlayer)
 class ParameterSetPlayerAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
@@ -152,7 +200,7 @@ class ParameterSetAdmin(admin.ModelAdmin):
         return False
     
     readonly_fields = []
-    inlines = [ParameterSetPeriodInline, ParameterSetPlayerInline]
+    inlines = [ParameterSetPeriodInline, ParameterSetPlayerInline, ParameterSetPayblockInline]
     
 class SessionPlayerPeriodInline(admin.TabularInline):
     def has_add_permission(self, request, obj=None):
@@ -172,11 +220,8 @@ class SessionPlayerPeriodAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request, obj=None):
         return False
-      
-    def has_delete_permission(self, request, obj=None):
-        return False
     
-    readonly_fields = ['session_period', 'session_player']
+    readonly_fields = ['session_period', 'session_player' , 'last_login']
 
 @admin.register(SessionPlayerChat)
 class SessionPlayerChatAdmin(admin.ModelAdmin):
@@ -207,13 +252,11 @@ class SessionPlayerAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request, obj=None):
         return False
-      
-    def has_delete_permission(self, request, obj=None):
-        return False
     
     readonly_fields = ['session', 'parameter_set_player', 'player_number', 'player_key',
                        'player_key_backup' , 'fitbit_last_synced', 'fitbit_device', 'channel_name',
-                       'recruiter_id_private' ,'recruiter_id_public']
+                       'recruiter_id_private' ,'recruiter_id_public', 'connecting']
+
     inlines = [SessionPlayerPeriodInline, ]
 
 class sessionPeriodInline(admin.TabularInline):
@@ -234,9 +277,6 @@ class sessionPeriodInline(admin.TabularInline):
 class SessionPeriodAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request, obj=None):
-        return False
-      
-    def has_delete_permission(self, request, obj=None):
         return False
     
     def has_change_permission(self, request, obj=None):
