@@ -108,6 +108,7 @@ sendPullTimeSeriesData(){
 
     app.working = true;
     app.time_series_pulled = false;
+    app.data_downloading = true;
     app.sendMessage("pull_time_series_data",
                    {});
 },
@@ -120,10 +121,37 @@ takesPullTimeSeriesData(messageData)
     if(messageData.status.value == "success")
     { 
         app.time_series_pulled = true;
+        app.data_downloading = false;
     }
     else
     {
 
     }
+},
+
+/**send download payment data
+*/
+downloadPayblockData(){
+    app.working = true;
+    this.data_downloading = true;
+    app.sendMessage("download_payblock_data", {});
+},
+
+/** take download payment data
+ * @param messageData {json}
+*/
+takeDownloadPayblockData(messageData){
+
+    var downloadLink = document.createElement("a");
+    var blob = new Blob(["\ufeff", messageData.status.result]);
+    var url = URL.createObjectURL(blob);
+    downloadLink.href = url;
+    downloadLink.download = "Fitbit_2_Payblock_Data_Session_" + app.session.id +".csv";
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+
+    this.data_downloading = false;
 },
 

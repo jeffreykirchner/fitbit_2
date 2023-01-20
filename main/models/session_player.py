@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import uuid
 import logging
 import pytz
+import statistics
 
 from django.db import models
 from django.urls import reverse
@@ -204,12 +205,13 @@ class SessionPlayer(models.Model):
         
         return 0
     
-    def get_pay_block_no_pay_percent(self):
+    def get_pay_block_no_pay_percent(self, pay_block):
         '''
         return the total no pay percent from all blocks
         '''
 
-        session_player_periods = self.session_player_periods_b.filter(check_in=True)\
+        session_player_periods = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
+                                                              .filter(check_in=True) \
                                                               .values_list('earnings_no_pay_percent', flat=True)            
 
         if session_player_periods:
@@ -255,7 +257,7 @@ class SessionPlayer(models.Model):
         earnings["fixed"] = round(self.get_pay_block_fixed_earnings(pay_block))
 
         earnings["total"] = round(earnings["individual"] + earnings["group_bonus"] + earnings["fixed"])
-        earnings["earnings_no_pay_percent"] = self.get_pay_block_no_pay_percent()
+        earnings["earnings_no_pay_percent"] = self.get_pay_block_no_pay_percent(pay_block)
 
         return earnings
     
@@ -706,6 +708,38 @@ class SessionPlayer(models.Model):
         '''
 
         return self.session.session_players.filter(group_number=self.group_number)
+
+    def write_payblock_csv(self, pay_block, writer):
+        '''
+        take csv writer and add row
+        '''
+        # ["Session ID", "Payblock Number", "payblock type", "Player",  "Recruiter ID", "Group", "Total Zone Minutes"]
+
+        values_list = []
+
+        zone_minutes_list = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
+
+        for i in zone_minutes_list:
+            if i.check_in:
+                values_list.append(i.zone_minutes)
+            else:
+                 values_list.append(0)
+
+        block_earnings = self.get_block_earnings(pay_block)
+
+        writer.writerow([self.session.id, 
+                        pay_block.pay_block_number,
+                        pay_block.pay_block_type,
+                        self.player_number,
+                        self.recruiter_id_private,
+                        self.group_number,
+                        sum(values_list),
+                        statistics.mean(values_list),
+                        statistics.median(values_list),
+                        block_earnings["fixed"],
+                        block_earnings["individual"],
+                        block_earnings["group_bonus"],
+                        block_earnings["earnings_no_pay_percent"]])
 
     def json(self, get_chat=True):
         '''

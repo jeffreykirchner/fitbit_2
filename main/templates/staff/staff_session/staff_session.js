@@ -177,6 +177,9 @@ var app = Vue.createApp({
                 case "refresh_screens":
                     app.take_refresh_screens(messageData);
                     break;
+                case "download_payblock_data":
+                    app.takeDownloadPayblockData(messageData);
+                    break;
             }
 
             this.first_load_done = true;
