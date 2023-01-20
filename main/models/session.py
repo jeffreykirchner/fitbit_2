@@ -315,10 +315,13 @@ class Session(models.Model):
         fill session players with test data up to this point in the experiment
         '''
 
+        if self.is_before_first_period():
+            return
+
         period = self.get_current_session_period()
 
         if not period:
-            return
+            period = self.session_periods.last()
 
         for p in self.session_players.all():
             p.fill_with_test_data(period.period_number)
@@ -510,6 +513,9 @@ class Session(models.Model):
         '''
 
         current_session_period = self.get_current_session_period()
+
+        if self.is_after_last_period():
+            current_session_period = self.session_periods.last()
 
         is_last_period = False
         if current_session_period:
