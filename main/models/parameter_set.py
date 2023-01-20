@@ -138,8 +138,13 @@ class ParameterSet(models.Model):
 
         player = main.models.ParameterSetPlayer()
         player.parameter_set = self
-        player.id_label = self.parameter_set_players.count() + 1
-        player.display_color = get_random_hex_color()
+        # player.id_label = self.parameter_set_players.count() + 1
+        # player.display_color = get_random_hex_color()
+
+        v = main.globals.get_color_by_group(self.group_size, self.parameter_set_players.count() + 1)
+
+        player.id_label = v["label"]
+        player.display_color = v["color"]
 
         player.save()
 
