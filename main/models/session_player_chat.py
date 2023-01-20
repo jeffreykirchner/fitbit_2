@@ -54,6 +54,7 @@ class SessionPlayerChat(models.Model):
         writer.writerow([self.session_period.session.id,
                          self.session_period.period_number,
                          self.session_player.player_number,
+                         self.session_player.recruiter_id_private,
                          self.session_player.group_number,
                          self.text,
                          self.timestamp.astimezone(tmz).strftime("%m/%d/%Y %I:%M:%S %p")])

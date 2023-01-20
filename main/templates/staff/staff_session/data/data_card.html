@@ -3,8 +3,10 @@
         <span class="align-middle">Data</span>       
             
         <span class="float-end">
+            <span v-if="data_downloading"><i class="fas fa-spinner fa-spin"></i></span>
+
             <button type="button" 
-                    class="btn btn-outline-primary" 
+                    class="btn btn-outline-primary ms-2" 
                     title="Pull Time Series Data" 
                     v-on:click="sendPullTimeSeriesData()" 
                     v-bind:disabled="working"
@@ -12,9 +14,7 @@
                 Pull Activity Data <span v-if="time_series_pulled"><i class="fas fa-check"></i></span>
             </button>
 
-             <span v-if="data_downloading"><i class="fas fa-spinner fa-spin"></i></span>
-
-             <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Data')">
+             <button type="button" class="btn btn-link" title="Show Help Doc" v-on:click="sendLoadHelpDoc('Staff Data')">
                 <i class="far fa-question-circle"></i> 
             </button>
         </span>
@@ -22,15 +22,28 @@
     </div>
     <div class="card-body"> 
 
-        <!-- summary data -->
+        <!-- period data -->
         <div class="row">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
                         v-on:click = "downloadSummaryData()"
-                        title="Download Summary Data"
+                        title="Download Period Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Summary <i class="fas fa-scroll"></i>
+                    Download Period Data <i class="fas fa-scroll"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- payblock data -->
+        <div class="row mt-2">
+            <div class="col-md text-center">
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        v-on:click = "downloadPayblockData()"
+                        title="Download Payblock Data"
+                        v-bind:disabled="reconnecting || working || session.started==false">
+                    Download Payblock Data <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>
@@ -43,12 +56,12 @@
                         v-on:click = "downloadHeartRateData()"
                         title="Download Heart Rate Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
-                    Download Heart Rate <i class="fas fa-scroll"></i>
+                    Download Heart Rate Data <i class="fas fa-scroll"></i>
                 </button>
             </div>
         </div>
 
-        <!-- recruiter payments -->
+        <!-- fitbit activies -->
         <div class="row mt-2">
             <div class="col-md text-center">
                 <button type="button"
@@ -61,13 +74,13 @@
             </div>
         </div>
         
-        <!-- earnings -->
-        <div class="row mt-2">
+        <!-- chat data -->
+        <div class="row mt-2" v-if="session.parameter_set.enable_chat=='True'">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-primary"
                         v-on:click = "downloadChatData()"
-                        title="Download Recruiter Data"
+                        title="Download Chat Data"
                         v-bind:disabled="reconnecting || working || session.started==false">
                     Download Chat <i class="fas fa-scroll"></i>
                 </button>

@@ -197,7 +197,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Recruiter ID", "Group", 
+        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Recruiter ID", "Label", "Group", 
                          "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
                          "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
                          "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
@@ -255,7 +255,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Group", "Chat", "Timestamp"]
+        v = ["Session ID", "Period", "Player", "Recruiter ID", "Group", "Chat", "Timestamp"]
    
         writer.writerow(v)
 
@@ -267,6 +267,27 @@ class Session(models.Model):
             c.write_action_download_csv(writer)
 
         return output.getvalue()
+    
+    def get_payblock_data_csv(self):
+        '''
+        return payblock level data in csv format
+        '''
+        output = io.StringIO()
+
+        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+
+        v = ["Session ID", "Payblock Number","Payblock Type", "Player",  "Recruiter ID", "Group", 
+             "Total Zone Minutes", "Average Zone Minutes", "Median Zone Minutes",
+             "Fixed Pay", "Individual Bonus", "Group Bonus", "Fitbit Percent"]
+   
+        writer.writerow(v)
+
+        for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+            for j in self.session_players.all():
+                j.write_payblock_csv(i, writer)
+
+        return output.getvalue()
+
     
     def get_playerlist_csv(self):
         '''

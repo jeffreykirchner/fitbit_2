@@ -387,6 +387,20 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
+    async def download_payblock_data(self, event):
+        '''
+        download payblock data
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_download_payblock_data)(self.session_id)
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -1003,7 +1017,6 @@ def take_get_playerlist_csv(session_id, data):
 
     return {"value" : "success", "player_list_csv" : session.get_playerlist_csv()}
 
-
 def take_import_session(session_id, data):
     '''
     import session connections
@@ -1041,4 +1054,18 @@ def take_refresh_screens(session_id, data):
 
     return {"value" : "success", "parameter_set" : session.json()}
 
+def take_download_payblock_data(session_id):
+    '''
+    get return payblock data in csv format
+    '''
 
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_get_playerlist_csv: {session_id}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_download_payblock_data session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    return {"value" : "success", "result" : session.get_payblock_data_csv()}
