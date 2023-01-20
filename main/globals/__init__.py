@@ -9,6 +9,7 @@ from .sessions import PeriodType
 from .sessions import PayBlockType
 
 from .random_hex_color import get_random_hex_color
+from .random_hex_color import get_color_by_group
 
 from .get_registration_link import get_registration_link
 
