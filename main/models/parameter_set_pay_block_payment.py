@@ -30,7 +30,7 @@ class ParameterSetPayBlockPayment(models.Model):
 
     class Meta:
         verbose_name = 'Parameter Set Pay Block Payment'
-        verbose_name_plural = 'arameter Set Pay Block Payments'
+        verbose_name_plural = 'Parameter Set Pay Block Payments'
         constraints = [            
             models.UniqueConstraint(fields=['parameter_set_pay_block', 'zone_minutes'], name='unique_parameter_set_pay_block_payment'),
         ]
