@@ -478,13 +478,6 @@ class SessionPlayerPeriod(models.Model):
 
         return  self.last_login.astimezone(tmz).strftime("%m/%d/%Y %I:%M:%S %p") 
 
-    def is_last_period_in_block(self):
-        '''
-        return true if this periods is the last in the payblock
-        '''
-
-        pass 
-
     def write_summary_download_csv(self, writer):
         '''
         take csv writer and add row
