@@ -2,6 +2,8 @@
 Parameterset edit form
 '''
 
+from tinymce.widgets import TinyMCE
+
 from django import forms
 
 from main.models import ParameterSet
@@ -50,6 +52,10 @@ class ParameterSetForm(forms.ModelForm):
                                             queryset=main.models.HelpDocSubjectSet.objects.all(),
                                             widget=forms.Select(attrs={"v-model":"current_parameter_set.help_doc_subject_set.id"}))
 
+    completion_message = forms.CharField(label='End of Study Message',
+                                  required=False,
+                                  widget=TinyMCE(attrs={"rows":10, "cols":100,"v-model":"current_parameter_set.completion_message"}))
+
     test_mode = forms.ChoiceField(label='Test Mode',
                                        choices=((True, 'Yes'), (False,'No' )),
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set.test_mode",}))
@@ -57,4 +63,4 @@ class ParameterSetForm(forms.ModelForm):
     class Meta:
         model=ParameterSet
         fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required',
-                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set', 'test_mode']
+                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set', 'test_mode' ,'completion_message']

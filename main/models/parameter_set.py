@@ -3,6 +3,8 @@ parameter set
 '''
 import logging
 
+from tinymce.models import HTMLField
+
 from decimal import Decimal
 
 from django.db import models
@@ -35,6 +37,8 @@ class ParameterSet(models.Model):
     consent_form = models.CharField(verbose_name='Consent Form File Name', max_length = 100, default="file_name.pdf")    #consent for file name
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
+    completion_message = HTMLField(default="The study is complete, thank you for your participation.", verbose_name="End of study message", blank=True)
+
     json_for_session_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set 
     json_for_subject_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set for subject
 
@@ -65,6 +69,8 @@ class ParameterSet(models.Model):
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = True if new_ps.get("consent_form_required") == "True" else False
+
+            self.completion_message = new_ps.get("completion_message")
 
             self.save()
 
@@ -200,6 +206,8 @@ class ParameterSet(models.Model):
         self.json_for_session_json["consent_form"] = self.consent_form
         self.json_for_session_json["consent_form_required"] = "True" if self.consent_form_required else "False"
 
+        self.json_for_session_json["completion_message"] = self.completion_message
+
         self.json_for_session_json["help_doc_subject_set"] =  self.help_doc_subject_set.json() if self.help_doc_subject_set else {"id":None}
 
         self.json_for_session_json["test_mode"] = "True" if self.test_mode else "False"
@@ -253,6 +261,7 @@ class ParameterSet(models.Model):
                 "consent_form_required" : self.consent_form_required,
                 "parameter_set_pay_blocks" : {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()},
                 "parameter_set_pay_blocks_order" : list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True)),
+                "completion_message" : self.completion_message,
             }
 
             self.save()
