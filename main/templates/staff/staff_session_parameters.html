@@ -14,6 +14,14 @@
             plugins: "directionality,paste,searchreplace,code",
             directionality: "{{ directionality }}",
         });
+
+        tinyMCE.init({
+            target: document.getElementById('id_completion_message'),
+            height : "200",
+            theme: "silver",
+            plugins: "directionality,paste,searchreplace,code",
+            directionality: "{{ directionality }}",
+        });
     
         // Prevent Bootstrap dialog from blocking focusin
         document.addEventListener('focusin', (e) => {
@@ -48,7 +56,6 @@
 
 <!-- modals -->
 <div v-if="session">
-{%include "staff/staff_session_parameters/general_settings/edit_parameterset_modal.html"%}
 {%include "staff/staff_session_parameters/players/edit_parameterset_player_modal.html"%}
 {%include "staff/staff_session_parameters/control/upload_parameters_modal.html"%}
 {%include "staff/staff_session_parameters/control/import_parameters_modal.html"%}
@@ -56,6 +63,7 @@
 {%include "staff/staff_session_parameters/pay_blocks/edit_parameterset_pay_block_payment_modal.html"%}
 {%include "help_modal.html"%}
 </div>
+{%include "staff/staff_session_parameters/general_settings/edit_parameterset_modal.html"%}
 {%include "staff/staff_session_parameters/periods/edit_parameterset_periods_modal.html"%}
 
 <!-- cards -->

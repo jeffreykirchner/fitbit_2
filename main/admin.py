@@ -294,6 +294,7 @@ class SessionAdmin(admin.ModelAdmin):
 
     inlines = [SessionPlayerInline, sessionPeriodInline]
     readonly_fields = ['parameter_set',]
+    list_display = ['title','creator']
 
 #instruction set page
 class InstructionPageInline(admin.TabularInline):
