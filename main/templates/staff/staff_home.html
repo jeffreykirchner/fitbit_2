@@ -21,15 +21,15 @@
 {%endblock head%}
 
 {% block content %}
-<div class="row justify-content-lg-center" v-cloak>
-    <div class="col col-md-8">
+<div class="row justify-content-md-center" v-cloak>
+    <div class="col-md-8">
         {%include "staff/staff_home/sessions_card.html"%}                   
     </div>
 </div>
 
 {%if request.user.is_superuser%}
-<div class="row justify-content-lg-center" v-cloak>
-    <div class="col col-md-8 mt-4">
+<div class="row justify-content-md-center" v-cloak>
+    <div class="col-md-8 mt-4">
         {%include "staff/staff_home/sessions_full_admin_card.html"%}                   
     </div>
 </div>
