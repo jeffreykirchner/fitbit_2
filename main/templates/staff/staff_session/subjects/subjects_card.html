@@ -99,7 +99,7 @@
                                 <th scope="col" class = "text-center m-1 p-1">
                                     History
                                 </th> 
-                                <th scope="col" class = "text-center m-1 p-1" v-show="session.parameter_set.enable_chat">
+                                <th scope="col" class = "text-center m-1 p-1" v-show="session.parameter_set.enable_chat=='True'">
                                     Chat
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1" v-show="session.current_experiment_phase == 'Instructions'">
@@ -168,7 +168,7 @@
                                 <td class="player_table_cell text-nowrap" v-on:click="showViewSubject(index, p.id)">
                                     <i class="fas fa-history"></i>
                                 </td>
-                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubjectChat(index, p.id)" v-show="session.parameter_set.enable_chat">
+                                <td class="player_table_cell text-nowrap" v-on:click="showViewSubjectChat(index, p.id)" v-show="session.parameter_set.enable_chat=='True'">
                                     <i class="far fa-comment"></i>
                                 </td>
                                 <td class="player_table_cell text-nowrap" v-show="session.current_experiment_phase == 'Instructions'">
