@@ -278,7 +278,7 @@ class Session(models.Model):
 
         v = ["Session ID", "Payblock Number","Payblock Type", "Player",  "Recruiter ID", "Group", 
              "Total Zone Minutes", "Average Zone Minutes", "Median Zone Minutes",
-             "Fixed Pay", "Individual Bonus", "Group Bonus", "Fitbit Percent"]
+             "Fixed Pay", "Individual Bonus", "Group Bonus", "Fitbit Percent","Check-ins"]
    
         writer.writerow(v)
 
@@ -536,7 +536,7 @@ class Session(models.Model):
             "current_period" : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
 
-            "median_zone_minutes" : [i.get_median_zone_minutes() for i in self.session_periods.all()],
+            "median_zone_minutes" : [i.get_median_average_zone_minutes() for i in self.session_periods.all()],
 
             "finished":self.finished,
             "parameter_set": self.parameter_set.json(),

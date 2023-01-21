@@ -372,9 +372,19 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
     for(let i=0;i<current_period;i++)
     {
         x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
-        y = app.convertToY(zone_minutes_list[i], yMax, yMin, h-marginX-margin2, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value, yMax, yMin, h-marginX-margin2, markerWidth);
 
-        ctx.lineTo(x,y);
+        if(i>0)
+        {
+            if(!zone_minutes_list[i-1].is_last_period_in_block)
+                ctx.lineTo(x,y);
+            else
+                ctx.moveTo(x,y);
+        }
+        else
+        {
+            ctx.lineTo(x,y);
+        }
     }
     ctx.strokeStyle="black";
     ctx.stroke();
@@ -384,7 +394,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
     {
         ctx.beginPath();
         x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
-        y = app.convertToY(zone_minutes_list[i], yMax, yMin, h-marginX-margin2, markerWidth);
+        y = app.convertToY(zone_minutes_list[i]["value"], yMax, yMin, h-marginX-margin2, markerWidth);
         ctx.arc(x, y, 4, 0, 2 * Math.PI);
         ctx.fillStyle="gray";
         ctx.fill();
@@ -408,7 +418,7 @@ updateGraph(){
     app.drawAxis("graph_id", 
                  0, app.session.parameter_set.graph_y_max, 1,
                  1, app.session.parameter_set.parameter_set_periods_order.length, app.session.parameter_set.parameter_set_periods_order.length/7,
-                 "Median Zone Minutes", "Day");
+                 "Median of Rolling Average AZM", "Day");
 
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
                            1,  app.session.parameter_set.parameter_set_periods_order.length);
