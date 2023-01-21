@@ -884,7 +884,8 @@ class SessionPlayer(models.Model):
 
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
-
+             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+             
             #"survey_link" : self.get_current_survey_link(),
         }
     
@@ -940,6 +941,7 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+            "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
         }
 
 
