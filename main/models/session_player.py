@@ -739,7 +739,8 @@ class SessionPlayer(models.Model):
                         block_earnings["fixed"],
                         block_earnings["individual"],
                         block_earnings["group_bonus"],
-                        block_earnings["earnings_no_pay_percent"]])
+                        block_earnings["earnings_no_pay_percent"],
+                        zone_minutes_list.filter(check_in=True).count()])
 
     def json(self, get_chat=True):
         '''

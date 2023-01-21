@@ -77,6 +77,20 @@ class SessionPeriod(models.Model):
             return statistics.median(list(zone_min_list))
         
         return None
+    
+    def get_median_average_zone_minutes(self):
+        '''
+        return the median zone minutes for all players this period
+        '''
+
+        result = {"value":None, "is_last_period_in_block" : self.is_last_period_in_block}
+
+        zone_min_list = self.session_player_periods_a.filter(session_player__disabled=False).values_list('average_pay_block_zone_minutes', flat=True)
+
+        if zone_min_list:
+            result["value"] = statistics.median(list(zone_min_list)) 
+        
+        return result
 
     def json(self):
         '''
