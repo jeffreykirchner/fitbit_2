@@ -76,7 +76,7 @@ class SessionPlayerPeriod(models.Model):
     fitbit_on_wrist_minutes = models.IntegerField(default=0)          #minutes fit bit was one wrist (sum of heart time series) 
     fitbit_min_heart_rate_zone_bpm = models.IntegerField(default=0)   #minimum bmp a subject must have to register active zone minutes
     fitbit_resting_heart_rate = models.IntegerField(default=0)        #resting heart rate
-    fitbit_age = models.IntegerField(default=0)                        #age reported by fitbit.
+    fitbit_age = models.IntegerField(default=0)                       #age reported by fitbit.
 
     last_login = models.DateTimeField(null=True, blank=True)          #last time the subject logged this day
     
@@ -112,7 +112,6 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
         
-    
     def wrist_time_met(self):
         '''
         return true if subject has required wrist yesterday for todays payment
@@ -122,6 +121,22 @@ class SessionPlayerPeriod(models.Model):
             return True
         
         return False
+
+    def get_expected_fitbit_min_heart_rate_zone_bpm(self):
+        '''
+        return the expect fitbit_min_heart_rate_zone_bpm based on age and resting HR
+        '''
+
+        if self.fitbit_age == 0:
+            return None
+        
+        if self.fitbit_resting_heart_rate == 0:
+            return None
+
+        max_heart_rate = 220 - self.fitbit_age
+        heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
+
+        return self.fitbit_resting_heart_rate + 0.4 * heart_rate_reserve
 
     def get_pay_block(self):
         '''
@@ -258,7 +273,6 @@ class SessionPlayerPeriod(models.Model):
                                                            .filter(session_period=self.session_period) \
                                                            .order_by('average_pay_block_zone_minutes').first().average_pay_block_zone_minutes   
                                                                               
-
     def get_earning(self):
         '''
         get earnings from period
@@ -514,6 +528,7 @@ class SessionPlayerPeriod(models.Model):
                          self.fitbit_minutes_heart_fat_burn,
                          self.fitbit_minutes_heart_out_of_range,
                          self.fitbit_min_heart_rate_zone_bpm,
+                         self.get_expected_fitbit_min_heart_rate_zone_bpm(),
                          self.fitbit_resting_heart_rate,
                          self.fitbit_age,
                          self.fitbit_on_wrist_minutes,
@@ -658,6 +673,7 @@ class SessionPlayerPeriod(models.Model):
             "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
+            "fitbit_min_heart_rate_zone_bpm_expected" : self.get_expected_fitbit_min_heart_rate_zone_bpm(),
             "fitbit_resting_heart_rate" : self.fitbit_resting_heart_rate,
 
             "fitbit_age" : self.fitbit_age,    
