@@ -44,7 +44,7 @@
                                 Average AZM
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
-                                Min BPM
+                                Min BPM | Expected
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Resting HR
@@ -97,7 +97,7 @@
                                 [[p.average_pay_block_zone_minutes]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
-                                [[p.fitbit_min_heart_rate_zone_bpm]]
+                                [[p.fitbit_min_heart_rate_zone_bpm]] <span v-if="p.fitbit_min_heart_rate_zone_bpm_expected"> | [[p.fitbit_min_heart_rate_zone_bpm_expected]]</span>
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.fitbit_resting_heart_rate]]
