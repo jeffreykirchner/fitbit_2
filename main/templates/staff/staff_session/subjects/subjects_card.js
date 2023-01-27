@@ -447,3 +447,42 @@ take_import_session(messageData){
         
     } 
 },
+
+ /** send anonymize data request to server
+*/
+send_anonymize_data(){
+    
+    if (!confirm('Anonymize data? Identifying information will be permanent removed.')) {
+        return;
+    }
+
+    app.working = true;
+    app.sendMessage("anonymize_data",{});
+},
+
+/** take anonymize data result for server
+ * @param message_data {json} result of update, either sucess or fail with errors
+*/
+take_anonymize_data(messageData){
+    app.clearMainFormErrors();
+
+    if(messageData.status.value == "success")
+    {            
+
+        let session_player_updates = messageData.status.result;
+        let session_players = app.session.session_players;
+
+        for(let i=0; i<session_player_updates.length; i++)
+        {
+            session_player = app.findSessionPlayer(session_player_updates[i].id);
+
+            if(session_player)
+            {
+                session_player.email = session_player_updates[i].email;
+                session_player.name = session_player_updates[i].name;
+                session_player.student_id = session_player_updates[i].student_id;
+            }
+        }
+    
+    } 
+},

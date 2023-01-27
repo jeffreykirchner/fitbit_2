@@ -21,7 +21,8 @@ sendUpdatePeriods(){
     
     app.working = true;
     app.sendMessage("update_parameterset_period", {"sessionID" : app.sessionID,
-                                                    "formData" : app.current_parameter_set_period,});
+                                                   "update_all_periods_in_block" : app.update_all_periods_in_block,
+                                                   "formData" : app.current_parameter_set_period,});
 },
 
 /** handle result of updating parameter set period

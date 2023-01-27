@@ -17,7 +17,14 @@
             </button>
         </span>
 
-        <span class="float-end d-none d-sm-block me-4">           
+        <span class="float-end d-none d-sm-block me-4"> 
+
+            <button type="button" 
+                    class="btn btn-outline-primary me-2" 
+                    title="Remove Names and Student IDs" 
+                    v-on:click="send_anonymize_data()">
+                Anonymize Data <i class="far fa-address-card"></i>
+            </button>          
 
             <button type="button" 
                     class="btn btn-outline-primary me-2" 
@@ -25,7 +32,7 @@
                     v-on:click="showSendEmailList()" 
                     v-bind:disabled="working"
                     v-show="session.started">
-                Upload Player List
+                Upload Player List <i class="fas fa-upload"></i>
             </button>
 
             <button type="button" 
@@ -34,7 +41,7 @@
                     v-on:click="get_playerlist_csv()" 
                     v-bind:disabled="working"
                     v-show="session.started">
-                Copy Player List <span v-if="player_list_copied"><i class="fas fa-check"></i></span>
+                Copy Player List <i class="far fa-copy"></i> <span v-if="player_list_copied"><i class="fas fa-check"></i></span>
             </button>
 
             <button type="button" 
@@ -43,7 +50,7 @@
                     v-on:click="showImportSession()" 
                     v-bind:disabled="working"
                     v-show="session.started">
-                Import Connections <span v-if="session_imported"><i class="fas fa-check"></i></span>
+                Import Connections <i class="fas fa-file-import"></i> <span v-if="session_imported"><i class="fas fa-check"></i></span>
             </button>
         </span>        
     </div>

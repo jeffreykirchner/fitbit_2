@@ -43,6 +43,8 @@ var app = Vue.createApp({
 
                     //form paramters
                     session_import : null,
+
+                    update_all_periods_in_block : false,
                 }},
     methods: {
 

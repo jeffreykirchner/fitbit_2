@@ -180,6 +180,9 @@ var app = Vue.createApp({
                 case "download_payblock_data":
                     app.takeDownloadPayblockData(messageData);
                     break;
+                case "update_anonymize_data":
+                    app.take_anonymize_data(messageData);
+                    break;
             }
 
             this.first_load_done = true;
