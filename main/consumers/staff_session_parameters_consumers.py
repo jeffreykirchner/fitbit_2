@@ -201,14 +201,6 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
-    #consumer updates
-    async def update_connection_status(self, event):
-        '''
-        handle connection status update from group member
-        '''
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Connection update")
-
     async def add_parameterset_pay_block(self, event):
         '''
         add a parameterset pay block
@@ -298,6 +290,14 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
+    #consumer updates
+    async def update_connection_status(self, event):
+        '''
+        handle connection status update from group member
+        '''
+        # logger = logging.getLogger(__name__) 
+        # logger.info("Connection update")
 
 def get_session(id_):
     '''
@@ -488,6 +488,17 @@ def take_update_parameterset_period(data):
     if form.is_valid():
         #print("valid form")             
         form.save()              
+
+        if data["update_all_periods_in_block"]:
+            session.parameter_set.parameter_set_periods.filter(parameter_set_pay_block=parameter_set_period.parameter_set_pay_block) \
+                                                       .update(minimum_wrist_minutes=parameter_set_period.minimum_wrist_minutes,
+                                                               show_graph_1=parameter_set_period.show_graph_1,
+                                                               graph_1_start_period_number=parameter_set_period.graph_1_start_period_number,
+                                                               graph_1_end_period_number=parameter_set_period.graph_1_end_period_number,
+                                                               show_graph_2=parameter_set_period.show_graph_2,
+                                                               graph_2_start_period_number=parameter_set_period.graph_2_start_period_number,
+                                                               graph_2_end_period_number=parameter_set_period.graph_2_end_period_number,
+                                                               )\
 
         session.parameter_set.update_json_fk(update_periods=True)
 

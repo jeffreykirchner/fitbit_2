@@ -19,7 +19,13 @@
                 </form>
             </div>
             <div class="modal-footer" v-if="session">
-                
+                <div class="form-check me-4">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" v-model="update_all_periods_in_block">
+                    <label class="form-check-label" for="flexCheckDefault">
+                      Update all wrist times and graphs in pay block.
+                    </label>
+                 </div>
+
                 <button type="button"
                         class="btn btn-outline-primary"
                         v-on:click = "sendUpdatePeriods()"
