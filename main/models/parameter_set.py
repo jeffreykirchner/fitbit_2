@@ -127,15 +127,13 @@ class ParameterSet(models.Model):
         '''    
 
         if self.parameter_set_periods.count() == 0:
-            parameter_set_period = main.models.ParameterSetPeriod()
-            parameter_set_period.parameter_set = self
-            parameter_set_period.save()
-            parameter_set_period.setup()
+           self.add_new_period()
         
         if self.parameter_set_players.count() == 0:
-            parameter_set_player = main.models.ParameterSetPlayer()
-            parameter_set_player.parameter_set = self
-            parameter_set_player.save()
+            self.add_new_player()
+        
+        if self.parameter_set_pay_blocks_a.count() == 0:
+            self.add_new_pay_block()
 
     def add_new_player(self):
         '''
