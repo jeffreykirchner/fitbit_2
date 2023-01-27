@@ -149,9 +149,12 @@ class StaffHomeConsumer(SocketConsumerMixin):
         '''
         handle connection status update from group member
         '''
-        # logger = logging.getLogger(__name__) 
-        # logger.info("Connection update")
-        
+
+    async def update_anonymize_data(self, event):
+        '''
+        no anonmyize data update on client
+        '''
+
 def create_new_session(auth_user):
     '''
     create an emtpy session and return it
