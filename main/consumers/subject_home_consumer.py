@@ -48,7 +48,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         self.connection_uuid = event["message_text"]["playerKey"]
         self.connection_type = "subject"
 
-        self.session_id = await sync_to_async(take_get_session_id)(self.connection_uuid)
+        self.session_id = await sync_to_async(take_get_session_id, thread_sensitive=False)(self.connection_uuid)
 
         await self.update_local_info(event)
 
