@@ -46,7 +46,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
 
         #build response
         message_data = {}
-        message_data["session"] = await sync_to_async(take_get_session)(self.connection_uuid)       
+        message_data["session"] = await sync_to_async(take_get_session, thread_sensitive=False)(self.connection_uuid)       
 
         self.session_id = message_data["session"]["id"]
 
@@ -80,7 +80,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         start experiment
         '''
         message_data = {}
-        message_data["status"] = await sync_to_async(take_start_experiment)(self.session_id, event["message_text"])
+        message_data["status"] = await sync_to_async(take_start_experiment,thread_sensitive=False)(self.session_id, event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -174,7 +174,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_summary_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_summary_data, thread_sensitive=False)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
@@ -286,7 +286,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_fill_with_test_data)(self.session_id,  event["message_text"])
+        message_data["status"] = await sync_to_async(take_fill_with_test_data, thread_sensitive=False)(self.session_id,  event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -300,7 +300,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_get_pay_block)(self.session_id,  event["message_text"])
+        message_data["status"] = await sync_to_async(take_get_pay_block, thread_sensitive=False)(self.session_id,  event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -326,7 +326,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         return full subject object
         '''
         message_data = {}
-        message_data["status"] = await sync_to_async(take_load_full_subject)(self.session_id,  event["message_text"])
+        message_data["status"] = await sync_to_async(take_load_full_subject, thread_sensitive=False)(self.session_id,  event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -339,7 +339,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         pull timeseries data for session
         '''
         message_data = {}
-        message_data["status"] = await sync_to_async(take_pull_time_series_data)(self.session_id,  event["message_text"])
+        message_data["status"] = await sync_to_async(take_pull_time_series_data, thread_sensitive=False)(self.session_id,  event["message_text"])
 
         message = {}
         message["messageType"] = event["type"]
@@ -393,7 +393,7 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
 
         message_data = {}
-        message_data["status"] = await sync_to_async(take_download_payblock_data)(self.session_id)
+        message_data["status"] = await sync_to_async(take_download_payblock_data, thread_sensitive=False)(self.session_id)
 
         message = {}
         message["messageType"] = event["type"]
