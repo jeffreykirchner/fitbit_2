@@ -94,7 +94,7 @@ class StaffHomeConsumer(SocketConsumerMixin):
 
         #build response
         message_data = {}
-        message_data["sessions"] = await sync_to_async(get_session_list_json)(self.user)
+        message_data["sessions"] = await sync_to_async(get_session_list_json, thread_sensitive=False)(self.user)
 
         message = {}
         message["messageType"] = event["type"]

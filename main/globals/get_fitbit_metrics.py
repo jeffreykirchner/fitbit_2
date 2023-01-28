@@ -51,7 +51,6 @@ def get_fitbit_metrics(fitbit_user, metrics_dict):
 
     return request_result.json()
 
-
 def get_fitbit_metrics_test():
     '''
     return simulated metric pull for unit tests
