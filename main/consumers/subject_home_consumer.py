@@ -48,11 +48,11 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         self.connection_uuid = event["message_text"]["playerKey"]
         self.connection_type = "subject"
 
-        self.session_id = await sync_to_async(take_get_session_id, thread_sensitive=False)(self.connection_uuid)
+        self.session_id = await take_get_session_id(self.connection_uuid)
 
         await self.update_local_info(event)
 
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
+        result = await sync_to_async(take_get_session_subject, thread_sensitive=False)(self.session_player_id, event["message_text"])
 
         #build response
         message_data = {"status":{}}
@@ -69,7 +69,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         take chat from client
         '''        
-        r = await sync_to_async(take_chat)(self.session_id, self.session_player_id, event["message_text"])
+        r = await sync_to_async(take_chat, thread_sensitive=False)(self.session_id, self.session_player_id, event["message_text"])
 
         if r["value"] == "fail":
             await self.send(text_data=json.dumps({'message': r}, cls=DjangoJSONEncoder))
@@ -156,7 +156,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         fisish instructions
         '''
-        r = await sync_to_async(take_check_in)(self.session_id, self.session_player_id, event["message_text"])
+        r = await sync_to_async(take_check_in, thread_sensitive=False)(self.session_id, self.session_player_id, event["message_text"])
         message_data = {}
         message_data["status"] = r
 
@@ -186,7 +186,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         survey complete
         '''
-        result = await sync_to_async(take_survey_complete)(self.session_id, self.session_player_id, event["message_text"])
+        result = await sync_to_async(take_survey_complete, thread_sensitive=False)(self.session_id, self.session_player_id, event["message_text"])
         message_data = {}
         message_data["status"] = result
 
@@ -200,7 +200,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         help doc request
         '''
-        result = await sync_to_async(take_help_doc_subject)(self.session_id, self.session_player_id, event["message_text"])
+        result = await sync_to_async(take_help_doc_subject, thread_sensitive=False)(self.session_id, self.session_player_id, event["message_text"])
 
         message_data = {}
         message_data["status"] = result
@@ -250,7 +250,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         await self.update_local_info(event)
 
         #get session json object
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
+        result = await sync_to_async(take_get_session_subject, thread_sensitive=False)(self.session_player_id, event["message_text"])
 
         message_data = {}
         message_data["status"] = result
@@ -270,7 +270,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         #logger.info(f'update start subjects {self.channel_name}')
 
         #get session json object
-        result = await sync_to_async(take_get_session_subject)(self.session_player_id, event["message_text"])
+        result = await sync_to_async(take_get_session_subject, thread_sensitive=False)(self.session_player_id, event["message_text"])
 
         message_data = {}
         message_data["status"] = result
@@ -313,7 +313,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         if self.channel_name == event['sender_channel_name']:
             return
 
-        session_player_json = result = await sync_to_async(take_get_session_player_json)(self.session_player_id)
+        session_player_json = await sync_to_async(take_get_session_player_json, thread_sensitive=False)(self.session_player_id)
 
         if not session_player_json:
             return
@@ -326,7 +326,7 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         '''
         update connection's information
         '''
-        result = await sync_to_async(take_update_local_info)(self.session_id, self.connection_uuid, self.channel_name, event)
+        result = await take_update_local_info(self.session_id, self.connection_uuid, self.channel_name, event)
 
         logger = logging.getLogger(__name__) 
         logger.info(f"update_local_info {result}")
@@ -428,12 +428,12 @@ def take_get_session_player_json(session_player_id):
 
     return session_player.json()
 
-def take_get_session_id(player_key):
+async def take_get_session_id(player_key):
     '''
     get the session id for the player_key
     '''
     try:
-        session_player = SessionPlayer.objects.get(player_key=player_key)
+        session_player = await SessionPlayer.objects.select_related('session').aget(player_key=player_key)
     except ObjectDoesNotExist:
         return None
         
@@ -498,15 +498,15 @@ def take_chat(session_id, session_player_id, data):
 
     return {"value" : "success", "result" : result}
 
-def take_update_local_info(session_id, player_key, channel_name, data):
+async def take_update_local_info(session_id, player_key, channel_name, data):
     '''
     update connection's information
     '''
 
     try:
-        session_player = SessionPlayer.objects.get(player_key=player_key)
+        session_player = await SessionPlayer.objects.aget(player_key=player_key)
         session_player.channel_name = channel_name
-        session_player.save()
+        await sync_to_async(session_player.save, thread_sensitive=False)()
 
         return {"session_player_id" : session_player.id}
     except ObjectDoesNotExist:      
