@@ -835,6 +835,7 @@ class SessionPlayer(models.Model):
                     ]
 
         todays_session_player_period = self.get_todays_session_player_period()  
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
         # if todays_session_player_period:
         #     period_number = todays_session_player_period.session_period.period_number
@@ -884,7 +885,8 @@ class SessionPlayer(models.Model):
 
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
-             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
+            "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
              
             #"survey_link" : self.get_current_survey_link(),
         }
@@ -919,6 +921,7 @@ class SessionPlayer(models.Model):
         '''
 
         todays_session_player_period = self.get_todays_session_player_period()
+        yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
         return{
             "id" : self.id,      
@@ -941,6 +944,7 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "todays_wrist_minutes" : todays_session_player_period.get_formated_wrist_minutes() if todays_session_player_period else "---",
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
+            "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
         }
 
