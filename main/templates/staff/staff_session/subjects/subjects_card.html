@@ -95,7 +95,7 @@
                                     Check In Today
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1">
-                                    Zone Minutes Today
+                                    Zone Minutes<br>YTD | Today
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1">
                                     Block Average Zone Minutes
@@ -164,7 +164,7 @@
                                     </span>
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
-                                    [[p.todays_zone_minutes]]
+                                    [[p.yesterdays_zone_minutes]] | [[p.todays_zone_minutes]]
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.todays_average_zone_minutes]]
@@ -190,26 +190,6 @@
         </div>  
         
         <!-- private links -->
-        <div class="row justify-content-center">            
-            <div class="col-md-auto text-center">
-                Private Login Links (do not share with subjects)
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-auto text-center">
-                Next available connection:
-            </div>
-            <div class="col-md-auto text-center">
-                <a href='{%url "subject_home_auto_connect" session.session_key%}' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}</a>
-            </div>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col-md-auto text-center">
-                Login by client number:
-            </div>
-            <div class="col-md-auto text-center">
-                <a href='{%url "subject_home_auto_connect" session.session_key%}[client_number]' class = 'link-primary'>{{parameters.site_url}}{%url "subject_home_auto_connect" session.session_key%}[client_number]</a>
-            </div>
-        </div>
+       
     </div>                    
 </div> 
