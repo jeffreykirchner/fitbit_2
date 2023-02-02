@@ -136,7 +136,7 @@ class SessionPlayerPeriod(models.Model):
         max_heart_rate = 220 - self.fitbit_age
         heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
 
-        return self.fitbit_resting_heart_rate + 0.4 * heart_rate_reserve
+        return math.floor(self.fitbit_resting_heart_rate + 0.4 * heart_rate_reserve)
 
     def get_pay_block(self):
         '''
