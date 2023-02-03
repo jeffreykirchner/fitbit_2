@@ -930,7 +930,8 @@ class SessionPlayer(models.Model):
             "email" : self.email,
             "group_number" : self.group_number,   
             "player_number" : self.player_number, 
-
+            "disabled" : self.disabled,
+            
             "parameter_set_player" : self.parameter_set_player.json(),
 
             "current_instruction" : self.current_instruction,
