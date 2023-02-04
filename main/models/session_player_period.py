@@ -23,6 +23,7 @@ from main.models import Parameters
 from main.globals import get_fitbit_metrics
 from main.globals import format_minutes
 from main.globals import PayBlockType
+from main.globals import format_timedelta
 
 import main
 
@@ -567,9 +568,10 @@ class SessionPlayerPeriod(models.Model):
                     time_dict[i["time"]] = i["value"] 
 
             for i in range(1440):
-                v.append(time_dict.get(str(timedelta(minutes=i)), ""))
+                v.append(time_dict.get(format_timedelta(timedelta(minutes=i)), ""))
         
         writer.writerow(v)
+    
     
     def write_activities_download_csv(self, writer):
         '''
