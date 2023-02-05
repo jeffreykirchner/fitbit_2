@@ -793,6 +793,7 @@ def take_update_subject(session_id, data):
         session_player.name = form.cleaned_data["name"]
         session_player.student_id = form.cleaned_data["student_id"]
         session_player.email = form.cleaned_data["email"]
+        session_player.note = form.cleaned_data["note"]
         session_player.group_number = form.cleaned_data["group_number"]
         session_player.disabled = True if form.cleaned_data["disabled"] == "1" else False
         session_player.fitbit_user_id =  form.cleaned_data["fitbit_user_id"]
@@ -802,7 +803,7 @@ def take_update_subject(session_id, data):
         except IntegrityError as e:
             return {"value":"fail", "errors" : {f"email":["Email must be unique within session."]}}  
 
-        return {"value":"success", "session_player" : session_player.json()}                      
+        return {"value":"success", "session_player" : session_player.json_for_staff()}                      
                                 
     logger.info("Invalid session form")
     return {"status":"fail", "errors":dict(form.errors.items())}

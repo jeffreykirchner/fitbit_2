@@ -46,7 +46,8 @@ class SessionPlayer(models.Model):
     name = models.CharField(verbose_name='Full Name', max_length = 100, default="", blank=True, null=True)            #subject's full name
     student_id = models.CharField(verbose_name='Student ID', max_length = 100, default="", blank=True, null=True)     #subject's student ID number
     email =  models.EmailField(verbose_name='Email Address', max_length = 100, blank=True, null=True)                 #subject's email address
-                                         
+    note = models.CharField(verbose_name='Note', max_length = 100, default="", blank=True, null=True)                 #extra info about player
+
     group_number = models.IntegerField(default = 1, verbose_name="Group Number")
 
     current_instruction = models.IntegerField(verbose_name='Current Instruction', default=0)                     #current instruction page subject is on
@@ -731,6 +732,7 @@ class SessionPlayer(models.Model):
                         pay_block.pay_block_number,
                         pay_block.pay_block_type,
                         self.player_number,
+                        self.note,
                         self.recruiter_id_private,
                         self.group_number,
                         sum(values_list),
@@ -846,6 +848,7 @@ class SessionPlayer(models.Model):
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
+            "note" : self.note,
             "group_number" : self.group_number,
 
             "player_number" : self.player_number,
@@ -928,6 +931,7 @@ class SessionPlayer(models.Model):
             "name" : self.name,
             "student_id" : self.student_id,   
             "email" : self.email,
+            "note" : self.note,
             "group_number" : self.group_number,   
             "player_number" : self.player_number, 
             "disabled" : self.disabled,

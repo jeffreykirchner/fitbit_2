@@ -252,6 +252,7 @@ showEditSubject:function(id){
     this.staffEditNameEtcForm.name = session_player.name;
     this.staffEditNameEtcForm.student_id = session_player.student_id;
     this.staffEditNameEtcForm.email = session_player.email;
+    this.staffEditNameEtcForm.note = session_player.note;
     this.staffEditNameEtcForm.group_number = session_player.group_number;
     this.staffEditNameEtcForm.disabled = session_player.disabled ? 1 : 0;
     this.staffEditNameEtcForm.fitbit_user_id = session_player.fitbit_user_id;

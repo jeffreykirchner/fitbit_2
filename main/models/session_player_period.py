@@ -518,6 +518,7 @@ class SessionPlayerPeriod(models.Model):
                          self.get_pay_block().pay_block_number,
                          self.session_period.period_number,
                          self.session_player.player_number,
+                         self.session_player.note,
                          self.session_player.recruiter_id_private,
                          self.session_player.parameter_set_player.id_label,
                          self.session_player.group_number,
@@ -557,6 +558,7 @@ class SessionPlayerPeriod(models.Model):
         v = [self.session_period.session.id,
              self.session_period.period_number,
              self.session_player.player_number,
+             self.session_player.note,
              self.session_player.recruiter_id_private,
              self.session_player.group_number]
 
@@ -586,6 +588,7 @@ class SessionPlayerPeriod(models.Model):
                 v = [self.session_period.session.id,
                         self.session_period.period_number,
                         self.session_player.player_number,
+                        self.session_player.note,
                         self.session_player.recruiter_id_private,
                         self.session_player.group_number]
                 
