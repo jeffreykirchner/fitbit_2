@@ -86,7 +86,10 @@
             Please wait for the study to begin.
             <div v-if="session.is_before_first_period">
                 The first day is [[session.start_date]].
-            </div>            
+            </div>   
+            <div v-if="!show_fitbit_connect">
+                Your Fibit is connected.
+            </div>         
         </div>
     </div>
     

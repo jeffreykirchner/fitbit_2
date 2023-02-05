@@ -469,38 +469,38 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     
     async def update_chat(self, event):
         '''
-        send chat to clients, if clients can view it
+        do not pass chat to server
         '''
-        result = event["staff_result"]
+        # result = event["staff_result"]
 
-        message_data = {}
-        message_data["status"] = result
+        # message_data = {}
+        # message_data["status"] = result
 
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
+        # message = {}
+        # message["messageType"] = event["type"]
+        # message["messageData"] = message_data
 
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+        # await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     async def update_connection_status(self, event):
         '''
-        handle connection status update from group member
+        do not pass connection status to server
         '''
         # logger = logging.getLogger(__name__) 
         # logger.info("Connection update")
 
         #update not from a client
-        if event["data"]["value"] == "fail":
-            return
+        # if event["data"]["value"] == "fail":
+        #     return
 
-        message_data = {}
-        message_data["status"] = event["data"]
+        # message_data = {}
+        # message_data["status"] = event["data"]
 
-        message = {}
-        message["messageType"] = event["type"]
-        message["messageData"] = message_data
+        # message = {}
+        # message["messageType"] = event["type"]
+        # message["messageData"] = message_data
 
-        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+        # await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
 
     async def update_next_phase(self, event):
         '''
