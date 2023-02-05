@@ -203,7 +203,7 @@ class Session(models.Model):
                          "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
                 s_p.write_summary_download_csv(writer)
 
         return output.getvalue()
@@ -224,7 +224,7 @@ class Session(models.Model):
         writer.writerow(v)
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
                 s_p.write_heart_rate_download_csv(writer)
 
         return output.getvalue()
@@ -242,7 +242,7 @@ class Session(models.Model):
         writer.writerow(v)
 
         for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.all().order_by('session_player__group_number', 'session_player__player_number'):
+            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
                 s_p.write_activities_download_csv(writer)
 
         return output.getvalue()
@@ -260,8 +260,9 @@ class Session(models.Model):
         writer.writerow(v)
 
         chat_list = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all()) \
-                                             .select_related('session_period', 'session_player') \
-                                             .order_by('session_player__group_number', 'timestamp')
+                                                         .filter(session_player__soft_delete=False)\
+                                                         .select_related('session_period', 'session_player') \
+                                                         .order_by('session_player__group_number', 'timestamp')
 
         for c in chat_list:
             c.write_action_download_csv(writer)
@@ -283,7 +284,7 @@ class Session(models.Model):
         writer.writerow(v)
 
         for i in self.parameter_set.parameter_set_pay_blocks_a.all():
-            for j in self.session_players.all():
+            for j in self.session_players.filter(soft_delete=False):
                 j.write_payblock_csv(i, writer)
 
         return output.getvalue()
@@ -297,7 +298,7 @@ class Session(models.Model):
 
         writer = csv.writer(output, quoting=csv.QUOTE_NONE)
 
-        for i in self.session_players.all():
+        for i in self.session_players.filter(soft_delete=False):
             v = [i.name,
                  "",
                  i.email, 
@@ -387,7 +388,7 @@ class Session(models.Model):
                           "range" : self.get_pay_block_range(pay_block),
                           "payments" : []} 
 
-        for p in self.session_players.exclude(disabled=True):
+        for p in self.session_players.exclude(disabled=True).exclude(soft_delete=True):
 
             payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block)}
             pay_block_json["payments"].append(payment)
@@ -539,7 +540,7 @@ class Session(models.Model):
 
             "finished":self.finished,
             "parameter_set": self.parameter_set.json(),
-            "session_players":[i.json_min() for i in self.session_players.all()],
+            "session_players":[i.json_min() for i in self.session_players.filter(soft_delete=False)],
             "invitation_text" : self.invitation_text,
             "invitation_subject" : self.invitation_subject,
             "is_before_first_period" : self.is_before_first_period(),

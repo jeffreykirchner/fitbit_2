@@ -60,7 +60,8 @@ class SessionPlayer(models.Model):
     
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
-    disabled =  models.BooleanField(default=False)                                                               #if true disable subject's screen
+    disabled = models.BooleanField(default=False, verbose_name = 'Disabled')                #if true disable subject's screen
+    soft_delete = models.BooleanField(default=False, verbose_name = 'Soft Delete')          #if true remove fron session 
 
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

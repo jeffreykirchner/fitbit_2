@@ -85,7 +85,9 @@ class SessionPeriod(models.Model):
 
         result = {"value":None, "is_last_period_in_block" : self.is_last_period_in_block}
 
-        zone_min_list = self.session_player_periods_a.filter(session_player__disabled=False).values_list('average_pay_block_zone_minutes', flat=True)
+        zone_min_list = self.session_player_periods_a.filter(session_player__disabled=False)\
+                                                     .filter(session_player__soft_delete=False)\
+                                                     .values_list('average_pay_block_zone_minutes', flat=True)
 
         if zone_min_list:
             result["value"] = statistics.median(list(zone_min_list)) 
