@@ -522,6 +522,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.recruiter_id_private,
                          self.session_player.parameter_set_player.id_label,
                          self.session_player.group_number,
+                         self.session_player.fitbit_device,
                          self.zone_minutes,
                          self.average_pay_block_zone_minutes,
                          #self.sleep_minutes,
@@ -590,7 +591,7 @@ class SessionPlayerPeriod(models.Model):
                         self.session_player.player_number,
                         self.session_player.note,
                         self.session_player.recruiter_id_private,
-                        self.session_player.group_number]
+                        self.session_player.group_number,]
                 
                 v.append(a["activityName"])
 
