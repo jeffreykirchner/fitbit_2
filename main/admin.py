@@ -241,8 +241,8 @@ class SessionPlayerInline(admin.TabularInline):
     show_change_link = True
 
     model = SessionPlayer
-    fields = ['player_number', 'name' , 'email']
-    readonly_fields = ['player_number', 'name' , 'email']
+    fields = ['player_number', 'name' , 'email','note']
+    readonly_fields = ['player_number']
 
 @admin.register(SessionPlayer)
 class SessionPlayerAdmin(admin.ModelAdmin):
