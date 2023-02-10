@@ -62,6 +62,7 @@ class StaffSessionView(SingleObjectMixin, View):
                                "page_key" : f'session-{session.id}',
                                "parameters" : parameters,
                                "session" : session,
+                               "user_is_owner" : session.user_is_owner(request.user),
                                "session_json":{},
                                })
     

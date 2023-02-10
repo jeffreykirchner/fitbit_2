@@ -523,6 +523,18 @@ class Session(models.Model):
         
         return {"value":"success"}
 
+    def user_is_owner(self, user):
+        '''
+        return turn is user is owner or an admin
+        '''
+
+        if user.is_staff:
+            return True
+
+        if user==self.creator:
+            return True
+        
+        return False
     
     def json(self):
         '''

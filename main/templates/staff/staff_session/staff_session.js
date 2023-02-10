@@ -15,6 +15,7 @@ var app = Vue.createApp({
                     first_load_done : false,          //true after software is loaded for the first time
                     helpText : "Loading ...",
                     sessionID : {{session.id}},
+                    user_is_owner : {%if user_is_owner%}true{%else%}false{%endif%},
                     sessionKey : "{{session.session_key}}",
                     other_color : 0xD3D3D3,
                     session : null,

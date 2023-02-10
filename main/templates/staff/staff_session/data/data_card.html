@@ -10,7 +10,7 @@
                     title="Pull Time Series Data" 
                     v-on:click="sendPullTimeSeriesData()" 
                     v-bind:disabled="working"
-                    v-show="session.started">
+                    v-show="session.started && user_is_owner">
                 Pull Activity Data <span v-if="time_series_pulled"><i class="fas fa-check"></i></span>
             </button>
 
