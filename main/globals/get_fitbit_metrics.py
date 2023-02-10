@@ -39,7 +39,7 @@ def get_fitbit_metrics(fitbit_user, metrics_dict):
                                     json=data,
                                     auth=(str(settings.FITBIT_MS_USERNAME), str(settings.FITBIT_MS_PASS)),
                                     headers=headers,
-                                    timeout=10)
+                                    timeout=30)
     except requests.Timeout:
         logger.error(f"get_fitbit_metrics timeout: {data}")
         return {"status":"fail","message":"timeout", "result":{}}
