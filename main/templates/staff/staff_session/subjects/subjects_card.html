@@ -22,7 +22,8 @@
             <button type="button" 
                     class="btn btn-outline-primary me-2" 
                     title="Remove Names and Student IDs" 
-                    v-on:click="send_anonymize_data()">
+                    v-on:click="send_anonymize_data()"
+                    v-show="!session.locked">
                 Anonymize Data <i class="far fa-address-card"></i>
             </button>          
 
