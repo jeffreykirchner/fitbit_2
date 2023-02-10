@@ -169,8 +169,24 @@ class Session(models.Model):
             return None
         
         session_period = self.session_periods.filter(period_date=todays_date())
-
+        
         return session_period.first()
+
+    def get_yesterday_session_period(self):
+        '''
+        return the current session period
+        '''
+        if not self.started:
+            return None
+        
+        session_period_today = self.get_current_session_period()
+
+        if not session_period_today:
+            return None
+        
+        session_period_yesterday = self.session_periods.filter(period_number=session_period_today.period_number-1)
+
+        return session_period_yesterday.first()
     
     def update_player_count(self):
         '''
@@ -507,6 +523,18 @@ class Session(models.Model):
         
         return {"value":"success"}
 
+    def user_is_owner(self, user):
+        '''
+        return turn is user is owner or an admin
+        '''
+
+        if user.is_staff:
+            return True
+
+        if user==self.creator:
+            return True
+        
+        return False
     
     def json(self):
         '''
@@ -514,6 +542,7 @@ class Session(models.Model):
         '''
 
         current_session_period = self.get_current_session_period()
+        yesterday_session_period = self.get_yesterday_session_period()
 
         if self.is_after_last_period():
             current_session_period = self.session_periods.last()
@@ -534,8 +563,11 @@ class Session(models.Model):
             "current_experiment_phase":self.current_experiment_phase,
 
             "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
-            "current_period" : current_session_period.period_number if current_session_period else "---",
-            "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+            
+            "current_period" : current_session_period.json() if current_session_period else None,
+            "yesterdays_period" : yesterday_session_period.json() if yesterday_session_period else None,
+            # "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+            
 
             "median_zone_minutes" : [i.get_median_average_zone_minutes() for i in self.session_periods.all()],
 

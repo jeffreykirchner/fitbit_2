@@ -1,4 +1,4 @@
-<div class="card" v-show="first_load_done">                  
+<div class="card" v-show="first_load_done && user_is_owner">                  
     <div class="card-header fw-bold">                
         <span class="align-middle">Control</span>       
             
@@ -53,7 +53,6 @@
         </div>
 
         <!-- end early -->
-        {%if user.is_staff%}
         <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
@@ -70,7 +69,6 @@
                 </button>
             </div>
         </div>
-        {%endif%}
 
         <!-- reset experiment -->
         <div class="row mt-2" v-show="session.started && !session.locked">
@@ -99,7 +97,6 @@
         </div>
  
          <!-- refresh clients -->
-         {%if user.is_staff%}
          <div class="row mt-2" v-show="session.started">
             <div class="col-md text-center">
                 <button type="button"
@@ -111,7 +108,6 @@
                 </button>
             </div>
         </div>
-        {%endif%}
 
         <!-- fill with test data -->
         <div class="row mt-2" v-show="session.started && !session.locked && session.parameter_set.test_mode=='True'">
