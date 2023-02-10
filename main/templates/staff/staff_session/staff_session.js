@@ -34,6 +34,7 @@ var app = Vue.createApp({
                     time_series_pulled : false,                 //show after time series data pulled
                     player_list_copied :false,                  //show after player list copied
                     session_imported : false,                   //show after as session has been imported
+                    no_checkins_copied : false,                 //show after no checkins have been copied 
 
                     staffEditNameEtcForm : {name : "", student_id : "", email : "", id : -1},
                     sendMessageModalForm : {subject : "", text : ""},
@@ -180,6 +181,9 @@ var app = Vue.createApp({
                     break;
                 case "download_payblock_data":
                     app.takeDownloadPayblockData(messageData);
+                    break;
+                case "get_no_checkins":
+                    app.take_get_no_checkins(messageData);
                     break;
                 case "update_anonymize_data":
                     app.take_anonymize_data(messageData);

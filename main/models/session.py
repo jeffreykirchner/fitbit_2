@@ -304,7 +304,24 @@ class Session(models.Model):
                 j.write_payblock_csv(i, writer)
 
         return output.getvalue()
-  
+
+    def get_no_checkins_csv(self):
+        '''
+        return no checkins for todays session period
+        '''
+        output = io.StringIO()
+
+        writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+
+        session_period = self.get_current_session_period()
+
+        if session_period:
+            for i in session_period.session_player_periods_a.filter(check_in=False):
+                if i.session_player.email:
+                    writer.writerow([i.session_player.email])                 
+
+        return output.getvalue()
+    
     def get_playerlist_csv(self):
         '''
         return the player list in csv format

@@ -487,3 +487,27 @@ take_anonymize_data(messageData){
     
     } 
 },
+
+ /** send anonymize data request to server
+*/
+send_get_no_checkins(){
+    
+    app.working = true;
+    app.sendMessage("get_no_checkins",{});
+},
+
+/** take anonymize data result for server
+ * @param message_data {json} result of update, either sucess or fail with errors
+*/
+take_get_no_checkins(messageData){
+    this.no_checkins_copied = true;
+
+    if(messageData.status.value == "success")
+    {
+        app.copyToClipboard(messageData.status.result);      
+    } 
+    else
+    {
+        
+    } 
+},

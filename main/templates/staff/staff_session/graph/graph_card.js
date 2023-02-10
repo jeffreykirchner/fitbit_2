@@ -357,8 +357,10 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
 
     let markerWidth = 1;
 
+    if(!app.session.current_period) return;
+
     let zone_minutes_list = app.session.median_zone_minutes;
-    let current_period = app.session.current_period;
+    let current_period = app.session.current_period.period_number;
 
     // line
     ctx.save();

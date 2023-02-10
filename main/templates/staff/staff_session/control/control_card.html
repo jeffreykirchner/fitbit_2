@@ -53,7 +53,7 @@
         </div>
 
         <!-- end early -->
-        <div class="row mt-2" v-show="session.started && !session.locked && !session.is_after_last_period">
+        <div class="row mt-2" v-if="session.started && !session.locked && !session.is_after_last_period">
             <div class="col-md text-center">
                 <button type="button"
                         class="btn btn-outline-danger"
@@ -64,7 +64,7 @@
                                          session.started===false || 
                                          session.is_last_period ||
                                          session.locked">
-                        <span v-if="session.current_period!=session.parameter_set.parameter_set_periods.length">End Early <i class="far fa-hand-paper"></i></span>
+                        <span v-if="session.current_period.period_number!=session.parameter_set.parameter_set_periods.length">End Early <i class="far fa-hand-paper"></i></span>
                         <span v-else>***Final Period***</span>
                 </button>
             </div>

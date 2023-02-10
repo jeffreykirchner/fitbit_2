@@ -416,6 +416,34 @@ class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
              "sender_channel_name": self.channel_name,},
         )
 
+    async def download_payblock_data(self, event):
+        '''
+        download payblock data
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_download_payblock_data, thread_sensitive=False)(self.session_id)
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+    
+    async def get_no_checkins(self, event):
+        '''
+        download no checkins for today
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_get_no_checkins, thread_sensitive=False)(self.session_id)
+
+        message = {}
+        message["messageType"] = event["type"]
+        message["messageData"] = message_data
+
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     #consumer updates
     async def update_start_experiment(self, event):
         '''
@@ -1103,6 +1131,22 @@ def take_download_payblock_data(session_id):
         return {"value":"fail", "result":"session not found"}
 
     return {"value" : "success", "result" : session.get_payblock_data_csv()}
+
+def take_get_no_checkins(session_id):
+    '''
+    get subjects who have not checked in today
+    '''
+
+    logger = logging.getLogger(__name__)
+    logger.info(f'take_get_playerlist_csv: {session_id}')
+
+    try:        
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_get_no_checkins session, not found: {session_id}")
+        return {"value":"fail", "result":"session not found"}
+
+    return {"value" : "success", "result" : session.get_no_checkins_csv()}
 
 def take_anonymize_data(session_id, data):
     '''
