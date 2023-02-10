@@ -46,6 +46,15 @@
             </button>
 
             <button type="button" 
+                    class="btn btn-outline-primary me-2" 
+                    title="Upload Email List" 
+                    v-on:click="send_get_no_checkins()" 
+                    v-bind:disabled="working"
+                    v-show="session.started">
+                Copy No Check-Ins <i class="far fa-copy"></i> <span v-if="no_checkins_copied"><i class="fas fa-check"></i></span>
+            </button>
+
+            <button type="button" 
                     class="btn btn-outline-primary" 
                     title="Upload Email List" 
                     v-on:click="showImportSession()" 
