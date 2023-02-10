@@ -22,7 +22,9 @@
                 Current Period:
             </div>
             <div class="col text-start ps-1">
-                [[session.current_period]] of [[session.parameter_set.parameter_set_periods_order.length]]
+                <span v-if="session.current_period">[[session.current_period.period_number]]</span> 
+                <span v-else>---</span>
+                of [[session.parameter_set.parameter_set_periods_order.length]]
             </div>
         </div>  
     </div>                    

@@ -94,6 +94,13 @@ class SessionPeriod(models.Model):
         
         return result
 
+    def get_check_in_count(self):
+        '''
+        return number of subjects that have checked in this period
+        '''
+
+        return self.session_player_periods_a.filter(check_in=True).count()
+
     def json(self):
         '''
         json object of model
@@ -103,5 +110,6 @@ class SessionPeriod(models.Model):
             "id" : self.id,
             "period_number" : self.period_number,
             "period_date" : self.get_formatted_date(),
-            "period_day_of_week" : self.get_formatted_day_of_week()
+            "period_day_of_week" : self.get_formatted_day_of_week(),
+            "check_in_count" : self.get_check_in_count(),
         }

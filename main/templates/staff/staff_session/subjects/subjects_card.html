@@ -63,47 +63,52 @@
                     <table class="table table-condensed"> 
                         <thead>
                             <tr>
-                                <th scope="col" class = "m-1 p-1">
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
                                     Client #
                                 </th>
-                                <th scope="col" class = "m-1 p-1">
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
                                     ID Label
                                 </th>
-                                <th scope="col" class = "m-1 p-1">
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
                                     Name
                                 </th>                                
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Group Number
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Color
                                 </th>                                  
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Active
                                 </th>  
-                                <th scope="col" class = "text-center m-1 p-1" 
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap" 
                                     v-if="session.parameter_set.consent_form_required=='True'">
                                     Consent
                                 </th>                                              
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Shareable<br>Login Link
                                 </th> 
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Last Sync
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
-                                    Check In<br>Today | YTD
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Check In<br>TDY | YTD<br>
+                                    <span v-if="session.current_period">[[session.current_period.check_in_count]]</span>
+                                    <span v-else>---</span>
+                                    |
+                                    <span v-if="session.yesterdays_period"> [[session.yesterdays_period.check_in_count]]</span>
+                                    <span v-else>---</span>
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
-                                    Zone Minutes<br>Today | YTD
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    AZM<br>TDY | YTD
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
-                                    Block Average Zone Minutes
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Block Average<br>AZM
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
-                                    Wrist Time Today
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Wrist Time<br>TDY
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1">
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     History
                                 </th> 
                                 <th scope="col" class = "text-center m-1 p-1" v-show="session.parameter_set.enable_chat=='True'">
@@ -155,7 +160,7 @@
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.fitbit_last_synced]]
                                 </td>
-                                <td class="player_table_cell text-nowrap" >
+                                <td class="player_table_cell text-nowrap text-center" >
                                     <span v-if="p.checked_in_today" style="color: lightgreen;">
                                         <i class="fas fa-check"></i>
                                     </span>
@@ -169,7 +174,7 @@
                                         <i class="fas fa-times"></i>
                                     </span>
                                 </td>
-                                <td class="player_table_cell text-nowrap" >
+                                <td class="player_table_cell text-nowrap text-center" >
                                     [[p.todays_zone_minutes]] | [[p.yesterdays_zone_minutes]]
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
