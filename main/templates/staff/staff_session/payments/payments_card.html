@@ -29,7 +29,7 @@
                                 Range
                             </th>
                             <th scope="col" class = "m-1 p-1">
-                                Copy to Clipboard
+                                Download
                             </th>                                                        
                         </tr>
                     </thead>
@@ -47,7 +47,7 @@
                                         v-on:click = "get_pay_block(r.block_number)"
                                         title="Copy earnings to clipboard"
                                         v-bind:disabled="reconnecting || working || !session.started">
-                                    <i class="far fa-copy"></i>
+                                        <i class="fas fa-download"></i>
                                 </button>
                             </td>                                                 
                         </tr>

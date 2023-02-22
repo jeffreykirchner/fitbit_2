@@ -464,7 +464,7 @@ class Session(models.Model):
         back fill last day of a pay block
         '''
 
-        parameter_set_pay_block = self.parameter_set.parameter_set_pay_block__pay_block_number=pay_block_number
+        parameter_set_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=pay_block_number)
         
         for i in self.session_players.exclude(disabled=True):
 
