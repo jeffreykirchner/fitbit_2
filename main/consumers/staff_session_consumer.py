@@ -993,7 +993,8 @@ def take_get_pay_block(session_id, data):
     session.back_fill_for_pay_block(pay_block_number)
 
     return {"value" : "success",
-            "pay_block_csv" : session.get_pay_block_csv(pay_block_number),}
+            "pay_block_csv" : session.get_pay_block_csv(pay_block_number),
+            "pay_block_number" : pay_block_number}
 
 def take_force_check_in(session_id, data):
     '''
