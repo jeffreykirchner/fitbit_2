@@ -627,7 +627,7 @@ def take_check_in(session_id, session_player_id, data):
     except ObjectDoesNotExist:
         status = "fail"
         error_message = "Session not available."
-        logger.warning(f"take_check_in : {session_player_id}") 
+        logger.warning(f"take_check_in session not available: {session_player_id}") 
     
     #software version
     if status == "success":
@@ -685,10 +685,14 @@ def take_check_in(session_id, session_player_id, data):
             error_message = "Fitbit is not available, try again later."
        
     if status == "success":
+        logger.info(f"Take check in success: session {session_id}, player {session_player_id}")
+
         result = {"session_player" : session_player.json(),
                   "session" : session.json_for_subject(session_player),
                   "recipients" :  session.get_group_channel_list(session_player.group_number)}
     else:
+        logger.info(f"Take check in failed: session {session_id}, player {session_player_id}, error_message {error_message}")
+
         result = { "error_message" : error_message,
                  }
 
