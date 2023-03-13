@@ -128,6 +128,8 @@ class SessionPlayerPeriod(models.Model):
         return the expect fitbit_min_heart_rate_zone_bpm based on age and resting HR
         '''
 
+        #return 12
+
         if self.fitbit_age == 0:
             return None
         
@@ -138,6 +140,20 @@ class SessionPlayerPeriod(models.Model):
         heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
 
         return math.floor(self.fitbit_resting_heart_rate + 0.4 * heart_rate_reserve)
+
+    def get_fitbit_min_heart_rate_zone_bpm_flag(self):
+        '''
+        return true if incorrect AZM calc
+        '''
+
+        fitbit_min_heart_rate_zone_bpm_expected = self.get_expected_fitbit_min_heart_rate_zone_bpm()
+        v = False
+
+        if fitbit_min_heart_rate_zone_bpm_expected:
+            if self.fitbit_min_heart_rate_zone_bpm != fitbit_min_heart_rate_zone_bpm_expected:
+                v = True
+        
+        return v
 
     def get_pay_block(self):
         '''
@@ -575,7 +591,6 @@ class SessionPlayerPeriod(models.Model):
         
         writer.writerow(v)
     
-    
     def write_activities_download_csv(self, writer):
         '''
         take csv writer and add row
@@ -680,6 +695,7 @@ class SessionPlayerPeriod(models.Model):
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
             "fitbit_min_heart_rate_zone_bpm_expected" : self.get_expected_fitbit_min_heart_rate_zone_bpm(),
+            "fitbit_min_heart_rate_zone_bpm_flag" : self.get_fitbit_min_heart_rate_zone_bpm_flag(),
             "fitbit_resting_heart_rate" : self.fitbit_resting_heart_rate,
 
             "fitbit_age" : self.fitbit_age,    
@@ -690,6 +706,4 @@ class SessionPlayerPeriod(models.Model):
             "pay_block_number" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_number,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
-
-
         }
