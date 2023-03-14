@@ -168,7 +168,7 @@ class Session(models.Model):
         if not self.started:
             return None
         
-        session_period = self.session_periods.filter(period_date=todays_date())
+        session_period = self.session_periods.filter(period_date=todays_date()).prefetch_related('parameter_set_period')
         
         return session_period.first()
 
@@ -412,7 +412,7 @@ class Session(models.Model):
             return {"start_day" : {},
                     "end_day" : {}}
 
-    def get_pay_block(self, pay_block):
+    def get_pay_block(self, pay_block, get_payments=True):
         '''
         return dict of payblocks
         '''
@@ -421,10 +421,11 @@ class Session(models.Model):
                           "range" : self.get_pay_block_range(pay_block),
                           "payments" : []} 
 
-        for p in self.session_players.exclude(disabled=True).exclude(soft_delete=True):
+        if get_payments:
+            for p in self.session_players.exclude(disabled=True).exclude(soft_delete=True):
 
-            payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block)}
-            pay_block_json["payments"].append(payment)
+                payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block)}
+                pay_block_json["payments"].append(payment)
 
         return pay_block_json
     
@@ -455,7 +456,7 @@ class Session(models.Model):
         for p in self.parameter_set.parameter_set_pay_blocks_a.all():
 
             if not pay_blocks.get(p.pay_block_number, False):
-                pay_blocks[p.pay_block_number] = self.get_pay_block(p)
+                pay_blocks[p.pay_block_number] = self.get_pay_block(p, False)
 
         return pay_blocks
     
@@ -558,6 +559,10 @@ class Session(models.Model):
         return json object of model
         '''
 
+        logger = logging.getLogger(__name__)
+
+        start_load_time = datetime.now()
+
         current_session_period = self.get_current_session_period()
         yesterday_session_period = self.get_yesterday_session_period()
 
@@ -568,8 +573,10 @@ class Session(models.Model):
         if current_session_period:
             if current_session_period == self.session_periods.last():
                 is_last_period = True
+        
+        current_parameter_set_period = self.parameter_set.json()['parameter_set_periods'][str(current_session_period.parameter_set_period.id)] if current_session_period else None,
 
-        return{
+        v = {
             "id":self.id,
             "title":self.title,
             "locked":self.locked,
@@ -579,12 +586,10 @@ class Session(models.Model):
             "started":self.started,
             "current_experiment_phase":self.current_experiment_phase,
 
-            "current_parameter_set_period": current_session_period.parameter_set_period.json() if current_session_period else None,
+            "current_parameter_set_period": current_parameter_set_period,
             
             "current_period" : current_session_period.json() if current_session_period else None,
             "yesterdays_period" : yesterday_session_period.json() if yesterday_session_period else None,
-            # "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
-            
 
             "median_zone_minutes" : [i.get_median_average_zone_minutes() for i in self.session_periods.all()],
 
@@ -598,6 +603,10 @@ class Session(models.Model):
             "is_last_period": is_last_period, 
             "pay_blocks" : self.get_pay_block_list(),
         }
+
+        logger.info(f'Session JSON Load Length:{datetime.now() - start_load_time}' )
+
+        return v
 
     def json_for_parameter_set(self):
         '''
