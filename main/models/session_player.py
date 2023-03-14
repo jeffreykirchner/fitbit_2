@@ -820,7 +820,6 @@ class SessionPlayer(models.Model):
             "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "groups_average_zone_minutes" : todays_session_player_period.get_team_average() if todays_session_player_period else "---",
             
-
             "survey_link" : self.get_current_survey_link(),
         }
     
@@ -875,13 +874,10 @@ class SessionPlayer(models.Model):
 
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "checked_in_yesterday" : yesterdays_session_player_period.check_in if yesterdays_session_player_period else None,
-            #"group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,
+            "flagged_yesterday" : yesterdays_session_player_period.get_fitbit_min_heart_rate_zone_bpm_flag() if yesterdays_session_player_period else False,
             "missed_check_ins" : self.get_current_missed_check_ins(),
 
-            #"individual_earnings" : round(todays_session_player_period.get_individual_bonus_payment()) if todays_session_player_period else None,
-            #"group_earnings" : round(todays_session_player_period.get_group_parameter_set_payment()) if todays_session_player_period else False,
-            #"no_pay_percent" : todays_session_player_period.get_no_pay_percent if todays_session_player_period else False,
-
+           
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
             "fitbit_user_id" : self.fitbit_user_id,
@@ -892,8 +888,6 @@ class SessionPlayer(models.Model):
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
-             
-            #"survey_link" : self.get_current_survey_link(),
         }
     
     def json_for_subject(self, session_player):
@@ -954,6 +948,7 @@ class SessionPlayer(models.Model):
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "flagged_yesterday" : yesterdays_session_player_period.get_fitbit_min_heart_rate_zone_bpm_flag() if yesterdays_session_player_period else False,
         }
 
 
