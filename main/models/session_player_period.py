@@ -146,6 +146,9 @@ class SessionPlayerPeriod(models.Model):
         return true if incorrect AZM calc
         '''
 
+        if self.fitbit_age >= self.session_player.parameter_set_player.parameter_set.age_warning:
+            return True
+
         fitbit_min_heart_rate_zone_bpm_expected = self.get_expected_fitbit_min_heart_rate_zone_bpm()
         v = False
 

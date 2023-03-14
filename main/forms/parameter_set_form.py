@@ -55,6 +55,13 @@ class ParameterSetForm(forms.ModelForm):
     completion_message = forms.CharField(label='End of Study Message',
                                   required=False,
                                   widget=TinyMCE(attrs={"rows":10, "cols":100,"v-model":"current_parameter_set.completion_message"}))
+    
+    age_warning = forms.IntegerField(label='Age Warning',
+                                    min_value=1,
+                                    max_value=125,
+                                    widget=forms.NumberInput(attrs={"v-model":"current_parameter_set.age_warning",
+                                                                    "step":"1",
+                                                                    "min":"1"}))
 
     test_mode = forms.ChoiceField(label='Test Mode',
                                        choices=((True, 'Yes'), (False,'No' )),
