@@ -185,7 +185,9 @@
                                     </span>
                                 </td>
                                 <td class="player_table_cell text-nowrap text-center" >
-                                    [[p.todays_zone_minutes]] | [[p.yesterdays_zone_minutes]]
+                                    <span v-bind:style="p.flagged_yesterday ? 'color:red' : 'color:black'">
+                                        [[p.todays_zone_minutes]] | [[p.yesterdays_zone_minutes]]
+                                    </span>                                    
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.todays_average_zone_minutes]]

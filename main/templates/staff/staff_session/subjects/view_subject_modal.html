@@ -96,7 +96,7 @@
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.average_pay_block_zone_minutes]]
                             </td>
-                            <td class="player_table_cell text-center text-nowrap w-auto">
+                            <td class="player_table_cell text-center text-nowrap w-auto" v-bind:style="p.fitbit_min_heart_rate_zone_bpm_flag ? 'color:red' : 'color:black'">
                                 [[p.fitbit_min_heart_rate_zone_bpm]] <span v-if="p.fitbit_min_heart_rate_zone_bpm_expected"> | [[p.fitbit_min_heart_rate_zone_bpm_expected]]</span>
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
