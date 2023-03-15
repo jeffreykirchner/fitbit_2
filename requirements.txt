@@ -14,6 +14,7 @@ django-tinymce==3.4.*
 hyperlink==21.0.0
 idna==3.3
 incremental==21.3.0
+numpy==1.24.*
 psycopg2-binary==2.9.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8

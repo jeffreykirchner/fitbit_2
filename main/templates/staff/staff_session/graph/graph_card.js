@@ -365,6 +365,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
     // line
     ctx.save();
 
+    //50th percential
     ctx.lineCap = "round";
     ctx.translate(marginY, h-marginX);
     ctx.moveTo(0, 0);
@@ -388,17 +389,109 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
             ctx.lineTo(x,y);
         }
     }
-    ctx.strokeStyle="black";
+    ctx.strokeStyle="gray";
     ctx.stroke();
+
+    ctx.strokeStyle="black";
 
     //dots
     for(let i=0;i<current_period;i++)
     {
         ctx.beginPath();
         x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
-        y = app.convertToY(zone_minutes_list[i]["value"], yMax, yMin, h-marginX-margin2, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value, yMax, yMin, h-marginX-margin2, markerWidth);
         ctx.arc(x, y, 4, 0, 2 * Math.PI);
         ctx.fillStyle="gray";
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+
+    //25th percentile
+    ctx.save();
+
+    ctx.lineCap = "round";
+    ctx.translate(marginY, h-marginX);
+    ctx.moveTo(0, 0);
+    ctx.lineWidth=markerWidth;
+
+    ctx.beginPath();
+    for(let i=0;i<current_period;i++)
+    {
+        x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value_25, yMax, yMin, h-marginX-margin2, markerWidth);
+
+        if(i>0)
+        {
+            if(!zone_minutes_list[i-1].is_last_period_in_block)
+                ctx.lineTo(x,y);
+            else
+                ctx.moveTo(x,y);
+        }
+        else
+        {
+            ctx.lineTo(x,y);
+        }
+    }
+    ctx.strokeStyle="lightgray";
+    ctx.stroke();
+
+    ctx.strokeStyle="black";
+
+    //dots
+    for(let i=0;i<current_period;i++)
+    {
+        ctx.beginPath();
+        x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value_25, yMax, yMin, h-marginX-margin2, markerWidth);
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle="lightgray";
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    ctx.restore();
+
+    //75th percentile
+    ctx.save();
+
+    ctx.lineCap = "round";
+    ctx.translate(marginY, h-marginX);
+    ctx.moveTo(0, 0);
+    ctx.lineWidth=markerWidth;
+
+    ctx.beginPath();
+    for(let i=0;i<current_period;i++)
+    {
+        x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value_75, yMax, yMin, h-marginX-margin2, markerWidth);
+
+        if(i>0)
+        {
+            if(!zone_minutes_list[i-1].is_last_period_in_block)
+                ctx.lineTo(x,y);
+            else
+                ctx.moveTo(x,y);
+        }
+        else
+        {
+            ctx.lineTo(x,y);
+        }
+    }
+    ctx.strokeStyle="dimgray";
+    ctx.stroke();
+
+    ctx.strokeStyle="black";
+
+    //dots
+    for(let i=0;i<current_period;i++)
+    {
+        ctx.beginPath();
+        x = app.convertToX(i+1, xMax, xMin, w-marginY-marginY, markerWidth);
+        y = app.convertToY(zone_minutes_list[i].value_75, yMax, yMin, h-marginX-margin2, markerWidth);
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle="dimgray";
         ctx.fill();
         ctx.stroke();
     }
