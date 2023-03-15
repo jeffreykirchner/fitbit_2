@@ -867,7 +867,7 @@ def take_send_invitations(session_id, data):
                                         }] 
                          })
 
-    memo = f'Trade Steal: Session {session_id}, send invitations'
+    memo = f'Fitbit 2: Session {session_id}, send invitations'
 
     result = send_mass_email_service(user_list, session.invitation_subject, session.invitation_text , session.invitation_text, memo)
 
