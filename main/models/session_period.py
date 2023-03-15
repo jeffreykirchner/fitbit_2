@@ -4,6 +4,7 @@ session period model
 
 #import logging
 import statistics
+import numpy
 
 from django.db import models
 from django.utils.timezone import now
@@ -83,14 +84,18 @@ class SessionPeriod(models.Model):
         return the median zone minutes for all players this period
         '''
 
-        result = {"value":None, "is_last_period_in_block" : self.is_last_period_in_block}
+        result = {"value":None, "value_25":None, "value_75":None, "is_last_period_in_block" : self.is_last_period_in_block}
 
         zone_min_list = self.session_player_periods_a.filter(session_player__disabled=False)\
                                                      .filter(session_player__soft_delete=False)\
                                                      .values_list('average_pay_block_zone_minutes', flat=True)
 
         if zone_min_list:
-            result["value"] = statistics.median(list(zone_min_list)) 
+            zone_min_list = [float(i) for i in zone_min_list]
+
+            result["value_75"] = numpy.percentile(zone_min_list, 75) 
+            result["value"] = numpy.percentile(zone_min_list, 50) 
+            result["value_25"] = numpy.percentile(zone_min_list, 25)
         
         return result
 
