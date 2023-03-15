@@ -83,7 +83,15 @@
             <div class="col text-start">
                 <span v-if="session.parameter_set.test_mode=='True'">Yes</span><span v-else>No</span>                
             </div>  
-        </div>        
+        </div>   
+        <div class="row">
+            <div class="col-7 text-end">
+                {{parameter_set_form.age_warning.label}}:
+            </div>
+            <div class="col text-start">
+                [[session.parameter_set.age_warning]]
+            </div>
+        </div>     
         <div class="row justify-content-center">
             <div class="col-md text-center mb-2 mt-2">
                 <button class="btn btn-outline-primary"
