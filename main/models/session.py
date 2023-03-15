@@ -209,139 +209,163 @@ class Session(models.Model):
         '''
         return data summary in csv format
         '''
-        output = io.StringIO()
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        with io.StringIO() as output:
 
-        writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Note", "Recruiter ID", "Label", "Group", "Device", 
-                         "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM Reported", "Zone Minutes HR BPM Expected", "Resting HR", "Age", "Wrist Time", 
-                         "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
-                         "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
-                s_p.write_summary_download_csv(writer)
+            writer.writerow(["Session ID", "Pay Block Type", "Pay Block Number", "Period", "Player", "Note", "Recruiter ID", "Label", "Group", "Device", 
+                            "Zone Minutes", "Average Block Zone Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM Reported", "Zone Minutes HR BPM Expected", "Resting HR", "Age", "Wrist Time", 
+                            "Checked In", "Checked In Forced", "Fixed Pay", "Individual Earnings", "Group Earnings", "Earnings Paid", "Fitbit Earned Percent", "Total Fitbit Earned Percent", "Last Visit Time",
+                            "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
 
-        return output.getvalue()
+            for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                    s_p.write_summary_download_csv(writer)
+
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_download_heart_rate_csv(self):
         '''
         return heart rate data in csv format
         '''
-        output = io.StringIO()
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        with io.StringIO() as output:
 
-        v = ["Session ID", "Period", "Player", "Note", "Recruiter ID", "Group"]
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        for i in range(1440):
-            v.append(str(timedelta(minutes=i)))
+            v = ["Session ID", "Period", "Player", "Note", "Recruiter ID", "Group"]
 
-        writer.writerow(v)
+            for i in range(1440):
+                v.append(str(timedelta(minutes=i)))
 
-        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
-                s_p.write_heart_rate_download_csv(writer)
+            writer.writerow(v)
 
-        return output.getvalue()
+            for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                    s_p.write_heart_rate_download_csv(writer)
+
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_download_activities_csv(self):
         '''
         return activities data recruiter in csv format
         '''
-        output = io.StringIO()
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        with io.StringIO() as output:
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Note", "Recruiter ID", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
+            v = ["Session ID", "Period", "Player", "Note", "Recruiter ID", "Group", "Activity", "Zone Minutes", "Start Time", "End Time", "Log Type"]
 
-        writer.writerow(v)
+            writer.writerow(v)
 
-        for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-            for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
-                s_p.write_activities_download_csv(writer)
+            for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                    s_p.write_activities_download_csv(writer)
 
-        return output.getvalue()
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_download_chat_csv(self):
         '''
         return chat data in csv format
         '''
-        output = io.StringIO()
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        with io.StringIO() as output:
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        v = ["Session ID", "Period", "Player", "Recruiter ID", "Group", "Chat", "Timestamp"]
-   
-        writer.writerow(v)
+            v = ["Session ID", "Period", "Player", "Recruiter ID", "Group", "Chat", "Timestamp"]
+    
+            writer.writerow(v)
 
-        chat_list = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all()) \
-                                                         .filter(session_player__soft_delete=False)\
-                                                         .select_related('session_period', 'session_player') \
-                                                         .order_by('session_player__group_number', 'timestamp')
+            chat_list = main.models.SessionPlayerChat.objects.filter(session_player__in=self.session_players.all()) \
+                                                            .filter(session_player__soft_delete=False)\
+                                                            .select_related('session_period', 'session_player') \
+                                                            .order_by('session_player__group_number', 'timestamp')
 
-        for c in chat_list:
-            c.write_action_download_csv(writer)
+            for c in chat_list:
+                c.write_action_download_csv(writer)
 
-        return output.getvalue()
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_payblock_data_csv(self):
         '''
         return payblock level data in csv format
         '''
-        output = io.StringIO()
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
+        with io.StringIO() as output:
 
-        v = ["Session ID", "Payblock Number","Payblock Type", "Player", "Note", "Recruiter ID", "Group", 
-             "Total Zone Minutes", "Average Zone Minutes", "Median Zone Minutes",
-             "Fixed Pay", "Individual Bonus", "Group Bonus", "Fitbit Percent","Check-ins"]
-   
-        writer.writerow(v)
+            writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
 
-        for i in self.parameter_set.parameter_set_pay_blocks_a.all():
-            for j in self.session_players.filter(soft_delete=False):
-                j.write_payblock_csv(i, writer)
+            v = ["Session ID", "Payblock Number","Payblock Type", "Player", "Note", "Recruiter ID", "Group", 
+                "Total Zone Minutes", "Average Zone Minutes", "Median Zone Minutes",
+                "Fixed Pay", "Individual Bonus", "Group Bonus", "Fitbit Percent","Check-ins"]
+    
+            writer.writerow(v)
 
-        return output.getvalue()
+            for i in self.parameter_set.parameter_set_pay_blocks_a.all():
+                for j in self.session_players.filter(soft_delete=False):
+                    j.write_payblock_csv(i, writer)
+
+            v = output.getvalue()
+            output.close()
+
+        return v
 
     def get_no_checkins_csv(self):
         '''
         return no checkins for todays session period
         '''
-        output = io.StringIO()
+        with io.StringIO() as output:
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+            writer = csv.writer(output, quoting=csv.QUOTE_NONE)
 
-        session_period = self.get_current_session_period()
+            session_period = self.get_current_session_period()
 
-        if session_period:
-            for i in session_period.session_player_periods_a.filter(check_in=False):
-                if i.session_player.email:
-                    writer.writerow([i.session_player.email])                 
+            if session_period:
+                for i in session_period.session_player_periods_a.filter(check_in=False):
+                    if i.session_player.email:
+                        writer.writerow([i.session_player.email])                 
 
-        return output.getvalue()
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_playerlist_csv(self):
         '''
         return the player list in csv format
         '''
 
-        output = io.StringIO()
+        with io.StringIO() as output:
 
-        writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+            writer = csv.writer(output, quoting=csv.QUOTE_NONE)
 
-        for i in self.session_players.filter(soft_delete=False):
-            v = [i.name,
-                 "",
-                 i.email, 
-                 i.student_id, 
-                 i.recruiter_id_private, 
-                 i.recruiter_id_public]
+            for i in self.session_players.filter(soft_delete=False):
+                v = [i.name,
+                    "",
+                    i.email, 
+                    i.student_id, 
+                    i.recruiter_id_private, 
+                    i.recruiter_id_public]
 
-            writer.writerow(v)
+                writer.writerow(v)
 
-        return output.getvalue()
+            v = output.getvalue()
+            output.close()
+
+        return v
 
     def fill_with_test_data(self):
         '''
@@ -438,13 +462,17 @@ class Session(models.Model):
 
         pay_block = self.get_pay_block(pay_block)
 
-        output = io.StringIO()
-        writer = csv.writer(output, quoting=csv.QUOTE_NONE)
-       
-        for p in pay_block["payments"]:
-            writer.writerow([p["student_id"], p["earnings"]["total"]])
+        
+        with io.StringIO() as output:
+            writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+        
+            for p in pay_block["payments"]:
+                writer.writerow([p["student_id"], p["earnings"]["total"]])
 
-        return output.getvalue()
+            v = output.getvalue()
+            output.close()
+
+        return v
     
     def get_pay_block_list(self):
         '''
