@@ -448,7 +448,7 @@ class Session(models.Model):
         if get_payments:
             for p in self.session_players.exclude(disabled=True).exclude(soft_delete=True):
 
-                payment = {"student_id" : p.student_id, "earnings" : p.get_block_earnings(pay_block)}
+                payment = {"recruiter_id_private" : p.recruiter_id_private, "earnings" : p.get_block_earnings(pay_block)}
                 pay_block_json["payments"].append(payment)
 
         return pay_block_json
@@ -467,7 +467,7 @@ class Session(models.Model):
             writer = csv.writer(output, quoting=csv.QUOTE_NONE)
         
             for p in pay_block["payments"]:
-                writer.writerow([p["student_id"], p["earnings"]["total"]])
+                writer.writerow([p["recruiter_id_private"], p["earnings"]["total"]])
 
             v = output.getvalue()
             output.close()
