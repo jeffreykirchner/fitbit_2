@@ -40,6 +40,7 @@ class ParameterSet(models.Model):
     completion_message = HTMLField(default="The study is complete, thank you for your participation.", verbose_name="End of study message", blank=True)
 
     age_warning = models.IntegerField(verbose_name='Age Warning', default=25)              #age cut that issues a warning for invalid age range
+    reconnection_limit = models.IntegerField(verbose_name='Age Warning', default=25)       #age cut that issues a warning for invalid age range
 
     json_for_session_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set 
     json_for_subject_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set for subject
@@ -69,6 +70,7 @@ class ParameterSet(models.Model):
             self.graph_y_max = new_ps.get("graph_y_max")
             self.group_size = new_ps.get("group_size")
             self.age_warning = new_ps.get("age_warning")
+            self.reconnection_limit = new_ps.get("reconnection_limit")
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = True if new_ps.get("consent_form_required") == "True" else False
@@ -204,6 +206,7 @@ class ParameterSet(models.Model):
         self.json_for_session_json["graph_y_max"] = self.graph_y_max
         self.json_for_session_json["group_size"] = self.group_size
         self.json_for_session_json["age_warning"] = self.age_warning
+        self.json_for_session_json["reconnection_limit"] = self.reconnection_limit
 
         self.json_for_session_json["consent_form"] = self.consent_form
         self.json_for_session_json["consent_form_required"] = "True" if self.consent_form_required else "False"
@@ -264,6 +267,7 @@ class ParameterSet(models.Model):
                 "parameter_set_pay_blocks" : {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()},
                 "parameter_set_pay_blocks_order" : list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True)),
                 "completion_message" : self.completion_message,
+                "reconnection_limit" : self.reconnection_limit,
             }
 
             self.save()
