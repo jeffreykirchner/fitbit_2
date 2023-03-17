@@ -667,6 +667,17 @@ class Session(models.Model):
         if(current_parameter_set_period):
             current_parameter_set_period["notice_text"] = session_player.process_help_doc(current_parameter_set_period["notice_text"])
 
+
+        parameter_set_json_for_subject = self.parameter_set.json_for_subject()
+
+        #hide future pay blocks
+        if(current_parameter_set_period):
+            for i in parameter_set_json_for_subject["parameter_set_pay_blocks"]:
+                if parameter_set_json_for_subject["parameter_set_pay_blocks"][i]["pay_block_number"] > current_parameter_set_period["parameter_set_pay_block"]["pay_block_number"]:
+                    parameter_set_json_for_subject["parameter_set_pay_blocks"][i] = {}
+        else:
+            parameter_set_json_for_subject["parameter_set_pay_blocks"] = {}
+
         return{
             "id":self.id,
             "started":self.started,
@@ -681,7 +692,7 @@ class Session(models.Model):
 
             "finished":self.finished,
 
-            "parameter_set":self.parameter_set.json_for_subject(),
+            "parameter_set":parameter_set_json_for_subject,
             "is_before_first_period" : self.is_before_first_period(),
             "is_after_last_period" : self.is_after_last_period(),
             "is_last_period": is_last_period, 
