@@ -70,6 +70,14 @@ var app = Vue.createApp({
             app.sendGetSession();
         },
 
+        /** fire trys to connect to server
+         * return true if re-connect should be allowed else false
+        */
+         handleSocketConnectionTry(){            
+            return true;
+        },
+
+
         /** take websocket message from server
         *    @param data {json} incoming data from server, contains message and message type
         */

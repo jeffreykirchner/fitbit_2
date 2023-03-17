@@ -10,6 +10,8 @@ var app = Vue.createApp({
 
     data() {return {chatSocket : "",
                     reconnecting : true,
+                    reconnection_failed : false,
+                    reconnection_count : 0,
                     is_subject : true,
                     working : false,
                     first_load_done : false,                       //true after software is loaded for the first time
@@ -47,6 +49,24 @@ var app = Vue.createApp({
         */
         handleSocketConnected(){            
             app.sendGetSession();
+        },
+
+        /** fire trys to connect to server
+         * return true if re-connect should be allowed else false
+        */
+        handleSocketConnectionTry(){            
+            if(!app.session) return true;
+
+            app.reconnection_count+=1;
+
+            if(app.reconnection_count > app.session.parameter_set.reconnection_limit)
+            {
+                app.reconnection_failed = true;
+                app.check_in_error_message = "Refresh your browser."
+                return false;
+            }
+
+            return true;
         },
 
         /** take websocket message from server

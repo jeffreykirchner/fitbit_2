@@ -63,6 +63,12 @@ class ParameterSetForm(forms.ModelForm):
                                                                     "step":"1",
                                                                     "min":"1"}))
 
+    reconnection_limit = forms.IntegerField(label='Re-connection Limit',
+                                    min_value=1,
+                                    widget=forms.NumberInput(attrs={"v-model":"current_parameter_set.reconnection_limit",
+                                                                    "step":"1",
+                                                                    "min":"1"}))
+
     test_mode = forms.ChoiceField(label='Test Mode',
                                        choices=((True, 'Yes'), (False,'No' )),
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set.test_mode",}))
@@ -70,4 +76,5 @@ class ParameterSetForm(forms.ModelForm):
     class Meta:
         model=ParameterSet
         fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required',
-                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set', 'test_mode' ,'completion_message']
+                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set',
+                 'test_mode' ,'completion_message', 'age_warning' ,'reconnection_limit']
