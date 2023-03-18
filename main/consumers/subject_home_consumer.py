@@ -458,6 +458,10 @@ def take_chat(session_id, session_player_id, data):
     #result["recipients"] = []
 
     session = Session.objects.get(id=session_id)
+
+    if not session.parameter_set.enable_chat:
+        return {"value" : "fail", "result" : {"message" : "Invalid chat."}}
+
     session_player = session.session_players.get(id=session_player_id)
     
     session_player_chat = SessionPlayerChat()
