@@ -190,6 +190,9 @@ def get_session_list_json(usr):
     get list of sessions created by usr
     usr: auth user
     '''
+    if not usr.is_authenticated:
+        return []
+
     session_list_1 = usr.sessions_a.all()
     session_list_2 = usr.sessions_b.all()
 
