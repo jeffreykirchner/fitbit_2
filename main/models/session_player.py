@@ -54,10 +54,11 @@ class SessionPlayer(models.Model):
     current_instruction_complete = models.IntegerField(verbose_name='Current Instruction Complete', default=0)   #furthest complete page subject has done
     instructions_finished = models.BooleanField(verbose_name='Instructions Finished', default=False)             #true once subject has completed instructions
 
-    fitbit_user_id = models.CharField(max_length=100, default="",verbose_name = 'FitBit User ID', blank=True, null=True)     #fitbit user id
-    fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name = 'FitBit Last Synced')                  #time when the fitbit was last synced to user's phone
-    fitbit_device = models.CharField(max_length=100, default="",verbose_name = 'FitBit Device')                              #last fitbit device to sync
-    
+    fitbit_user_id = models.CharField(max_length=100, default="",verbose_name='FitBit User ID', blank=True, null=True)     #fitbit user id
+    fitbit_last_synced = models.DateTimeField(default=None, null=True, verbose_name='FitBit Last Synced')                  #time when the fitbit was last synced to user's phone
+    fitbit_device = models.CharField(max_length=100, default="",verbose_name='FitBit Device')                              #last fitbit device to sync
+    fitbit_time_zone = models.CharField(max_length=100, default="America/Los_Angeles", verbose_name='FitBit Timezone')     #time zone of fitbit  
+
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
     disabled = models.BooleanField(default=False, verbose_name = 'Disabled')                #if true disable subject's screen
@@ -410,20 +411,20 @@ class SessionPlayer(models.Model):
 
         return {"status" : "success"}
 
-    def pull_fitbit_last_synced(self):
-        '''
-        pull the last time a fitbit has been synced
-        '''
+    # def pull_fitbit_last_synced(self):
+    #     '''
+    #     pull the last time a fitbit has been synced
+    #     '''
 
-        logger = logging.getLogger(__name__) 
+    #     logger = logging.getLogger(__name__) 
 
-        data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
-        r = get_fitbit_metrics(self.fitbit_user_id, data)
+    #     data = {'devices' : f'https://api.fitbit.com/1/user/-/devices.json'}
+    #     r = get_fitbit_metrics(self.fitbit_user_id, data)
 
-        if r["status"]=="success":
-            return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
-        else:
-            return {"status" : "fail", "message" : r["message"]}
+    #     if r["status"]=="success":
+    #         return self.process_fitbit_last_synced(r["result"]["devices"]["result"])
+    #     else:
+    #         return {"status" : "fail", "message" : r["message"]}
 
     def calcs_for_payblock(self, session_player_period=None):
         '''
@@ -463,7 +464,7 @@ class SessionPlayer(models.Model):
         for i in session_player_periods:
             i.calc_and_store_payment()
 
-    def process_fitbit_last_synced(self, r):
+    def process_fitbit_last_synced(self, r, time_zone=None):
         '''
         process result of pulling fitbit last sync time
         '''
@@ -471,6 +472,12 @@ class SessionPlayer(models.Model):
         logger = logging.getLogger(__name__) 
 
         devices = r
+
+        if not time_zone:
+            prm = main.models.Parameters.objects.first()
+            self.fitbit_time_zone = prm.experiment_time_zone
+        else:
+            self.fitbit_time_zone = time_zone
 
         v = -1
             
@@ -495,7 +502,7 @@ class SessionPlayer(models.Model):
                 #logger.info(f'pull_fitbit_last_synced sync: time {v}')
 
                 d = {}
-                d["last_sync"] = todays_date()
+                d["last_sync"] = todays_date(self.fitbit_time_zone)
                 d["last_sync"] = d["last_sync"].replace(hour=v.hour,minute=v.minute, second=v.second,microsecond=v.microsecond,
                                                         year=v.year,month=v.month,day=v.day)
 
@@ -521,7 +528,7 @@ class SessionPlayer(models.Model):
             return "---"
 
         prm = main.models.Parameters.objects.first()
-        tmz = pytz.timezone(prm.experiment_time_zone) 
+        tmz = pytz.timezone(self.fitbit_time_zone) 
 
         return  self.fitbit_last_synced.astimezone(tmz).strftime("%-m/%#d/%Y %#-I:%M %p")
     
@@ -530,13 +537,14 @@ class SessionPlayer(models.Model):
         true if the subject has synced their fitbit today
         '''
         logger = logging.getLogger(__name__) 
-        d_today = todays_date().date()
+        d_today = todays_date(self.fitbit_time_zone).date()
 
         if not self.fitbit_last_synced:
             return False
         
         prm = main.models.Parameters.objects.first()
-        tmz = pytz.timezone(prm.experiment_time_zone)
+        # tmz = pytz.timezone(prm.experiment_time_zone)
+        tmz = pytz.timezone(self.fitbit_time_zone)
 
         d_fitbit=self.fitbit_last_synced.astimezone(tmz).date()
 
