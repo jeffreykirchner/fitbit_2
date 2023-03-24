@@ -8,7 +8,7 @@ from datetime import datetime
 import main
 
 #get todays, time zone adjusted date time object
-def todays_date():
+def todays_date(time_zone=None):
     '''
         Get today's server time zone adjusted date time object with zeroed time
     '''
@@ -16,7 +16,11 @@ def todays_date():
     #logger.info("Get todays date object")
 
     prm = main.models.Parameters.objects.first()
-    tmz = pytz.timezone(prm.experiment_time_zone)
+
+    if not time_zone:
+        tmz = pytz.timezone(prm.experiment_time_zone)
+    else:
+        tmz = pytz.timezone(time_zone)
 
     d_today = datetime.now(tmz)
     d_today = d_today.replace(hour=0, minute=0, second=0, microsecond=0)       

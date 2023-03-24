@@ -421,8 +421,8 @@ class SessionPlayerPeriod(models.Model):
 
         try: 
             if save_pull_time:    
-                self.session_player.process_fitbit_last_synced(result["devices"]["result"])
                 self.fitbit_profile = result["fitbit_profile"]["result"]
+                self.session_player.process_fitbit_last_synced(result["devices"]["result"], self.fitbit_profile['user']['timezone'])
                 self.fitbit_age = self.fitbit_profile['user']['age']
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
