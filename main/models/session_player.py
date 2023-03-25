@@ -473,7 +473,7 @@ class SessionPlayer(models.Model):
 
         devices = r
 
-        if not time_zone:
+        if not time_zone or time_zone=="Etc/UTC":
             prm = main.models.Parameters.objects.first()
             self.fitbit_time_zone = prm.experiment_time_zone
         else:
