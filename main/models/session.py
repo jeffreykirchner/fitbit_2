@@ -26,6 +26,7 @@ from main.models import ParameterSet
 
 from main.globals import ExperimentPhase
 from main.globals import todays_date
+from main.globals import PayBlockType
 
 #experiment sessoin
 class Session(models.Model):
@@ -448,7 +449,10 @@ class Session(models.Model):
         if get_payments:
             for p in self.session_players.exclude(disabled=True).exclude(soft_delete=True):
 
-                payment = {"recruiter_id_private" : p.recruiter_id_private, "earnings" : p.get_block_earnings(pay_block)}
+                payment = {"recruiter_id_private" : p.recruiter_id_private, 
+                           "student_id" : p.student_id,
+                           "earnings" : p.get_block_earnings(pay_block)}
+                
                 pay_block_json["payments"].append(payment)
 
         return pay_block_json
@@ -458,16 +462,20 @@ class Session(models.Model):
         return pay block in csv format
         '''
 
-        pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=pay_block_number)
+        parameter_set_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=pay_block_number)
 
-        pay_block = self.get_pay_block(pay_block)
+        pay_block = self.get_pay_block(parameter_set_pay_block)
 
         
         with io.StringIO() as output:
             writer = csv.writer(output, quoting=csv.QUOTE_NONE)
-        
-            for p in pay_block["payments"]:
-                writer.writerow([p["recruiter_id_private"], p["earnings"]["total"]])
+
+            if parameter_set_pay_block.pay_block_type == PayBlockType.EARN_FITBIT:
+                for p in pay_block["payments"]:
+                    writer.writerow([p["student_id"], p["earnings"]["earnings_no_pay_percent"]])
+            else:
+                for p in pay_block["payments"]:
+                    writer.writerow([p["recruiter_id_private"], p["earnings"]["total"]])
 
             v = output.getvalue()
             output.close()
