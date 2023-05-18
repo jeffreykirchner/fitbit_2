@@ -525,16 +525,18 @@ class SessionPlayerPeriod(models.Model):
         earnings_total = 0
         no_pay_total = 0
 
+        pay_block = self.get_pay_block()
+
         if self.session_period.is_last_period_in_block:
-            v = self.session_player.get_block_earnings(self.get_pay_block())
+            v = self.session_player.get_block_earnings(pay_block)
             earnings_individual = v["individual"]
             earnings_group = v["group_bonus"]
             earnings_total = v["total"]
             no_pay_total = v["earnings_no_pay_percent"]
 
         writer.writerow([self.session_period.session.id,
-                         self.get_pay_block().pay_block_type,
-                         self.get_pay_block().pay_block_number,
+                         pay_block.pay_block_type,
+                         pay_block.pay_block_number,
                          self.session_period.period_number,
                          self.session_player.player_number,
                          self.session_player.note,
