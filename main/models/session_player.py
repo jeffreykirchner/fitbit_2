@@ -304,7 +304,8 @@ class SessionPlayer(models.Model):
 
             temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
 
-            temp_date = "2025-03-08"
+            #test date
+            # temp_date = "2025-03-08"
 
             data["devices"] = 'https://api.fitbit.com/1/user/-/devices.json'
             data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
