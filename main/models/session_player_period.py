@@ -364,8 +364,9 @@ class SessionPlayerPeriod(models.Model):
 
         if v == -1:
             self.fitbit_on_wrist_minutes = 0
-        
-        v = v.get('dataset',-1)
+        else:
+            v = v.get('dataset',-1)
+            
         if v==-1:
             self.fitbit_on_wrist_minutes = 0
         else:
