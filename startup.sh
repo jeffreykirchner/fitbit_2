@@ -1,4 +1,5 @@
 echo "*** Startup.sh ***"
+echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
 apt-get update
 echo "Run Migrations:"
 python manage.py migrate
