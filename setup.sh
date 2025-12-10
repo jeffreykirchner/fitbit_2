@@ -1,19 +1,19 @@
-echo "setup template"
+echo "Setup Fitbit environment"
 sudo service postgresql restart
-echo "drop template db: enter db password"
-dropdb fitbit_2 -U dbadmin -h localhost -i
-echo "create database: enter db password"
-createdb -h localhost -U dbadmin -O dbadmin fitbit_2
-echo "create virtual environment"
-rm -rf _fitbit_2_env
-virtualenv --python=python3.9 _fitbit_2_env
-source _fitbit_2_env/bin/activate
-echo "install requirements"
-pip install -r requirements.txt
-python manage.py migrate
-echo "create super user"
-python manage.py createsuperuser 
-echo "load fixtures"
-python manage.py loaddata main.json
-echo "setup done"
-python manage.py runserver
+sudo service redis-server start
+echo "Drop Fitbit db: enter db password"
+dropdb fitbit_2 -U dbadmin -h localhost -i -p 5432
+echo "Create database: enter db password"
+createdb -h localhost -p 5432 -U dbadmin -O dbadmin fitbit_2
+echo "Restore database? (y/n)"
+read restore
+if [ "$restore" = "y" ]; then
+    echo "Restore database: enter db password"
+    pg_restore -v --no-owner --role=dbowner --host=localhost --port=5432 --username=dbadmin --dbname=fitbit_2 database_dumps/fitbit_2.sql
+else
+    python manage.py migrate
+    echo "Create Super User:"
+    python manage.py setup_superuser_with_profile
+    python manage.py setup_site_parameters    
+fi
+echo "Setup complete."
