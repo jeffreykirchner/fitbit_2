@@ -5,7 +5,7 @@ pull fitbit metrics
 from datetime import datetime
 
 import logging
-from async_timeout import timeout
+# from async_timeout import timeout
 import requests
 import json
 import sys

@@ -1,5 +1,5 @@
 """
-Django settings for trade_steal project.
+Django settings for fitbit 2 project.
 """
 
 from pathlib import Path
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'main',
     'crispy_forms',
+    'crispy_bootstrap5',
     'django.contrib.admin',
     'channels',
     'tinymce',
@@ -48,7 +49,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = '_fitbit_2.urls'
 ADMIN_SITE_HEADER = 'Fitbit 2 Administration'
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 TEMPLATES = [
     {
@@ -94,6 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
 TINYMCE_DEFAULT_CONFIG = {
     "height" : 600,
     "menubar": False,
+    "convert_urls": False,
+    "promotion": False,
     "menubar": "file edit view insert format tools table help",
     "plugins": "advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste code help wordcount",
     "toolbar": "undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample | a11ycheck ltr rtl | showcomments addcomment code",
