@@ -11,16 +11,26 @@
             target: document.getElementById('id_notice_text'),
             height : "400",
             theme: "silver",
-            plugins: "directionality,paste,searchreplace,code",
+            convert_urls: false,
+            promotion: false,
+            auto_focus: 'id_text_html',
+            plugins: "directionality,searchreplace,code,link,image,lists",
+            toolbar: "undo redo | styleselect forecolor bold italic alignleft aligncenter alignright alignjustify outdent indent numlist bullist link code image",
             directionality: "{{ directionality }}",
+            license_key: 'gpl',
         });
 
         tinyMCE.init({
             target: document.getElementById('id_completion_message'),
-            height : "200",
+            height : "400",
             theme: "silver",
-            plugins: "directionality,paste,searchreplace,code",
+            convert_urls: false,
+            promotion: false,
+            auto_focus: 'id_text_html',
+            plugins: "directionality,searchreplace,code,link,image,lists",
+            toolbar: "undo redo | styleselect forecolor bold italic alignleft aligncenter alignright alignjustify outdent indent numlist bullist link code image",
             directionality: "{{ directionality }}",
+            license_key: 'gpl',
         });
     
         // Prevent Bootstrap dialog from blocking focusin
