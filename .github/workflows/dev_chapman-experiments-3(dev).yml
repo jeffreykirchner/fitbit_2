@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - chapman-experiments-3
+name: Build and deploy Python app to Azure Web App
 
 on:
   push:
@@ -95,6 +95,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'chapman-experiments-3'
+          app-name: '${{ secrets.AZURE_APP_NAME }}'
           slot-name: 'dev'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_57F8373C8B574F52827A50E02C070D35 }}
