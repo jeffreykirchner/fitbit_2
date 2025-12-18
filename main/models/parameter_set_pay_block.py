@@ -115,7 +115,7 @@ class ParameterSetPayBlock(models.Model):
             "pay_block_type" : self.pay_block_type,
             "pay_block_number" : self.pay_block_number,
 
-            "fixed_pay" : round(self.fixed_pay),
+            "fixed_pay" : round(self.fixed_pay,2),
             "no_pay_percent" : self.no_pay_percent,
 
             "parameter_set_pay_block_payments" : {p.id : p.json() for p in self.parameter_set_pay_block_payments_a.all()},

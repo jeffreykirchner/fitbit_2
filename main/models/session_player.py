@@ -255,11 +255,11 @@ class SessionPlayer(models.Model):
 
         earnings = {}
 
-        earnings["individual"] = round(self.get_pay_block_individual_earnings(pay_block))
-        earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block))
-        earnings["fixed"] = round(self.get_pay_block_fixed_earnings(pay_block))
+        earnings["individual"] = round(self.get_pay_block_individual_earnings(pay_block),2)
+        earnings["group_bonus"] = round(self.get_pay_block_bonus_earnings(pay_block),2)
+        earnings["fixed"] = round(self.get_pay_block_fixed_earnings(pay_block),2)
 
-        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"] + earnings["fixed"])
+        earnings["total"] = round(earnings["individual"] + earnings["group_bonus"] + earnings["fixed"],2)
         earnings["earnings_no_pay_percent"] = self.get_pay_block_no_pay_percent(pay_block)
 
         return earnings
@@ -815,9 +815,9 @@ class SessionPlayer(models.Model):
             "checked_in_today" : todays_session_player_period.check_in if todays_session_player_period else None,
             "group_checked_in_today" : todays_session_player_period.group_checked_in_today() if todays_session_player_period else False,            
 
-            "earnings_fixed" : round(todays_session_player_period.get_fixed_pay()) if todays_session_player_period else None,
-            "individual_earnings" : round(todays_session_player_period.earnings_individual) if todays_session_player_period else None,
-            "group_earnings" : round(todays_session_player_period.earnings_group) if todays_session_player_period else False,
+            "earnings_fixed" : round(todays_session_player_period.get_fixed_pay(),2) if todays_session_player_period else None,
+            "individual_earnings" : round(todays_session_player_period.earnings_individual,2) if todays_session_player_period else None,
+            "group_earnings" : round(todays_session_player_period.earnings_group,2) if todays_session_player_period else False,
             "no_pay_percent" : todays_session_player_period.get_no_pay_percent() if todays_session_player_period else False,            
 
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),

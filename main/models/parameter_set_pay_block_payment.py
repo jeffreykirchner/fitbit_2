@@ -64,9 +64,9 @@ class ParameterSetPayBlockPayment(models.Model):
             "id" : self.id,
 
             "label" : self.label,
-            "zone_minutes" : round(self.zone_minutes),
-            "payment" : round(self.payment),
-            "group_bonus" : round(self.group_bonus),
+            "zone_minutes" : round(self.zone_minutes,2),
+            "payment" : round(self.payment,2),
+            "group_bonus" : round(self.group_bonus,2),
             "no_pay_percent" : self.no_pay_percent,
         }
     
@@ -81,7 +81,7 @@ class ParameterSetPayBlockPayment(models.Model):
 
             "label" : self.label,
             "zone_minutes" : round(self.zone_minutes),
-            "payment" : round(self.payment),
+            "payment" : round(self.payment,2),
             "group_bonus" : self.group_bonus,
             "no_pay_percent" : self.no_pay_percent,
         }
