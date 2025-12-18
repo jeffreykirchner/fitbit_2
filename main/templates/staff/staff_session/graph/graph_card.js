@@ -146,7 +146,7 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
 
        
         // {
-        text = Math.round(tempXValue).toString();
+        text = Math.round(tempXValue,2).toString();
         //text = app.session_player.session_player_periods_2[i].period_day_of_week;
 
        

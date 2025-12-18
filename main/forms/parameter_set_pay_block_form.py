@@ -22,10 +22,10 @@ class ParameterSetPayBlockForm(forms.ModelForm):
                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_pay_block.fixed_pay",
                                                                      "step":"0.01"}))
     
-    no_pay_percent = forms.DecimalField(label='Daily Fitbit Percent Earned',
+    no_pay_percent = forms.IntegerField(label='Daily Fitbit Percent Earned',
                                      min_value=0,
                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set_pay_block.no_pay_percent",
-                                                                     "step":"0.01"}))
+                                                                     "step":"1"}))
 
     class Meta:
         model = ParameterSetPayBlock
