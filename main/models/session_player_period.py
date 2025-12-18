@@ -645,8 +645,8 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         return{
-            "earnings_individual" : round(self.earnings_individual),
-            "earnings_group" : round(self.earnings_group),
+            "earnings_individual" : round(self.earnings_individual,2),
+            "earnings_group" : round(self.earnings_group,2),
             "earnings_total" : self.get_earning(),
             "check_in" : self.check_in,
             "group_checked_in_today" : self.group_checked_in_today(),  
@@ -663,10 +663,10 @@ class SessionPlayerPeriod(models.Model):
             "period_number" : self.session_period.period_number,
             "period_day_of_week" : self.session_period.get_formatted_day_of_week(),
 
-            "earnings_fixed" : round(self.earnings_fixed),
-            "earnings_individual" : round(self.earnings_individual),
-            "earnings_group" : round(self.earnings_group),
-            "earnings_total" : round(self.get_earning()),
+            "earnings_fixed" : round(self.earnings_fixed,2),
+            "earnings_individual" : round(self.earnings_individual,2),
+            "earnings_group" : round(self.earnings_group,2),
+            "earnings_total" : round(self.get_earning(),2),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
 
             "zone_minutes" : self.zone_minutes,
@@ -690,10 +690,10 @@ class SessionPlayerPeriod(models.Model):
             "period_number" : self.session_period.period_number,
             "fitbit_formatted_date" : self.session_period.get_formatted_date(),
 
-            "earnings_fixed" : round(self.earnings_fixed),
-            "earnings_individual" : round(self.earnings_individual) if self.session_period.is_last_period_in_block else 0,
-            "earnings_group" : round(self.earnings_group) if self.session_period.is_last_period_in_block else 0,
-            "earnings_total" : round(self.get_earning()),
+            "earnings_fixed" : round(self.earnings_fixed,2),
+            "earnings_individual" : round(self.earnings_individual,2) if self.session_period.is_last_period_in_block else 0,
+            "earnings_group" : round(self.earnings_group,2) if self.session_period.is_last_period_in_block else 0,
+            "earnings_total" : round(self.get_earning(),2),
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             
             "zone_minutes" : self.zone_minutes,

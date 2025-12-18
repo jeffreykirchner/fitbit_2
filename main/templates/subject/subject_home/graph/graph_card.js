@@ -1,7 +1,7 @@
 /**
  * setup canvas
  */
-drawSetup(chartID){
+drawSetup: function drawSetup(chartID){
 
     if(!app.session) return;
     if(!app.session_player) return;
@@ -28,7 +28,7 @@ drawSetup(chartID){
 /**
  * draw axis
  */
-drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel, today){
+drawAxis: function drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel, today){
     
     if(document.getElementById(chartID) == null)
     {
@@ -183,7 +183,7 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
 /**
  * draw line on graph
  */
-drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha, lineDash){
+drawLine: function drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha, lineDash){
 
 
     if(document.getElementById(chartID) == null)
@@ -228,7 +228,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
 /**
  * convert X data point to X graph point
  */
-convertToX(tempValue, maxValue, minValue, tempWidth, markerWidth){
+convertToX: function convertToX(tempValue, maxValue, minValue, tempWidth, markerWidth){
     tempT = parseFloat(tempWidth) / parseFloat(maxValue-minValue);
 
     tempValue = parseFloat(tempValue) - parseFloat(minValue);
@@ -241,7 +241,7 @@ convertToX(tempValue, maxValue, minValue, tempWidth, markerWidth){
 /**
  * convert X data point to X graph point
  */
-convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
+convertToY: function convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
     tempT = tempHeight / (maxValue-minValue);
 
     if(tempValue > maxValue) tempValue=maxValue;
@@ -257,7 +257,7 @@ convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
 /**
  * draw right side Y axis
  */
-drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
+drawZoneMinuteAxis: function drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
 {
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
@@ -366,7 +366,7 @@ drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
 /**
  * draw earnings on right side
  */
-drawEarnings(chartID, yMin, yMax, xMin, xMax)
+drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
 {
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
@@ -433,7 +433,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax)
     ctx.font="bold 16px Georgia"; 
 
     ctx.save();
-    ctx.translate(w-14, (h-marginX-margin2)/2+margin2);
+    ctx.translate(w-5, (h-marginX-margin2)/2+margin2);
     ctx.rotate(Math.PI/2);                                                              
     ctx.fillText("Your " + block_length +  " Day Average Zone Minute Bonus", 0, 10);
     ctx.restore();
@@ -442,7 +442,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax)
 /**
  * draw zone minutes lines for each person in the group
  */
- drawZoneMinuteLines1(chartID, yMin, yMax, xMin, xMax){
+ drawZoneMinuteLines1: function drawZoneMinuteLines1(chartID, yMin, yMax, xMin, xMax){
 
     for(let i=0;i<app.session.session_players.length;i++)
     {
@@ -468,7 +468,7 @@ drawEarnings(chartID, yMin, yMax, xMin, xMax)
 /**
  * draw zone minutes lines for each person in the group
  */
-drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
+drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
 
     //draw group
     for(let i=0;i<app.session.session_players.length;i++)
@@ -530,7 +530,7 @@ drawZoneMinuteLines2(chartID, yMin, yMax, xMin, xMax){
 /**
  * draw dot for todays zone minutes
  */
-drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
+drawZoneMinutes: function drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
     var canvas = document.getElementById(chartID);
     var ctx = canvas.getContext('2d');           
 
@@ -611,7 +611,7 @@ drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
 /**
  * draw period earnings
  */
-drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
+drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
 
     if(app.session_player.earnings_fixed==0 && app.session_player.no_pay_percent==0) return;
 
@@ -790,7 +790,7 @@ drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax, xTickCount){
     }
 },
 
-drawLoadingScreen(chartID){
+drawLoadingScreen: function drawLoadingScreen(chartID){
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
 
@@ -805,7 +805,7 @@ drawLoadingScreen(chartID){
 /**
  * re-draw graph
  */
-updateGraph(){
+updateGraph: function updateGraph(){
 
     if(!app.session) return;
     if(!app.session_player) return;
