@@ -9,7 +9,6 @@ from django.db import models
 
 from main.models import ParameterSet
 
-from main.globals import PeriodType
 from main.globals import format_minutes
 
 import main
@@ -23,7 +22,6 @@ class ParameterSetPeriod(models.Model):
     parameter_set_pay_block = models.ForeignKey('main.ParameterSetPayBlock', on_delete=models.CASCADE, related_name="parameter_set_periods_b", blank=True, null=True)
 
     period_number = models.IntegerField(verbose_name='Period Number', default=1)                                       #period number 1 to N
-    #period_type = models.CharField(max_length=100, choices=PeriodType.choices, default=PeriodType.NO_PAY)              #type of payment system used
 
     survey_required = models.BooleanField(default=False, verbose_name="Survey Required")                               #if true show the survey below
     survey_link = models.CharField(max_length = 1000, default = 'https://www.google.com', verbose_name = 'Survey Link', blank=True)

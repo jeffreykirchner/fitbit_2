@@ -224,6 +224,21 @@ class SessionPlayer(models.Model):
         
         return 0
 
+    def get_pay_block_average_zone_minutes(self, pay_block):
+        '''
+        return the average zone minutes for the pay block
+        '''
+
+        last_session_period_in_block = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
+                                                                   .filter(check_in=True) \
+                                                                   .order_by('session_period__period_number') \
+                                                                   .last()
+        
+        if last_session_period_in_block:           
+            return last_session_period_in_block.average_pay_block_zone_minutes
+        
+        return 0
+
     def get_current_block_earnings(self):
         '''
         return current payblock earnings

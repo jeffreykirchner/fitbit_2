@@ -54,6 +54,9 @@
                                 <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
                                     [[temp_p.no_pay_percent]]%
                                 </td>
+                                <td v-on:click="showEditPayBlock(p)" class="player_table_cell text-nowrap">
+                                    [[temp_p.group_assignment_type]]
+                                </td>
                                 <td  class="text-nowrap">
                                    <div class="row text-nowrap">
                                         <div v-for="(p2, index2) in temp_p.parameter_set_pay_block_payments_order" 

@@ -27,6 +27,7 @@ from main.models import ParameterSet
 from main.globals import ExperimentPhase
 from main.globals import todays_date
 from main.globals import PayBlockType
+from main.globals import GroupAssignmentType
 
 #experiment sessoin
 class Session(models.Model):
@@ -126,6 +127,15 @@ class Session(models.Model):
             if parameter_set_period:
                 session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
                 session_period.is_last_period_in_block = True
+                session_period.save()
+        
+        #set first session period of competitive pay blocks to paused
+        for i in self.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_type=PayBlockType.BLOCK_PAY_COMPETITION):
+            parameter_set_period = i.parameter_set_periods_b.first()
+
+            if parameter_set_period:
+                session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
+                session_period.paused = True
                 session_period.save()
 
         self.current_experiment_phase = ExperimentPhase.RUN
@@ -531,17 +541,61 @@ class Session(models.Model):
     
     def auto_assign_groups(self):
         '''
-        auto assign gruops to session players based on parameter set group size.
+        auto assign groups to session players based on parameter set group size.
         '''
+        
+        pay_block_one = self.parameter_set.parameter_set_pay_blocks_a.first()
+
+
         temp_group = 1
         temp_counter = 0
+        temp_group_size = 1
 
+        if pay_block_one.group_assignment_type != GroupAssignmentType.INDIVIDUAL:
+            temp_group_size = self.parameter_set.group_size
+       
         for i in self.session_players.all():
             i.group_number = temp_group
             i.save()
             temp_counter+=1
 
-            if temp_counter == self.parameter_set.group_size:
+            if temp_counter == temp_group_size:
+                temp_group += 1
+                temp_counter = 0
+    
+    def average_azm_assign_groups(self, calc_for_yesterday:bool=True):
+        '''
+        assign groups based on average azm from previous pay block from highest to lowest
+        '''
+
+        # current_session_period = self.get_current_session_period()
+        yesterday_session_period = self.get_yesterday_session_period()
+
+        if not yesterday_session_period:
+            #no change to groups
+            return  
+        
+        if calc_for_yesterday:
+            #ensure all azm are calculated for yesterday
+            for i in self.session_players.all():
+                i.calc_averages_for_block(yesterday_session_period.parameter_set_period.parameter_set_pay_block)
+
+        # current_pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
+        yesterday_pay_block = yesterday_session_period.parameter_set_period.parameter_set_pay_block
+
+        group_size = self.parameter_set.group_size
+
+        sorted_players = sorted(self.session_players.all(), key=lambda x: x.get_pay_block_average_zone_minutes(yesterday_pay_block), reverse=True)
+
+        temp_group = 1
+        temp_counter = 0
+
+        for i in sorted_players:
+            i.group_number = temp_group
+            i.save()
+            temp_counter+=1
+
+            if temp_counter == group_size:
                 temp_group += 1
                 temp_counter = 0
 
@@ -610,7 +664,16 @@ class Session(models.Model):
             if current_session_period == self.session_periods.last():
                 is_last_period = True
         
-        current_parameter_set_period = self.parameter_set.json()['parameter_set_periods'][str(current_session_period.parameter_set_period.id)] if current_session_period else None,
+        parameter_set = self.parameter_set.json()
+        parameter_set_periods = parameter_set['parameter_set_periods']
+        current_parameter_set_period = parameter_set_periods[str(current_session_period.parameter_set_period.id)] if current_session_period else None
+
+        # current_pay_block_number = current_parameter_set_period['parameter_set_pay_block']['pay_block_number'] if current_parameter_set_period else None
+        
+        # previous_pay_block = None
+        # if current_pay_block_number and current_pay_block_number > 1:
+        #     previous_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=current_pay_block_number-1)
+        #     previous_pay_block_info = self.get_pay_block(previous_pay_block, False)
 
         v = {
             "id":self.id,
@@ -623,7 +686,7 @@ class Session(models.Model):
             "current_experiment_phase":self.current_experiment_phase,
 
             "current_parameter_set_period": current_parameter_set_period,
-            
+            # "current_pay_block_number": current_pay_block_number,
             "current_period" : current_session_period.json() if current_session_period else None,
             "yesterdays_period" : yesterday_session_period.json() if yesterday_session_period else None,
 
@@ -704,6 +767,7 @@ class Session(models.Model):
             "is_before_first_period" : self.is_before_first_period(),
             "is_after_last_period" : self.is_after_last_period(),
             "is_last_period": is_last_period, 
+            "paused": current_session_period.paused if current_session_period else False,
 
             "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number).prefetch_related()],
         }

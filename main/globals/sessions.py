@@ -15,15 +15,6 @@ class ExperimentPhase(models.TextChoices):
     RUN = 'Run', _('Run')
     DONE = 'Done', _('Done')
 
-class PeriodType(models.TextChoices):
-    '''
-    period types
-    '''
-    NO_PAY = 'No Pay', _('No Pay')
-    FIXED_PAY = 'Fixed Pay', _('Fixed Pay')
-    INDIVIDUAL_PAY = 'Individual Pay', _('Individual Pay')
-    GROUP_PAY = 'Group Pay', _('Group Pay')
-
 class PayBlockType(models.TextChoices):
     '''
     pay block types
@@ -32,4 +23,13 @@ class PayBlockType(models.TextChoices):
     BLOCK_PAY_GROUP = 'Block Pay Group', _('Block Pay Group')
     BLOCK_PAY_INDIVIDUAL = 'Block Pay Individual', _('Block Pay Individual')
     EARN_FITBIT = 'Earn Fitbit', _('Earn Fitbit')
+    BLOCK_PAY_COMPETITION = 'Block Pay Competition', _('Block Pay Competition')
+
+class GroupAssignmentType(models.TextChoices):
+    '''
+    group assignment types
+    '''
+    INDIVIDUAL = 'Individual', _('Individual')
+    FIXED = 'Fixed', _('Fixed')
+    SORTED = 'Sorted', _('Sorted')
 
