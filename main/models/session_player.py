@@ -845,7 +845,8 @@ class SessionPlayer(models.Model):
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
             "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "groups_average_zone_minutes" : todays_session_player_period.get_team_average() if todays_session_player_period else "---",
-            
+        
+
             "survey_link" : self.get_current_survey_link(),
         }
     
@@ -865,6 +866,15 @@ class SessionPlayer(models.Model):
         todays_session_player_period = self.get_todays_session_player_period()  
         yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
+        previous_block_average_zone_minutes = None
+
+        if todays_session_player_period:
+            current_play_block = todays_session_player_period.parameter_set_period.parameter_set_pay_block
+
+            if current_play_block.pay_block_number > 1:
+                previous_block = self.session.parameter_set.get_pay_block_by_number(current_play_block.pay_block_number - 1)
+                previous_block_average_zone_minutes = self.get_pay_block_average_zone_minutes(previous_block)
+                
         # if todays_session_player_period:
         #     period_number = todays_session_player_period.session_period.period_number
         # elif session. 
@@ -914,6 +924,7 @@ class SessionPlayer(models.Model):
             "todays_zone_minutes" :  todays_session_player_period.zone_minutes if todays_session_player_period else "---",
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
+            "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
         }
     
     def json_for_subject(self, session_player):
@@ -948,6 +959,15 @@ class SessionPlayer(models.Model):
         todays_session_player_period = self.get_todays_session_player_period()
         yesterdays_session_player_period = self.get_yesterdays_session_player_period()
 
+        #previous block average zone minutes
+        previous_block_average_zone_minutes = None
+        if todays_session_player_period:
+            current_play_block = todays_session_player_period.session_period.parameter_set_period.parameter_set_pay_block
+
+            if current_play_block.pay_block_number > 1:
+                previous_block = self.session.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=current_play_block.pay_block_number - 1)
+                previous_block_average_zone_minutes = self.get_pay_block_average_zone_minutes(previous_block)
+
         return{
             "id" : self.id,      
             "name" : self.name,
@@ -975,7 +995,9 @@ class SessionPlayer(models.Model):
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "flagged_yesterday" : yesterdays_session_player_period.get_fitbit_min_heart_rate_zone_bpm_flag() if yesterdays_session_player_period else False,
+            "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
         }
+
 
 
         

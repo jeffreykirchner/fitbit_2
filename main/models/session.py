@@ -544,8 +544,7 @@ class Session(models.Model):
         auto assign groups to session players based on parameter set group size.
         '''
         
-        pay_block_one = self.parameter_set.parameter_set_pay_blocks_a.first()
-
+        pay_block_one = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=1)
 
         temp_group = 1
         temp_counter = 0
