@@ -7,6 +7,7 @@ from tinymce.widgets import TinyMCE
 from django import forms
 
 from main.models import ParameterSet
+from main.globals import ColorAssignmentType
 
 import  main
 
@@ -25,6 +26,10 @@ class ParameterSetForm(forms.ModelForm):
                                     widget=forms.NumberInput(attrs={"v-model":"current_parameter_set.group_size",
                                                                     "step":"1",
                                                                     "min":"1"}))
+    
+    color_assignment_type = forms.ChoiceField(label='Color Assignment Type',
+                                              choices=ColorAssignmentType.choices,
+                                              widget=forms.Select(attrs={"v-model":"current_parameter_set.color_assignment_type",}))
                                        
     enable_chat = forms.ChoiceField(label='Enable Chat',
                                        choices=((True, 'Yes'), (False,'No' )),
@@ -75,6 +80,6 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['graph_y_max', 'group_size', 'enable_chat', 'consent_form_required',
+        fields =['graph_y_max', 'group_size', 'color_assignment_type', 'enable_chat', 'consent_form_required',
                  'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set',
                  'test_mode' ,'completion_message', 'age_warning' ,'reconnection_limit']

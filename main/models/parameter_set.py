@@ -12,6 +12,7 @@ from django.db.utils import IntegrityError
 from django.core.serializers.json import DjangoJSONEncoder
 
 from main.globals import get_random_hex_color
+from main.globals import ColorAssignmentType
 
 from main.models import InstructionSet
 from main.models import HelpDocSubjectSet
@@ -31,6 +32,7 @@ class ParameterSet(models.Model):
 
     graph_y_max = models.IntegerField(verbose_name='Graph: Y Max', default=75)           #max height of subject graph
     group_size = models.IntegerField(verbose_name='Group Size', default=2)               #max height of subject graph
+    color_assignment_type = models.CharField(max_length=100, choices=ColorAssignmentType.choices, default=ColorAssignmentType.FIXED, verbose_name='Color Assignment Type')  #how player colors are assigned
 
     test_mode = models.BooleanField(default=False, verbose_name = 'Test Mode')                                #if true subject screens will do random auto testing
 
@@ -69,6 +71,7 @@ class ParameterSet(models.Model):
             self.show_instructions = True if new_ps.get("show_instructions") == "True" else False
             self.graph_y_max = new_ps.get("graph_y_max")
             self.group_size = new_ps.get("group_size")
+            self.color_assignment_type = new_ps.get("color_assignment_type")
             self.age_warning = new_ps.get("age_warning")
             self.reconnection_limit = new_ps.get("reconnection_limit")
 
@@ -205,6 +208,7 @@ class ParameterSet(models.Model):
         self.json_for_session_json["instruction_set"] = self.instruction_set.json_min()
         self.json_for_session_json["graph_y_max"] = self.graph_y_max
         self.json_for_session_json["group_size"] = self.group_size
+        self.json_for_session_json["color_assignment_type"] = self.color_assignment_type
         self.json_for_session_json["age_warning"] = self.age_warning
         self.json_for_session_json["reconnection_limit"] = self.reconnection_limit
 

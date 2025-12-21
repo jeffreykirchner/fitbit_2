@@ -24,7 +24,9 @@ class SessionPeriod(models.Model):
     period_number = models.IntegerField()                        #period number from 1 to N
     period_date = models.DateField(default=now)                  #date of period
 
-    is_last_period_in_block = models.BooleanField(default=False, verbose_name="Last Period in block")     #true if last period in th block
+    is_last_period_in_block = models.BooleanField(default=False, verbose_name="Last Period in block")     #true if last period in the block
+
+    paused = models.BooleanField(default=False, verbose_name="Paused")     #true if period is paused
 
     timestamp = models.DateTimeField(auto_now_add= True)
     updated = models.DateTimeField(auto_now= True)
@@ -117,4 +119,5 @@ class SessionPeriod(models.Model):
             "period_date" : self.get_formatted_date(),
             "period_day_of_week" : self.get_formatted_day_of_week(),
             "check_in_count" : self.get_check_in_count(),
+            "paused" : self.paused,
         }

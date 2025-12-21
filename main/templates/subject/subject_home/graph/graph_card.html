@@ -7,7 +7,7 @@
 
         <span class="float-end">   
             <span class="me-4" v-if="session_player.parameter_set_player">
-                You are <span v-bind:style="{'color':session_player.parameter_set_player.display_color}">[[session_player.parameter_set_player.id_label]]</span>
+                You are <span v-bind:style="{'color':getColor(findSessionPlayerIndex(session_player.id))}">[[getColorName(findSessionPlayerIndex(session_player.id))]]</span>
             </span>
             <button type="button" class="btn btn-link ms-2" title="Show Help Doc" v-on:click="sendLoadHelpDocSubject('{{subject_graph_help_doc}}')">
                 <i class="far fa-question-circle"></i> 

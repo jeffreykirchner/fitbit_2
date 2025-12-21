@@ -7,7 +7,7 @@ def get_random_hex_color():
 
 def get_color_by_group(group_size:int, player_number:int):
     '''
-    return a color and namy by group number
+    return a color and name by group number
     '''    
 
     label = ""

@@ -409,7 +409,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
         
         if (current_pay_block.pay_block_type=="Block Pay Group")
         {
-            ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+            ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
             ctx.fillText("$" + pay_block_payment.payment, w-marginY-marginY+4, y-10);
 
             ctx.fillStyle = "green";
@@ -417,7 +417,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
         }
         else
         {
-            ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+            ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
             ctx.fillText("$" + pay_block_payment.payment, w-marginY-marginY+4, y+4);
         }
 
@@ -460,7 +460,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
         }
 
         app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                     3, app.session.session_players[i].parameter_set_player.display_color, 0.25,[3, 10]);
+                     3, app.getColor(app.findSessionPlayerIndex(app.session.session_players[i].id)), 0.25,[3, 10]);
     }
 
 },
@@ -492,7 +492,7 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
             }
 
             app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                        3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
+                        3, app.getColor(app.findSessionPlayerIndex(app.session.session_players[i].id)), 1,[1]);
         }
     }
 
@@ -518,7 +518,7 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
             }
             
             app.drawLine(chartID, yMin, yMax, xMin, xMax, dataSet,
-                        3, app.session.session_players[i].parameter_set_player.display_color, 1,[1]);
+                        3, app.getColor(app.findSessionPlayerIndex(app.session.session_players[i].id)), 1,[1]);
 
 
             break;
@@ -568,7 +568,7 @@ drawZoneMinutes: function drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
                     x = app.convertToX(session_player_period.period_number, xMax, xMin, w-marginY-marginY, markerWidth);
                     y = app.convertToY(session_player_period.zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
                     ctx.arc(x, y, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle=player.parameter_set_player.display_color;
+                    ctx.fillStyle=app.getColor(app.findSessionPlayerIndex(player.id));
                     ctx.fill();
                     ctx.stroke();
                 }
@@ -595,7 +595,7 @@ drawZoneMinutes: function drawZoneMinutes(chartID, yMin, yMax, xMin, xMax){
                     x = app.convertToX(session_player_period.period_number, xMax, xMin, w-marginY-marginY, markerWidth);
                     y = app.convertToY(session_player_period.zone_minutes, yMax, yMin, h-marginX-margin2, markerWidth);
                     ctx.arc(x, y, 6, 0, 2 * Math.PI);
-                    ctx.fillStyle=player.parameter_set_player.display_color;
+                    ctx.fillStyle=app.getColor(app.findSessionPlayerIndex(player.id));
                     ctx.fill();
                     ctx.stroke();
                 }
@@ -682,7 +682,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         }
 
         //local player
-        ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+        ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
 
         if(app.session_player.session_player_periods_2[i].check_in)
         {   
@@ -706,7 +706,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         //partner
         if(session_player_partner)
         {
-            ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+            ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
             if(session_player_partner.session_player_periods_2[i].check_in)
             {
                 if(app.session_player.session_player_periods_2[i].period_type == "Earn Fitbit")
@@ -734,9 +734,9 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     //labels
     if(session_player_partner)
     {
-        ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+        ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
         ctx.textAlign = "right";
-        ctx.fillText(session_player_partner.parameter_set_player.id_label+"'s", marginY-20, 15);
+        ctx.fillText(app.getColorName(app.findSessionPlayerIndex(session_player_partner.id))+"'s", marginY-20, 15);
 
         if(current_pay_block.pay_block_type == "Earn Fitbit")
         {
@@ -748,7 +748,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         }
     }
 
-    ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+    ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
     ctx.textAlign = "right";
     
     if(current_pay_block.pay_block_type == "Earn Fitbit")
@@ -764,7 +764,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     //partner
     if(session_player_partner)
     {
-        ctx.fillStyle = session_player_partner.parameter_set_player.display_color;
+        ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
         ctx.textAlign = "right";
 
         if(current_pay_block.pay_block_type == "Earn Fitbit")
@@ -778,7 +778,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     }
     
     //player
-    ctx.fillStyle = app.session_player.parameter_set_player.display_color;
+    ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
     ctx.textAlign = "right";
     if(current_pay_block.pay_block_type == "Earn Fitbit")
     {
