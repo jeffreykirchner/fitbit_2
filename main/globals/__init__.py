@@ -7,6 +7,7 @@ from .send_email import send_mass_email_service
 from .sessions import ExperimentPhase
 from .sessions import PayBlockType
 from .sessions import GroupAssignmentType
+from .sessions import ColorAssignmentType
 
 from .random_hex_color import get_random_hex_color
 from .random_hex_color import get_color_by_group

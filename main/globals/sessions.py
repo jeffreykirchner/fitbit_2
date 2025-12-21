@@ -33,3 +33,10 @@ class GroupAssignmentType(models.TextChoices):
     FIXED = 'Fixed', _('Fixed')
     SORTED = 'Sorted', _('Sorted')
 
+class ColorAssignmentType(models.TextChoices):
+    '''
+    color assignment types
+    '''
+    FIXED = 'Fixed', _('Fixed')
+    DYNAMIC = 'Dynamic', _('Dynamic')
+

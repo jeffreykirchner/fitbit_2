@@ -28,6 +28,7 @@ from main.globals import ExperimentPhase
 from main.globals import todays_date
 from main.globals import PayBlockType
 from main.globals import GroupAssignmentType
+from main.globals import get_color_by_group
 
 #experiment sessoin
 class Session(models.Model):
@@ -748,6 +749,9 @@ class Session(models.Model):
         else:
             parameter_set_json_for_subject["parameter_set_pay_blocks"] = {}
 
+        session_players = [i.json_for_subject(session_player) for i in self.session_players.filter(group_number=session_player.group_number).exclude(id=session_player.id).prefetch_related()]
+        session_players.insert(0, session_player.json_for_subject(session_player))
+
         return{
             "id":self.id,
             "started":self.started,
@@ -768,7 +772,8 @@ class Session(models.Model):
             "is_last_period": is_last_period, 
             "paused": current_session_period.paused if current_session_period else False,
 
-            "session_players":[i.json_for_subject(session_player) for i in session_player.session.session_players.filter(group_number=session_player.group_number).prefetch_related()],
+            "session_players": session_players,
+            "color_assigments" : {i : get_color_by_group(self.parameter_set.group_size, i) for i in range(self.parameter_set.group_size)} 
         }
           
 @receiver(post_delete, sender=Session)
