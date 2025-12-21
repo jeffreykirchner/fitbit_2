@@ -402,6 +402,7 @@ def take_remove_parameterset_player(data):
                 session.parameter_set.parameter_set_players.last().delete()
 
         session.update_player_count()
+        session.auto_assign_groups()
         session.parameter_set.update_json_fk(update_players=True)
     except ObjectDoesNotExist:
         logger.warning(f"take_remove_parameterset_player paramterset_player, not found")

@@ -7,8 +7,6 @@ from django import forms
 
 from main.models import ParameterSetPeriod
 
-from main.globals import PeriodType
-
 import main
 
 class ParameterSetPeriodForm(forms.ModelForm):
@@ -23,10 +21,6 @@ class ParameterSetPeriodForm(forms.ModelForm):
     survey_required = forms.ChoiceField(label='Enable Survey',
                                         choices=((1, 'Yes'), (0,'No')),
                                         widget=forms.Select(attrs={"v-model" : "current_parameter_set_period.survey_required"}))
-    
-    # period_type = forms.ChoiceField(label='Period Type',
-    #                                    choices=PeriodType.choices,
-    #                                    widget=forms.Select(attrs={"v-model":"current_parameter_set_period.period_type",}))
     
     minimum_wrist_minutes = forms.IntegerField(label="Minimum Wrist Minutes",
                                       min_value=0,

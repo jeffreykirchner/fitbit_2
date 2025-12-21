@@ -54,125 +54,133 @@
 </div>
 
 <!-- show only on virtical phone -->
-<div class="d-sm-none">
-    <div class="row justify-content-center mt-4 " v-cloak>
-        <div class="col mt-4 fs-3 text-center">
-            <br>
-            This screen resolution is not supported.<br><br>
-            If you are using a mobile device, try turning your device horizontally.<br><br>
-            <i class="fas fa-mobile-alt fa-2x"></i>
-            <i class="fas fa-undo fa-lg ps-4 pe-4"></i>
-            <i class="fas fa-mobile-alt fa-rotate-270 fa-2x"></i>
-        </div>
-    </div>
-</div>
-<!-- hide on vertical phone -->
-<div class="d-none d-sm-block" v-if="session && session_player">
-    <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
-        <div class="col-md">
-            {%include "subject/subject_home/instructions/instructions_card.html"%}
-        </div>
-    </div>
-    
-    <!-- experiment -->
-    
-    <!-- not started -->
-    <div class="row justify-content-center mt-4" v-cloak v-show="session.started == false || session.is_before_first_period">
-        <div class="col-12 fs-4 fw-bold text-center">
-            <br>
-            <br>
-            <br>
-            <br>
-            Please wait for the study to begin.
-            <div v-if="session.is_before_first_period">
-                The first day is [[session.start_date]].
-            </div>   
-            <div v-if="!show_fitbit_connect">
-                Your Fibit is connected.
-            </div>         
-        </div>
-    </div>
-    
-    <!-- complete -->
-    <div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period || session_player.disabled">
-        <div class="col-12 fs-4 fw-bold text-center">
-            <br>
-            <br>
-            <br>
-            <br>
-            <span v-html="session.parameter_set.completion_message"></span>
-            <!-- The study is complete, thank you for your participation. -->
-        </div>
-    </div>
-    
-    <!-- graph -->
-    <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
-        <div class="col-md">
-            {%include "subject/subject_home/graph/graph_card.html"%}                
-        </div>
-    </div>
-    
-    <div class="row justify-content-center mt-3">
-        <div class="col-lg-5" v-cloak v-if="session.enable_chat && !session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
-            <div class="row justify-content-center" >
-                <div class="col-lg mb-3 mb-lg-0">
-                    {%include "subject/subject_home/chat/chat_card.html"%}   
-                </div>
+<div v-if="session && !session.paused">
+    <div class="d-sm-none">
+        <div class="row justify-content-center mt-4 " v-cloak>
+            <div class="col mt-4 fs-3 text-center">
+                <br>
+                This screen resolution is not supported.<br><br>
+                If you are using a mobile device, try turning your device horizontally.<br><br>
+                <i class="fas fa-mobile-alt fa-2x"></i>
+                <i class="fas fa-undo fa-lg ps-4 pe-4"></i>
+                <i class="fas fa-mobile-alt fa-rotate-270 fa-2x"></i>
             </div>
         </div>
-        <div class="col-lg-7">
-             <!-- notice -->    
-            <div class="row justify-content-center" v-cloak v-if="session.current_parameter_set_period && session.current_parameter_set_period.show_notice">
-                <div class="col-lg mt-lg-0 mb-3">
-                    {%include "subject/subject_home/notice/notice_card.html"%}   
-                </div>
-            </div>            
-            <!-- checkin -->
-            <div class="row justify-content-center" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
-                <div class="col-lg">
-                    {%include "subject/subject_home/checkin/checkin_card.html"%}   
+    </div>
+    <!-- hide on vertical phone -->
+    <div class="d-none d-sm-block" v-if="session && session_player">
+        <div class="row justify-content-lg-center mt-4" v-cloak v-show="session.current_experiment_phase == 'Instructions'">
+            <div class="col-md">
+                {%include "subject/subject_home/instructions/instructions_card.html"%}
+            </div>
+        </div>
+        
+        <!-- experiment -->
+        
+        <!-- not started -->
+        <div class="row justify-content-center mt-4" v-cloak v-show="session.started == false || session.is_before_first_period">
+            <div class="col-12 fs-4 fw-bold text-center">
+                <br>
+                <br>
+                <br>
+                <br>
+                Please wait for the study to begin.
+                <div v-if="session.is_before_first_period">
+                    The first day is [[session.start_date]].
+                </div>   
+                <div v-if="!show_fitbit_connect">
+                    Your Fibit is connected.
+                </div>         
+            </div>
+        </div>
+        
+        <!-- complete -->
+        <div class="row justify-content-center mt-4" v-cloak v-show="session.finished || session.is_after_last_period || session_player.disabled">
+            <div class="col-12 fs-4 fw-bold text-center">
+                <br>
+                <br>
+                <br>
+                <br>
+                <span v-html="session.parameter_set.completion_message"></span>
+                <!-- The study is complete, thank you for your participation. -->
+            </div>
+        </div>
+        
+        <!-- graph -->
+        <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
+            <div class="col-md">
+                {%include "subject/subject_home/graph/graph_card.html"%}                
+            </div>
+        </div>
+        
+        <div class="row justify-content-center mt-3">
+            <div class="col-lg-5" v-cloak v-if="session.enable_chat && !session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
+                <div class="row justify-content-center" >
+                    <div class="col-lg mb-3 mb-lg-0">
+                        {%include "subject/subject_home/chat/chat_card.html"%}   
+                    </div>
                 </div>
             </div>
-            
-            <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
-                <div class="col-lg-6 mt-4 mt-lg-0">
-                    {%include "subject/subject_home/connect/connect_card.html"%}   
+            <div class="col-lg-7">
+                <!-- notice -->    
+                <div class="row justify-content-center" v-cloak v-if="session.current_parameter_set_period && session.current_parameter_set_period.show_notice">
+                    <div class="col-lg mt-lg-0 mb-3">
+                        {%include "subject/subject_home/notice/notice_card.html"%}   
+                    </div>
+                </div>            
+                <!-- checkin -->
+                <div class="row justify-content-center" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && first_load_done && !session_player.disabled">
+                    <div class="col-lg">
+                        {%include "subject/subject_home/checkin/checkin_card.html"%}   
+                    </div>
                 </div>
+                
+                <div class="row justify-content-center mt-4" v-cloak v-show="!session.is_after_last_period && session.started && first_load_done && !session_player.disabled">
+                    <div class="col-lg-6 mt-4 mt-lg-0">
+                        {%include "subject/subject_home/connect/connect_card.html"%}   
+                    </div>
+                </div>
+
+                <div class="row justify-content-center p-0 m-0">
+                    <div class="col-md text-end text-muted p-0 m-0">
+                        <span class="align-middle">[[session_player.name]]</span>
+                    </div>  
+                </div>
+                
+                <div class="row justify-content-center p-0 m-0">
+                    <div class="col-md text-end text-muted p-0 m-0">
+                        <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
+                    </div>  
+                </div>
+                
+                <div class="row justify-content-center p-0 m-0">
+                    <div class="col-md text-end text-muted p-0 m-0">
+                        <span class="align-middle">v[[software_version]]</span>
+                    </div>  
+                </div>
+                
+                <div class="row justify-content-center p-0 m-0" v-if="session.parameter_set.consent_form_required">
+                    <div class="col-md text-end p-0 m-0">
+                        <button type="button" class="btn btn-link text-muted text-end m-0 p-0" title="Consent Form" v-on:click="showConsentForm()">
+                            Consent Form 
+                        </button>
+                    </div>  
+                </div>           
             </div>
 
-            <div class="row justify-content-center p-0 m-0">
-                <div class="col-md text-end text-muted p-0 m-0">
-                    <span class="align-middle">[[session_player.name]]</span>
-                </div>  
-            </div>
-            
-            <div class="row justify-content-center p-0 m-0">
-                <div class="col-md text-end text-muted p-0 m-0">
-                    <span class="align-middle">Client [[session.id]]:[[session_player.player_number]]</span>
-                </div>  
-            </div>
-            
-            <div class="row justify-content-center p-0 m-0">
-                <div class="col-md text-end text-muted p-0 m-0">
-                    <span class="align-middle">v[[software_version]]</span>
-                </div>  
-            </div>
-            
-            <div class="row justify-content-center p-0 m-0" v-if="session.parameter_set.consent_form_required">
-                <div class="col-md text-end p-0 m-0">
-                    <button type="button" class="btn btn-link text-muted text-end m-0 p-0" title="Consent Form" v-on:click="showConsentForm()">
-                        Consent Form 
-                     </button>
-                </div>  
-            </div>           
         </div>
-
+    
     </div>
-   
 </div>
+<!-- show when paused -->
+<div class="row justify-content-lg-center mt-4" v-if="session && session.paused">
+    <div class = "col mt-4 text-center">
+        <h3>The study will resume soon. Please continue wearing your Fitbit.</h3>
+    </div>
+</div> 
 
 <!-- show when loading -->
-<div class="row justify-content-lg-center mt-4" v-else>
+<div class="row justify-content-lg-center mt-4" v-if="!session">
     <div class = "col mt-4 text-center">
         <i class="fas fa-cog fa-spin fa-2x"></i>
     </div>

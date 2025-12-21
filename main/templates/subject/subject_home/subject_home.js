@@ -369,6 +369,37 @@ var app = Vue.createApp({
             return null;
         },
 
+        /**
+         * get color label for by number in a group
+         */
+        getColorName(player_index)
+        {
+            if(app.session.parameter_set.color_assignment_type == "Fixed")
+            {
+                return app.session.session_players[player_index].parameter_set_player.id_label;
+            }
+            else
+            {
+                return app.session.color_assigments[player_index].label;
+            }
+        },
+
+        /**
+         * get color hex by number in a group
+         */
+        getColor(player_index)
+        {
+            if(app.session.parameter_set.color_assignment_type == "Fixed")
+            {
+                return app.session.session_players[player_index].parameter_set_player.display_color;
+            }
+            else
+            {
+                return app.session.color_assigments[player_index].color;
+            }
+        },
+
+
     },
 
     mounted(){
