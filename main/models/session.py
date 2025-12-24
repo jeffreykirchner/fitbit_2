@@ -146,6 +146,10 @@ class Session(models.Model):
         for i in self.session_players.all():
             i.start()
             # logger.info(f"Player {i} Created")
+
+        #store initial group numbers
+        current_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=1)
+        self.store_current_group_numbers(current_pay_block)
     
     def update_end_date(self):
         '''
@@ -563,6 +567,15 @@ class Session(models.Model):
                 temp_group += 1
                 temp_counter = 0
     
+    def store_current_group_numbers(self, pay_block):
+        '''
+        store current group numbers in session player periods for the specified pay block 
+        '''
+        
+        for i in self.session_players.all():
+            session_player_periods = i.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
+            session_player_periods.update(current_group_number=i.group_number)
+
     def average_azm_assign_groups(self, calc_for_yesterday:bool=True):
         '''
         assign groups based on average azm from previous pay block from highest to lowest
