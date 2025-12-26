@@ -24,10 +24,12 @@ from main.forms import StaffEditNameEtcForm
 
 from main.models import Session
 from main.models import Parameters
+from main.models import SessionPlayerPeriod
 
 from main.globals import send_mass_email_service
 from main.globals import ExperimentPhase
-from main.models.session_player_period import SessionPlayerPeriod
+from main.globals import GroupAssignmentType
+
 
 class StaffSessionConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
     '''
@@ -991,6 +993,23 @@ def take_get_pay_block(session_id, data):
         return {"value":"fail", "result":"session not found"}
     
     session.back_fill_for_pay_block(pay_block_number)
+
+    #check if next pay block needs to be started
+    current_session_period = session.get_current_session_period()
+    if current_session_period:
+        current_pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
+
+        #reassign partners if new pay block 
+        if current_pay_block.pay_block_number == pay_block_number+1 and \
+           current_pay_block.group_assignment_type == GroupAssignmentType.SORTED and \
+           current_session_period.paused:
+            
+            previous_pay_block = session.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=pay_block_number)
+            session.average_azm_assign_groups(False, previous_pay_block)
+            session.store_current_group_numbers(current_pay_block)
+            current_session_period.paused = False
+            current_session_period.save()
+
 
     return {"value" : "success",
             "pay_block_csv" : session.get_pay_block_csv(pay_block_number),

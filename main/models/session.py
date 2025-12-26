@@ -170,6 +170,7 @@ class Session(models.Model):
 
         self.save()
         self.session_periods.all().delete()
+        self.auto_assign_groups()
     
     def reset_connection_counts(self):
         '''
@@ -576,29 +577,19 @@ class Session(models.Model):
             session_player_periods = i.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
             session_player_periods.update(current_group_number=i.group_number)
 
-    def average_azm_assign_groups(self, calc_for_yesterday:bool=True):
+    def average_azm_assign_groups(self, calc_for_yesterday, previous_pay_block):
         '''
         assign groups based on average azm from previous pay block from highest to lowest
         '''
-
-        # current_session_period = self.get_current_session_period()
-        yesterday_session_period = self.get_yesterday_session_period()
-
-        if not yesterday_session_period:
-            #no change to groups
-            return  
         
         if calc_for_yesterday:
             #ensure all azm are calculated for yesterday
             for i in self.session_players.all():
-                i.calc_averages_for_block(yesterday_session_period.parameter_set_period.parameter_set_pay_block)
-
-        # current_pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
-        yesterday_pay_block = yesterday_session_period.parameter_set_period.parameter_set_pay_block
+                i.calc_averages_for_block(previous_pay_block)
 
         group_size = self.parameter_set.group_size
 
-        sorted_players = sorted(self.session_players.all(), key=lambda x: x.get_pay_block_average_zone_minutes(yesterday_pay_block), reverse=True)
+        sorted_players = sorted(self.session_players.all(), key=lambda x: x.get_pay_block_average_zone_minutes(previous_pay_block), reverse=True)
 
         temp_group = 1
         temp_counter = 0
