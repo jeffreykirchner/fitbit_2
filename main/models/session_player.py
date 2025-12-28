@@ -747,7 +747,10 @@ class SessionPlayer(models.Model):
 
         zone_minutes_list = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block)
 
+        session_player_period_group = None
         for i in zone_minutes_list:
+            session_player_period_group = i.current_group_number
+
             if i.check_in:
                 values_list.append(i.zone_minutes)
             else:
@@ -761,7 +764,7 @@ class SessionPlayer(models.Model):
                         self.player_number,
                         self.note,
                         self.recruiter_id_private,
-                        self.group_number,
+                        self.group_number if not session_player_period_group else session_player_period_group,
                         sum(values_list),
                         statistics.mean(values_list),
                         statistics.median(values_list),

@@ -45,6 +45,8 @@ class SessionPlayerPeriod(models.Model):
     #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
     average_pay_block_zone_minutes = models.DecimalField(verbose_name='Average Zone Minutes', decimal_places=2, default=0, max_digits=6)
 
+    current_group_number = models.IntegerField(null=True, blank=True, verbose_name="Group Number this Period")  #store group number at time of period
+
     check_in = models.BooleanField(verbose_name='Checked In', default=False)                     #true if player was able to check in this period
     check_in_forced = models.BooleanField(verbose_name='Checked In Forced', default=False)       #true if staff forces a check in
     back_pull = models.BooleanField(verbose_name='Back Pull', default=False)                     #true if session period data was pulled the next day to fill in missing time
@@ -543,7 +545,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.note,
                          self.session_player.recruiter_id_private,
                          self.session_player.parameter_set_player.id_label,
-                         self.session_player.group_number,
+                         self.session_player.group_number if not self.current_group_number else self.current_group_number,
                          self.session_player.fitbit_device,
                          self.zone_minutes,
                          self.average_pay_block_zone_minutes,
@@ -583,7 +585,7 @@ class SessionPlayerPeriod(models.Model):
              self.session_player.player_number,
              self.session_player.note,
              self.session_player.recruiter_id_private,
-             self.session_player.group_number]
+             self.session_player.group_number if not self.current_group_number else self.current_group_number,]
 
         if self.fitbit_heart_time_series:
             time_dict = {}
@@ -612,7 +614,7 @@ class SessionPlayerPeriod(models.Model):
                         self.session_player.player_number,
                         self.session_player.note,
                         self.session_player.recruiter_id_private,
-                        self.session_player.group_number,]
+                        self.session_player.group_number if not self.current_group_number else self.current_group_number]
                 
                 v.append(a["activityName"])
 
