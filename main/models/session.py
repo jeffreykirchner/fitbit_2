@@ -237,7 +237,7 @@ class Session(models.Model):
                             "Calories", "Steps", "Minutes Sedentary", "Minutes Lightly Active", "Minutes Fairly Active", "Minutes Very Active"])
 
             for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__player_number'):
                     s_p.write_summary_download_csv(writer)
 
             v = output.getvalue()
@@ -262,7 +262,7 @@ class Session(models.Model):
             writer.writerow(v)
 
             for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__player_number'):
                     s_p.write_heart_rate_download_csv(writer)
 
             v = output.getvalue()
@@ -283,7 +283,7 @@ class Session(models.Model):
             writer.writerow(v)
 
             for p in self.session_periods.all().prefetch_related('session_player_periods_a'):
-                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__group_number', 'session_player__player_number'):
+                for s_p in p.session_player_periods_a.filter(session_player__soft_delete=False).order_by('session_player__player_number'):
                     s_p.write_activities_download_csv(writer)
 
             v = output.getvalue()
