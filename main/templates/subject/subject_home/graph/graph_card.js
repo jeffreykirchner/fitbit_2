@@ -255,7 +255,7 @@ convertToY: function convertToY(tempValue, maxValue, minValue, tempHeight, marke
 },
 
 /**
- * draw right side Y axis
+ * draw left side Y axis
  */
 drawZoneMinuteAxis: function drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
 {
@@ -407,7 +407,8 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
                                             
         y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
         
-        if (current_pay_block.pay_block_type=="Block Pay Group")
+        if (current_pay_block.pay_block_type=="Block Pay Group" ||
+            current_pay_block.pay_block_type=="Block Pay Competition")
         {
             ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(app.session_player.id));
             ctx.fillText("$" + pay_block_payment.payment, w-marginY-marginY+4, y-10);
@@ -835,7 +836,8 @@ updateGraph: function updateGraph(){
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
     if(current_pay_block.pay_block_type == "Block Pay Group" || 
-       current_pay_block.pay_block_type == "Block Pay Individual")
+       current_pay_block.pay_block_type == "Block Pay Individual" ||
+       current_pay_block.pay_block_type == "Block Pay Competition")
     {
         app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
                         parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
