@@ -189,6 +189,17 @@ class Session(models.Model):
         
         return session_period.first()
 
+    def get_session_period_by_date(self, date):
+        '''
+        return the session period for the specified date
+        '''
+        if not self.started:
+            return None
+        
+        session_period = self.session_periods.filter(period_date=date).prefetch_related('parameter_set_period')
+        
+        return session_period.first()
+
     def get_yesterday_session_period(self):
         '''
         return the current session period
@@ -724,13 +735,16 @@ class Session(models.Model):
             "parameter_set": self.parameter_set.json(),
         }
 
-    def json_for_subject(self, session_player):
+    def json_for_subject(self, session_player, session_period_date=None):
         '''
         json object for subject screen
         session_player : SessionPlayer() : session player requesting session object
         '''
 
-        current_session_period = self.get_current_session_period()
+        if not session_period_date:
+            current_session_period = self.get_current_session_period()
+        else:
+            current_session_period = self.get_session_period_by_date(date=session_period_date)
 
         is_last_period = False
         if current_session_period:
