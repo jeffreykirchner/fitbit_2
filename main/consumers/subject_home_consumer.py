@@ -408,7 +408,12 @@ def take_get_session_subject(session_player_id, data):
                     fitbit_error_message = "Fitbit is not available, try again later."              
             else:
                 session_player.calcs_for_payblock()
-        return {"session" : session_player.session.json_for_subject(session_player), 
+        
+        session_period_date = None
+        if session_player.fitbit_last_synced:
+            session_period_date = session_player.fitbit_last_synced.date()
+
+        return {"session" : session_player.session.json_for_subject(session_player, session_period_date=session_period_date), 
                 "show_fitbit_connect" : show_fitbit_connect,
                 "fitbit_error_message" : fitbit_error_message,
                 "session_player" : session_player.json() }
@@ -621,7 +626,8 @@ def take_check_in(session_id, session_player_id, data):
 
         session = Session.objects.get(id=session_id)
         session_player = session.session_players.get(id=session_player_id)
-        session_player_period = session_player.get_todays_session_player_period()
+        # session_player_period = session_player.get_todays_session_player_period()
+        session_player_period = session_player.get_fitbit_last_synced_session_player_period()
 
         software_version = data["software_version"]
         client_current_period = data["current_period"]
@@ -645,6 +651,12 @@ def take_check_in(session_id, session_player_id, data):
             status = "fail"
             error_message = "Session has not begun."
     
+    #check if current period available
+    if status == "success":
+        if not session_player_period:
+            status = "fail"
+            error_message = " Sync your Fitbit to your phone."
+
     #period number
     if status == "success":
         if session_player_period.session_period.period_number != client_current_period:

@@ -174,7 +174,9 @@ class SessionPlayerPeriod(models.Model):
 
         pay_block_type = self.get_pay_block().pay_block_type
 
-        if pay_block_type == PayBlockType.BLOCK_PAY_GROUP or pay_block_type == PayBlockType.BLOCK_PAY_INDIVIDUAL: 
+        if pay_block_type == PayBlockType.BLOCK_PAY_GROUP or \
+           pay_block_type == PayBlockType.BLOCK_PAY_INDIVIDUAL or \
+           pay_block_type == PayBlockType.BLOCK_PAY_COMPETITION: 
 
             block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
 
@@ -191,13 +193,35 @@ class SessionPlayerPeriod(models.Model):
         pay_block_type = self.get_pay_block().pay_block_type
 
         if pay_block_type == PayBlockType.BLOCK_PAY_GROUP:
-
+            #pull the lowest average zone minutes from the group and pay everyone that amount
             zone_minutes = self.get_lowest_group_average_zone_minutes()
 
             block_payment = self.session_period.parameter_set_period.get_payment(zone_minutes)
 
             if block_payment:
                 return block_payment.group_bonus
+        elif pay_block_type == PayBlockType.BLOCK_PAY_COMPETITION:
+            #if this player has the highest average zone minutes in the group, pay the group bonus
+            group_members = self.session_player.get_group_members()
+            highest_avg = -1
+            is_highest = True
+
+            for i in group_members:
+                # i.calc_averages_for_block(self.get_pay_block())
+                session_player_period = i.session_player_periods_b.get(session_period=self.session_period)
+
+                if session_player_period.average_pay_block_zone_minutes > highest_avg:
+                    highest_avg = session_player_period.average_pay_block_zone_minutes
+                    if i != self.session_player:
+                        is_highest = False
+                    else:
+                        is_highest = True
+
+            if is_highest:
+                block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
+
+                if block_payment:
+                    return block_payment.group_bonus
 
         return 0
 
