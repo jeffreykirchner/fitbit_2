@@ -285,6 +285,16 @@ class SessionPlayer(models.Model):
         '''
         return self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=parameter_set_pay_block).count()
     
+    def get_fitbit_last_synced_session_player_period(self):
+        '''
+        return the session player period when the fitbit was last synced
+        '''
+
+        if not self.fitbit_last_synced:
+            return None
+            
+        return self.session_player_periods_b.filter(session_period__period_date__lte=self.fitbit_last_synced.date()).order_by('-session_period__period_number').first()
+
     def get_todays_session_player_period(self):
         '''
         return the session player period for today

@@ -1,7 +1,7 @@
 /**
  * setup canvas
  */
-drawSetup(chartID){
+drawSetup: function drawSetup(chartID){
 
     if(!app.session) return;
 
@@ -27,7 +27,7 @@ drawSetup(chartID){
 /**
  * convert X data point to X graph point
  */
- convertToX(tempValue, maxValue, minValue, tempWidth, markerWidth){
+ convertToX: function convertToX(tempValue, maxValue, minValue, tempWidth, markerWidth){
     tempT = parseFloat(tempWidth) / parseFloat(maxValue-minValue);
 
     tempValue = parseFloat(tempValue) - parseFloat(minValue);
@@ -40,7 +40,7 @@ drawSetup(chartID){
 /**
  * convert X data point to X graph point
  */
-convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
+convertToY: function convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
     tempT = tempHeight / (maxValue-minValue);
 
     if(tempValue > maxValue) tempValue=maxValue;
@@ -57,7 +57,7 @@ convertToY(tempValue, maxValue, minValue, tempHeight, markerHeight){
 /**
  * draw axis
  */
-drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel){
+drawAxis: function drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel){
     
     if(document.getElementById(chartID) == null)
     {
@@ -167,7 +167,7 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
 
     //labels
     ctx.restore();
-    ctx.save()
+    ctx.save();
     ctx.textAlign = "center";
     ctx.fillStyle = "DimGray";
     ctx.font="bold 16px Georgia"; 
@@ -187,7 +187,7 @@ drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCount, yLabel, xLabel
 /**
  * draw line on graph
  */
-drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha, lineDash){
+drawLine: function drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alpha, lineDash){
 
 
     if(document.getElementById(chartID) == null)
@@ -232,7 +232,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
 /**
  * draw right side Y axis
  */
- drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
+ drawZoneMinuteAxis: function drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
  {
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
@@ -343,7 +343,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
  /**
   * draw median zone minutes
   */
- drawMedianZoneMinutes(chartID, yMin, yMax, xMin, xMax)
+ drawMedianZoneMinutes: function drawMedianZoneMinutes(chartID, yMin, yMax, xMin, xMax)
  {
     let canvas = document.getElementById(chartID);
     let ctx = canvas.getContext('2d');
@@ -502,7 +502,7 @@ drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidth, markerColor, alp
 /**
  * re-draw graph
  */
-updateGraph(){
+updateGraph: function updateGraph(){
 
     if(!app.session) return;
 

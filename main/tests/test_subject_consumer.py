@@ -70,7 +70,10 @@ class TestSubjectConsumer(TestCase):
         session_player_1 = session.session_players.first()
        
         session_player_1.fitbit_user_id = "abc123"
+        session_player_1.fitbit_last_synced = todays_date() - timedelta(minutes=35)
         session_player_1.save()
+        session_player_1 = session.session_players.first()
+
 
         data = {'playerKey': '2ce05dfc-c421-4c04-ae35-4b2cf4166978', 'first_load_done': False}
 
@@ -104,6 +107,11 @@ class TestSubjectConsumer(TestCase):
         self.assertEqual(r["started"], True)
         session = Session.objects.get(title='70 Period Group Pay For Tests')
         self.assertEqual(session.get_current_session_period().period_number, 1)
+
+        #reload session player 1
+        session_player_1.fitbit_last_synced = todays_date() - timedelta(minutes=35)
+        session_player_1.save()
+        session_player_1 = session.session_players.first()
 
         #period number
         r = take_check_in(session.id, session_player_1.id, data3)
