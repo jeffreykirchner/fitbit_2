@@ -747,6 +747,21 @@ class SessionPlayer(models.Model):
 
         return self.session.session_players.filter(group_number=self.group_number)
 
+    def get_group_members_from_pay_block(self, pay_block):
+        '''
+        return other players in group from pay block
+        '''
+
+        session_player_period = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block).first()
+
+        #get session players from session_player_period group and pay block 
+        session_players_periods_in_group = main.models.SessionPlayerPeriod.objects.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
+                                                                                  .filter(current_group_number=session_player_period.current_group_number) \
+                                                                                  .exclude(session_player=self)
+        
+        session_players_in_group = self.session.session_players.filter(id__in=session_players_periods_in_group.values_list('session_player__id', flat=True))
+        return session_players_in_group    
+
     def write_payblock_csv(self, pay_block, writer):
         '''
         take csv writer and add row
@@ -783,6 +798,37 @@ class SessionPlayer(models.Model):
                         block_earnings["group_bonus"],
                         block_earnings["earnings_no_pay_percent"],
                         zone_minutes_list.filter(check_in=True).count()])
+
+    def get_earnings_history(self):
+        '''
+        return earnings history for all pay blocks
+        '''
+        current_session_period = self.session.get_current_session_period()
+
+        if not current_session_period:
+            return []
+        
+        current_pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
+        pay_blocks_up_to_now = self.session.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_number__lte=current_pay_block.pay_block_number)
+
+        earnings_history = []
+
+        for pb in pay_blocks_up_to_now:
+
+            group_members = self.get_group_members_from_pay_block(pb)
+
+            earnings_history.append({
+                "pay_block_number" : pb.pay_block_number,
+                "pay_block_id" : pb.id,
+                "pay_block_type" : pb.pay_block_type,
+                "earnings_self" : self.get_block_earnings(pb),
+                "earnings_group_members" : [ {
+                    "player_number" : gm.player_number,
+                    "earnings" : gm.get_block_earnings(pb)
+                } for gm in group_members ]
+            })
+
+        return earnings_history
 
     def json(self, get_chat=True):
         '''
@@ -859,8 +905,9 @@ class SessionPlayer(models.Model):
             "todays_average_zone_minutes" : todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "groups_average_zone_minutes" : todays_session_player_period.get_team_average() if todays_session_player_period else "---",
         
-
             "survey_link" : self.get_current_survey_link(),
+
+            "earnings_history" : self.get_earnings_history(),
         }
     
     def json_for_staff(self):

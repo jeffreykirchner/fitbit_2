@@ -41,6 +41,9 @@ class SubjectHomeView(View):
 
         except ObjectDoesNotExist:
             raise Http404("Subject not found.")
+        
+        if session.soft_delete:
+            raise Http404("Session not found.")
 
         # sprite_sheet_css = generate_css_sprite_sheet('main/static/avatars.json', static('avatars.png'))
 

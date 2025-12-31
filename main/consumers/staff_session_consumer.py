@@ -827,11 +827,22 @@ def take_update_subject(session_id, data):
         session_player.group_number = form.cleaned_data["group_number"]
         session_player.disabled = True if form.cleaned_data["disabled"] == "1" else False
         session_player.fitbit_user_id =  form.cleaned_data["fitbit_user_id"]
+
+        
         
         try:
-            session_player.save()              
+            session_player.save()             
         except IntegrityError as e:
             return {"value":"fail", "errors" : {f"email":["Email must be unique within session."]}}  
+        else:
+            current_session_period = session.get_current_session_period()
+            if current_session_period:
+                current_pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
+
+                SessionPlayerPeriod.objects.filter(session_player=session_player) \
+                                           .filter(session_period__parameter_set_period__parameter_set_pay_block=current_pay_block) \
+                                           .update(current_group_number=session_player.group_number)
+
 
         return {"value":"success", "session_player" : session_player.json_for_staff()}                      
                                 
