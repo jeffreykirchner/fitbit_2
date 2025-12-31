@@ -178,9 +178,9 @@ drawAxis: function drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCo
     ctx.fillText(yLabel, 0, 5);
     ctx.restore();
 
-    // ctx.textAlign = "right";
-    // ctx.fillStyle = "black";
-    // ctx.fillText(xLabel, marginY-5, h-marginX+5);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "DimGray";
+    ctx.fillText(xLabel, w/2, h-marginX/2+10);
     ctx.restore();                       
 },
 
