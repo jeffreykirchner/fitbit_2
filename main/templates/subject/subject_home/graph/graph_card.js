@@ -830,7 +830,7 @@ updateGraph: function updateGraph(){
                  0, app.session.parameter_set.graph_y_max, 1,
                  parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
                  (parameter_set_period.graph_2_end_period_number-parameter_set_period.graph_2_start_period_number),
-                 "Daily Zone Minutes", "Day", parameter_set_period.period_number);
+                 "Daily Zone Minutes", "", parameter_set_period.period_number);
     
     app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
