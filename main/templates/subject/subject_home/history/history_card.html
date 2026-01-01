@@ -1,0 +1,53 @@
+
+<div class="card">                  
+    <div class="card-header fw-bold">                
+        <span class="align-middle">History</span>         
+        
+        <span class = "float-end">
+            <button type="button" class="btn btn-link ms-4" title="Show Help Doc" v-on:click="sendLoadHelpDocSubject('Subject history help')">
+                <i class="far fa-question-circle"></i> 
+            </button>
+        </span>
+    </div>
+    <div class="card-body">     
+        <div class="row justify-content-center">
+            <div class="col">             
+             <div class="table-responsive">
+                    <table class="table table-condensed"> 
+                        <thead>
+                            <tr>
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
+                                    Person
+                                </th>
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
+                                    Daily Pay
+                                </th>
+                                <th scope="col" class = "m-1 p-1 text-nowrap">
+                                    Invidual Pay
+                                </th>                                
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Bonus Pay
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Fitbit Percent
+                                </th>                                                           
+                            </tr>
+                        </thead>
+                        <tbody id="player_list">
+                            <template  v-for="(e, index) in session_player.earnings_history" v-bind:key="e.pay_block_id">
+                                <tr v-for="(e, index) in session_player.earnings_history" v-bind:key="e.pay_block_id">
+                                    <td class="player_table_cell text-nowrap">
+                                        [[p.player_number]]
+                                    </td>
+                                
+                                </tr>
+                            </template>
+                                
+                        </tbody>
+                        
+                    </table>
+                </div>          
+            </div>
+        </div>
+    </div>                    
+</div> 

@@ -29,6 +29,7 @@ class ParameterSet(models.Model):
     
     enable_chat = models.BooleanField(default=False, verbose_name = 'Enable Chat')                           #if true subjects can privately chat one on one
     show_instructions = models.BooleanField(default=False, verbose_name = 'Show Instructions')                #if true show instructions
+    show_history = models.BooleanField(default=False, verbose_name = 'Show History')                          #if true show history
 
     graph_y_max = models.IntegerField(verbose_name='Graph: Y Max', default=75)           #max height of subject graph
     group_size = models.IntegerField(verbose_name='Group Size', default=2)               #max height of subject graph
@@ -69,6 +70,7 @@ class ParameterSet(models.Model):
         try:
             self.enable_chat = True if new_ps.get("enable_chat") == "True" else False
             self.show_instructions = True if new_ps.get("show_instructions") == "True" else False
+            self.show_history = True if new_ps.get("show_history") == "True" else False
             self.graph_y_max = new_ps.get("graph_y_max")
             self.group_size = new_ps.get("group_size")
             self.color_assignment_type = new_ps.get("color_assignment_type")
@@ -205,6 +207,7 @@ class ParameterSet(models.Model):
 
         self.json_for_session_json["enable_chat"] = "True" if self.enable_chat else "False"
         self.json_for_session_json["show_instructions"] = "True" if self.show_instructions else "False"
+        self.json_for_session_json["show_history"] = "True" if self.show_history else "False"
         self.json_for_session_json["instruction_set"] = self.instruction_set.json_min()
         self.json_for_session_json["graph_y_max"] = self.graph_y_max
         self.json_for_session_json["group_size"] = self.group_size

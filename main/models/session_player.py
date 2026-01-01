@@ -816,16 +816,16 @@ class SessionPlayer(models.Model):
         for pb in pay_blocks_up_to_now:
 
             group_members = self.get_group_members_from_pay_block(pb)
+            session_players = []
+            session_players.append({"id": self.id, "earnings": self.get_block_earnings(pb)})
+            for gm in group_members:
+                session_players.append({"id": gm.id, "earnings": gm.get_block_earnings(pb)})
 
             earnings_history.append({
                 "pay_block_number" : pb.pay_block_number,
                 "pay_block_id" : pb.id,
                 "pay_block_type" : pb.pay_block_type,
-                "earnings_self" : self.get_block_earnings(pb),
-                "earnings_group_members" : [ {
-                    "player_number" : gm.player_number,
-                    "earnings" : gm.get_block_earnings(pb)
-                } for gm in group_members ]
+                "session_players" : session_players,
             })
 
         return earnings_history
