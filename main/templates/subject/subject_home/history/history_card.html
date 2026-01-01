@@ -17,29 +17,46 @@
                         <thead>
                             <tr>
                                 <th scope="col" class = "m-1 p-1 text-nowrap">
+                                    Week
+                                </th>
+                                <th scope="col" class = "m-1 p-1 text-nowrap text-center">
                                     Person
                                 </th>
-                                <th scope="col" class = "m-1 p-1 text-nowrap">
+                                <th scope="col" class = "m-1 p-1 text-nowrap text-center">
                                     Daily Pay
                                 </th>
-                                <th scope="col" class = "m-1 p-1 text-nowrap">
+                                <th scope="col" class = "m-1 p-1 text-nowrap text-center">
                                     Invidual Pay
                                 </th>                                
-                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                <th scope="col" class = "m-1 p-1 text-nowrap text-center">
                                     Bonus Pay
                                 </th>
-                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                <th scope="col" class = "m-1 p-1 text-nowrap text-center">
                                     Fitbit Percent
                                 </th>                                                           
                             </tr>
                         </thead>
                         <tbody id="player_list">
-                            <template  v-for="(e, index) in session_player.earnings_history" v-bind:key="e.pay_block_id">
-                                <tr v-for="(e, index) in session_player.earnings_history" v-bind:key="e.pay_block_id">
-                                    <td class="player_table_cell text-nowrap">
-                                        [[p.player_number]]
+                            <template  v-for="(e, index1) in session_player.earnings_history" v-bind:key="e.pay_block_id">
+                                <tr v-for="(p, index2) in e.session_players" v-bind:key="p.id">
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        [[index1+1]]
                                     </td>
-                                
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        [[p.id]]
+                                    </td>
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        $[[p.earnings.fixed]]
+                                    </td>    
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        $[[p.earnings.individual]]
+                                    </td>                                
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        $[[p.earnings.group_bonus]]
+                                    </td>
+                                    <td class="player_table_cell text-nowrap text-center">
+                                        [[p.earnings.earnings_no_pay_percent]]%
+                                    </td>                            
                                 </tr>
                             </template>
                                 
