@@ -945,10 +945,34 @@ def take_fill_with_test_data(session_id, data):
 
     logger.info(f'take_take_fill_with_test_data: data filled')
 
+    #check if session is paused
+    current_session_period = session.get_current_session_period()
+    
+    for i in session.session_periods.all():
+        if i.period_number> current_session_period.period_number:
+            break
+        
+        current_pay_block = i.parameter_set_period.parameter_set_pay_block
+
+        if i.paused and \
+           current_pay_block.group_assignment_type == GroupAssignmentType.SORTED:
+            
+            previous_pay_block_number = i.parameter_set_period.parameter_set_pay_block.pay_block_number -1
+            if previous_pay_block_number < 0:
+                continue
+            previous_pay_block = session.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=previous_pay_block_number)
+            session.average_azm_assign_groups(False, previous_pay_block)
+
+            
+            session.store_current_group_numbers(current_pay_block)
+            current_session_period.paused = False
+            current_session_period.save()
+
+    #calculate payments
     for player in session.session_players.all():
         for session_period_player in player.session_player_periods_b.all():
             session_period_player.calc_and_store_payment()
-    
+
     session_player_1 = session.session_players.first()
     if session_player_1:
         session_player_1.fitbit_user_id = settings.FITBIT_TEST_ACCOUNT

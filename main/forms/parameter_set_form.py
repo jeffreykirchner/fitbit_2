@@ -48,6 +48,10 @@ class ParameterSetForm(forms.ModelForm):
                                        choices=((True, 'Yes'), (False,'No' )),
                                        widget=forms.Select(attrs={"v-model":"current_parameter_set.show_instructions",}))
     
+    show_history = forms.ChoiceField(label='Show History',
+                                       choices=((True, 'Yes'), (False,'No' )),
+                                       widget=forms.Select(attrs={"v-model":"current_parameter_set.show_history",}))
+    
     instruction_set = forms.ModelChoiceField(label='Instruction Set',
                                             empty_label=None,
                                             queryset=main.models.InstructionSet.objects.all(),
@@ -81,5 +85,5 @@ class ParameterSetForm(forms.ModelForm):
     class Meta:
         model=ParameterSet
         fields =['graph_y_max', 'group_size', 'color_assignment_type', 'enable_chat', 'consent_form_required',
-                 'consent_form', 'show_instructions', 'instruction_set', 'help_doc_subject_set',
+                 'consent_form', 'show_instructions', 'show_history', 'instruction_set', 'help_doc_subject_set',
                  'test_mode' ,'completion_message', 'age_warning' ,'reconnection_limit']

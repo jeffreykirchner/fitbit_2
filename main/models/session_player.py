@@ -816,16 +816,22 @@ class SessionPlayer(models.Model):
         for pb in pay_blocks_up_to_now:
 
             group_members = self.get_group_members_from_pay_block(pb)
+            session_players = []
+            session_players.append({"id": self.id,
+                                    "average_zone_minutes": self.get_pay_block_average_zone_minutes(pb),
+                                    "earnings": self.get_block_earnings(pb)})
+            for gm in group_members:
+                session_players.append({"id": gm.id, 
+                                        "average_zone_minutes": gm.get_pay_block_average_zone_minutes(pb),
+                                        "earnings": gm.get_block_earnings(pb)})
 
             earnings_history.append({
                 "pay_block_number" : pb.pay_block_number,
                 "pay_block_id" : pb.id,
                 "pay_block_type" : pb.pay_block_type,
-                "earnings_self" : self.get_block_earnings(pb),
-                "earnings_group_members" : [ {
-                    "player_number" : gm.player_number,
-                    "earnings" : gm.get_block_earnings(pb)
-                } for gm in group_members ]
+                "pay_block_fixed_pay" : pb.fixed_pay,
+                "pay_block_no_pay_percent" : pb.no_pay_percent,
+                "session_players" : session_players,
             })
 
         return earnings_history
@@ -907,7 +913,7 @@ class SessionPlayer(models.Model):
         
             "survey_link" : self.get_current_survey_link(),
 
-            "earnings_history" : self.get_earnings_history(),
+            "earnings_history" : self.get_earnings_history() if self.session.parameter_set.show_history else [],
         }
     
     def json_for_staff(self):

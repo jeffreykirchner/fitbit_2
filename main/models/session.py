@@ -781,6 +781,7 @@ class Session(models.Model):
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
 
             "enable_chat" : self.parameter_set.enable_chat,
+            "show_history" : self.parameter_set.show_history,
 
             "finished":self.finished,
 

@@ -737,7 +737,8 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     {
         ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
         ctx.textAlign = "right";
-        ctx.fillText(app.getColorName(app.findSessionPlayerIndex(session_player_partner.id))+"'s", marginY-20, 15);
+        // ctx.fillText(app.getColorName(app.findSessionPlayerIndex(session_player_partner.id))+"'s", marginY-20, 15);
+        ctx.fillText("Other's", marginY-20, 15);
 
         if(current_pay_block.pay_block_type == "Earn Fitbit")
         {
