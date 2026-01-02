@@ -301,6 +301,7 @@ var app = Vue.createApp({
         {%include "subject/subject_home/test_mode/test_mode.js"%}
         {%include "subject/subject_home/instructions/instructions_card.js"%}
         {%include "subject/subject_home/graph/graph_card.js"%}
+        {%include "subject/subject_home/history/history_card.js"%}
         {%include "js/help_doc.js"%}
     
         /** clear form error messages
