@@ -3,6 +3,7 @@ from main.models import Session
 from django.contrib.auth.models import User
 from django.forms import ModelChoiceField
 from django.forms import ModelMultipleChoiceField
+from main.globals import ExperimentPhase
 
 
 class UserModelChoiceField(ModelChoiceField):
@@ -32,7 +33,11 @@ class SessionFormAdmin(forms.ModelForm):
     shared = forms.BooleanField(label='Share parameterset with all.', required=False)
     locked = forms.BooleanField(label='Locked, prevent deletion.', required=False)
     soft_delete = forms.BooleanField(label='Soft Delete.', required=False)
+    finished = forms.BooleanField(label='Finished.', required=False)
+    current_experiment_phase = forms.ChoiceField(label='Current Experiment Phase',
+                                                 choices=ExperimentPhase.choices,
+                                                 widget=forms.Select(attrs={}))
 
     class Meta:
         model=Session
-        fields = ('creator', 'collaborators', 'title', 'shared', 'locked', 'soft_delete', 'parameter_set')
+        fields = ('creator', 'collaborators', 'title', 'shared', 'locked', 'soft_delete', 'finished', 'current_experiment_phase', 'parameter_set')
