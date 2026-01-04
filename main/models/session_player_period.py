@@ -443,13 +443,19 @@ class SessionPlayerPeriod(models.Model):
         if self.session_player.fitbit_user_id == "":
             return {"status" : "fail", "message" : "no fitbit user id"}
         
+        status = "success"
+        message = ""
 
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
 
         try: 
             if save_pull_time:    
                 self.fitbit_profile = result["fitbit_profile"]["result"]
-                self.session_player.process_fitbit_last_synced(result["devices"]["result"], self.fitbit_profile['user']['timezone'])
+                process_fitbit_last_synced_result = self.session_player.process_fitbit_last_synced(result["devices"]["result"], self.fitbit_profile['user']['timezone'])
+                
+                if process_fitbit_last_synced_result['status'] == 'fail':
+                    return {"status" : "fail", "message" : process_fitbit_last_synced_result['message']}
+                
                 self.fitbit_age = self.fitbit_profile['user']['age']
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]

@@ -355,19 +355,23 @@ class SessionPlayer(models.Model):
             data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
             r = get_fitbit_metrics(self.fitbit_user_id, data)
             if r["status"] != "fail":
-                self.process_fitbit_last_synced(r["result"]["devices"]["result"])
+                process_fitbit_last_synced_result = self.process_fitbit_last_synced(r["result"]["devices"]["result"])
+                if process_fitbit_last_synced_result['status'] == 'fail':
+                    return {"status" : "fail", "message" : process_fitbit_last_synced_result['message']}
 
         if r["status"] == "fail" :
             return {"status" : r['status'], "message" : r["message"]}
                     
         result = r["result"]
         if todays_session_player_period:
-            todays_session_player_period.process_metrics(save_pull_time=True,
-                                                         result={"devices" : result["devices"],
-                                                                 "fitbit_profile" : result["fitbit_profile"],
-                                                                 "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
-                                                                 "fitbit_activities" : result["fitbit_activities_td"]})
-
+            todays_session_player_period_result = todays_session_player_period.process_metrics(save_pull_time=True,
+                                                                                               result={"devices" : result["devices"],
+                                                                                                       "fitbit_profile" : result["fitbit_profile"],
+                                                                                                       "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
+                                                                                                       "fitbit_activities" : result["fitbit_activities_td"]})
+            if todays_session_player_period_result['status'] == 'fail':
+                return {"status" : "fail", "message" : todays_session_player_period_result["message"]}
+            
         #check synced today before storing yesterdays back pull
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
@@ -519,8 +523,13 @@ class SessionPlayer(models.Model):
             return {"status" : "fail", "message" : "last sync error"}
         else:
             a=[]
+            tracker_count = 0
             
             for i in devices:
+
+                if i.get("type","") != "TRACKER":
+                    continue
+                tracker_count = tracker_count + 1
 
                 v = datetime.strptime(i.get("lastSyncTime"),'%Y-%m-%dT%H:%M:%S.%f')
 
@@ -548,6 +557,12 @@ class SessionPlayer(models.Model):
 
             #logger.info(f"pull_fitbit_last_synced sync time: { self.fitbit_last_synced}")
 
+            if tracker_count == 0:
+                return {"status" : "fail", "message" : "no fitbit tracker found"}
+            
+            if tracker_count > 1:
+                return {"status" : "fail", "message" : "multiple fitbit trackers found"}
+            
             return {"status" : "success", "message" : ""}
 
     def get_fitbit_last_sync_str(self):
@@ -597,6 +612,18 @@ class SessionPlayer(models.Model):
         if datetime.now(pytz.UTC) - self.fitbit_last_synced <= timedelta(minutes=30):
             return True
 
+        return False
+    
+    def fitbit_multiple_devices(self):
+        '''
+        true if the subject has synced with multiple devices
+        '''
+
+        devices = main.models.SessionPlayerPeriod.objects.filter(session_player=self).values_list('fitbit_device', flat=True).distinct()
+
+        if len(devices) > 1:
+            return True
+        
         return False
     
     def get_current_survey_link(self):
