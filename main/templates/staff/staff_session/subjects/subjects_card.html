@@ -21,7 +21,7 @@
                     class="btn btn-outline-primary me-2" 
                     title="Remove Names and Student IDs" 
                     v-on:click="send_anonymize_data()"
-                    v-show="!session.locked">
+                    v-show="!session.locked && !session.finished">
                 Anonymize Data <i class="far fa-address-card"></i>
             </button>          
 
@@ -30,7 +30,7 @@
                     title="Upload Email List" 
                     v-on:click="showSendEmailList()" 
                     v-bind:disabled="working"
-                    v-show="session.started">
+                    v-show="session.started && !session.finished">
                 Upload Player List <i class="fas fa-upload"></i>
             </button>
 
@@ -39,7 +39,7 @@
                     title="Upload Email List" 
                     v-on:click="get_playerlist_csv()" 
                     v-bind:disabled="working"
-                    v-show="session.started">
+                    v-show="session.started && !session.finished">
                 Copy Player List <i class="far fa-copy"></i> <span v-if="player_list_copied"><i class="fas fa-check"></i></span>
             </button>
 
@@ -48,7 +48,7 @@
                     title="Upload Email List" 
                     v-on:click="send_get_no_checkins()" 
                     v-bind:disabled="working"
-                    v-show="session.started">
+                    v-show="session.started && !session.finished">
                 Copy No Check-Ins <i class="far fa-copy"></i> <span v-if="no_checkins_copied"><i class="fas fa-check"></i></span>
             </button>
 
@@ -57,7 +57,7 @@
                     title="Upload Email List" 
                     v-on:click="showImportSession()" 
                     v-bind:disabled="working"
-                    v-show="session.started">
+                    v-show="session.started && !session.finished">
                 Import Connections <i class="fas fa-file-import"></i> <span v-if="session_imported"><i class="fas fa-check"></i></span>
             </button>
         </span>        
