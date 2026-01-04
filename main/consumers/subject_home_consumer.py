@@ -404,6 +404,8 @@ def take_get_session_subject(session_player_id, data):
                     fitbit_error_message = "Connect your fitbit the app."
                 elif value["message"] == "Not synced today":
                     fitbit_error_message = "Sync your fitbit to your phone and refresh."
+                elif value["message"] == "multiple fitbit trackers found":
+                    fitbit_error_message = "Multiple Fitbit trackers found, remove others from your account."
                 else:
                     fitbit_error_message = "Fitbit is not available, try again later."              
             else:
