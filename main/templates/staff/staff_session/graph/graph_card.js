@@ -180,7 +180,7 @@ drawAxis: function drawAxis(chartID, yMin, yMax, yTickCount, xMin, xMax, xTickCo
 
     ctx.textAlign = "center";
     ctx.fillStyle = "DimGray";
-    ctx.fillText(xLabel, w/2, h-marginX/2+10);
+    ctx.fillText(xLabel, w/2, h-marginX/2+15);
     ctx.restore();                       
 },
 

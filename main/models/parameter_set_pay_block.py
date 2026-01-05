@@ -50,6 +50,7 @@ class ParameterSetPayBlock(models.Model):
         self.pay_block_type = source.get("pay_block_type")
         self.fixed_pay = source.get("fixed_pay")
         self.no_pay_percent = source.get("no_pay_percent")
+        self.group_assignment_type = source.get("group_assignment_type")
 
         if update_block_number:
             self.pay_block_number = source.get("pay_block_number")
