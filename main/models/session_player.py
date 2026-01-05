@@ -23,6 +23,8 @@ from main.models import ParameterSetPlayer
 from main.globals import todays_date
 from main.globals import get_fitbit_metrics
 from main.globals import format_minutes
+from main.globals import ColorAssignmentType
+from main.globals import get_color_by_group
 
 import main
 
@@ -690,12 +692,21 @@ class SessionPlayer(models.Model):
 
         text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
         text = text.replace('#Group_Zone_Minutes#', self.group_zone_minutes_html())
-        text = text.replace('#my_label#', self.parameter_set_player.label_html())
+        if self.session.parameter_set.color_assignment_type == ColorAssignmentType.FIXED:
+            text = text.replace('#my_label#', self.parameter_set_player.label_html())
+        else:
+            group_color = get_color_by_group(self.session.parameter_set.group_size, 0)
+            text = text.replace('#my_label#', self.parameter_set_player.label_html(display_color=group_color["color"], id_label=group_color["label"]))
+
         text = text.replace('#wrist_time#', wrist_time)
 
         partner = self.session.session_players.filter(group_number=self.group_number).exclude(id=self.id).first()
         if partner:
-            text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
+            if self.session.parameter_set.color_assignment_type == ColorAssignmentType.FIXED:
+                text = text.replace('#partner_label#', partner.parameter_set_player.label_html())
+            else:
+                group_color = get_color_by_group(self.session.parameter_set.group_size, 1)
+                text = text.replace('#partner_label#', partner.parameter_set_player.label_html(display_color=group_color["color"], id_label=group_color["label"]))
 
         if p:
             pay_block = p.get_pay_block()

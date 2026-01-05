@@ -44,12 +44,12 @@ class ParameterSetPlayer(models.Model):
 
         return message
     
-    def label_html(self):
+    def label_html(self, display_color=None, id_label=None):
         '''
         return label in html format
         '''
 
-        return f"""<span style='color:{self.display_color}'>{self.id_label}</span>"""
+        return f"""<span style='color:{display_color or self.display_color}'>{id_label or self.id_label}</span>"""
 
     def json(self):
         '''

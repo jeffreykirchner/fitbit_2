@@ -18,6 +18,7 @@ from main.models import SessionPlayer
 from main.models import Parameters
 
 from main.globals import get_registration_link
+from main.globals import PayBlockType
 
 class SubjectHomeView(View):
     '''
@@ -56,18 +57,21 @@ class SubjectHomeView(View):
 
             parmeter_set_pay_block = session_player_period_today.session_period.parameter_set_period.parameter_set_pay_block
 
-            if parmeter_set_pay_block.pay_block_type == "Block Pay Group":
+            if parmeter_set_pay_block.pay_block_type == PayBlockType.BLOCK_PAY_GROUP:
                 subject_graph_help_doc = "Subject graph help group pay"
                 subject_check_in_help_doc = "Subject check in help group pay"
-            elif parmeter_set_pay_block.pay_block_type == "Fixed Pay Only":
+            elif parmeter_set_pay_block.pay_block_type == PayBlockType.FIXED_PAY_ONLY:
                 subject_graph_help_doc = "Subject graph help fixed pay"
                 subject_check_in_help_doc = "Subject check in help fixed pay"
-            elif parmeter_set_pay_block.pay_block_type == "Block Pay Individual":
+            elif parmeter_set_pay_block.pay_block_type == PayBlockType.BLOCK_PAY_INDIVIDUAL:
                 subject_graph_help_doc = "Subject graph help individual pay"
                 subject_check_in_help_doc = "Subject check in help individual pay"
-            elif parmeter_set_pay_block.pay_block_type == "Earn Fitbit":
+            elif parmeter_set_pay_block.pay_block_type == PayBlockType.EARN_FITBIT:
                 subject_graph_help_doc = "Subject graph help no pay"
                 subject_check_in_help_doc = "Subject check in help no pay"
+            elif parmeter_set_pay_block.pay_block_type == PayBlockType.BLOCK_PAY_COMPETITION:
+                subject_graph_help_doc = "Subject graph help group pay"
+                subject_check_in_help_doc = "Subject check in help group pay"
 
         return render(request=request,
                       template_name=self.template_name,
