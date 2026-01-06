@@ -40,6 +40,8 @@ class ParameterSet(models.Model):
     consent_form = models.CharField(verbose_name='Consent Form File Name', max_length = 100, default="file_name.pdf")    #consent for file name
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
+    partner_string = models.CharField(verbose_name='Partner String', max_length = 200, default="", blank=True)             #partner string field
+
     completion_message = HTMLField(default="The study is complete, thank you for your participation.", verbose_name="End of study message", blank=True)
 
     age_warning = models.IntegerField(verbose_name='Age Warning', default=25)              #age cut that issues a warning for invalid age range
@@ -79,6 +81,7 @@ class ParameterSet(models.Model):
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = True if new_ps.get("consent_form_required") == "True" else False
+            self.partner_string = new_ps.get("partner_string", "")
 
             self.completion_message = new_ps.get("completion_message")
 
@@ -217,6 +220,7 @@ class ParameterSet(models.Model):
 
         self.json_for_session_json["consent_form"] = self.consent_form
         self.json_for_session_json["consent_form_required"] = "True" if self.consent_form_required else "False"
+        self.json_for_session_json["partner_string"] = self.partner_string
 
         self.json_for_session_json["completion_message"] = self.completion_message
 
