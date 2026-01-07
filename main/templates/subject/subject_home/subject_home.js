@@ -400,6 +400,39 @@ var app = Vue.createApp({
             }
         },
 
+        /** 
+         * get partner string
+         */
+        get_partner_string: function get_partner_string(string_case)
+        {
+            let partner_string = "";
+
+            if(app.session)
+            {
+                if(string_case=="upper")
+                {
+                    return app.capitalize_first_letter(app.session.parameter_set.partner_string);
+                }
+                else
+                {
+                    return app.session.parameter_set.partner_string.toLowerCase();
+                }
+            }
+
+            return string_case == "upper" ? "Partner" : "partner";
+        },
+
+        /**
+         * capitalize first letter of string
+         */
+        capitalize_first_letter: function capitalize_first_letter(string) 
+        {
+            if (!string) {
+                return ""; // Handle empty or null strings gracefully
+            }
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+
 
     },
 

@@ -58,7 +58,7 @@
                                     </td>
                                     <td class="player_table_cell text-nowrap text-center"
                                         v-if="show_person_column()">
-                                        [[p.id == session_player.id ? 'You' : "Other"]]
+                                        [[p.id == session_player.id ? 'You' : get_partner_string("upper")]]
                                         {%if session.parameter_set.test_mode%}
                                         ([[p.id]])
                                         {%endif%}

@@ -236,15 +236,15 @@ class ParameterSet(models.Model):
         '''
 
         if update_players:
-            self.json_for_session_json["parameter_set_players"] = {p.id : p.json() for p in self.parameter_set_players.all()}
+            self.json_for_session_json["parameter_set_players"] = {str(p.id) : p.json() for p in self.parameter_set_players.all()}
             self.json_for_session_json["parameter_set_players_order"] = list(self.parameter_set_players.all().values_list('id', flat=True))
 
         if update_periods:
-            self.json_for_session_json["parameter_set_periods"] = {p.id : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
+            self.json_for_session_json["parameter_set_periods"] = {str(p.id) : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
             self.json_for_session_json["parameter_set_periods_order"] = list(self.parameter_set_periods.all().values_list('id', flat=True))
 
         if update_pay_blocks:
-            self.json_for_session_json["parameter_set_pay_blocks"] = {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()}
+            self.json_for_session_json["parameter_set_pay_blocks"] = {str(p.id) : p.json() for p in self.parameter_set_pay_blocks_a.all()}
             self.json_for_session_json["parameter_set_pay_blocks_order"] = list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True))
 
         self.save()
@@ -278,6 +278,7 @@ class ParameterSet(models.Model):
                 "parameter_set_pay_blocks" : {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()},
                 "parameter_set_pay_blocks_order" : list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True)),
                 "completion_message" : self.completion_message,
+                "partner_string" : self.partner_string,
                 "reconnection_limit" : self.reconnection_limit,
             }
 
