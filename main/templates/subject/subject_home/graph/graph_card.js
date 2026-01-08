@@ -214,7 +214,14 @@ drawLine: function drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidt
         x = app.convertToX(dataSet[i].x,xMax,xMin,w-marginY-marginY,markerWidth);
         y = app.convertToY(dataSet[i].y,yMax,yMin,h-marginX-margin2,markerWidth);
 
-        ctx.lineTo(x,y);
+        if(i>0 && dataSet[i].pay_block_number != dataSet[i-1].pay_block_number)
+        {
+            ctx.moveTo(x,y);
+        }
+        else
+        {
+            ctx.lineTo(x,y);
+        }
     }    
 
     ctx.strokeStyle=markerColor;
@@ -425,8 +432,6 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
         previous_zone_minutes = pay_block_payment.zone_minutes + 1;
     }
 
-    let block_length = app.session.current_parameter_set_period.graph_2_end_period_number - app.session.current_parameter_set_period.graph_2_start_period_number + 1;
-
     ctx.restore();
 
     ctx.textAlign = "center";
@@ -436,7 +441,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
     ctx.save();
     ctx.translate(w-5, (h-marginX-margin2)/2+margin2);
     ctx.rotate(Math.PI/2);                                                              
-    ctx.fillText("Your " + block_length +  " Day Average Zone Minute Bonus", 0, 10);
+    ctx.fillText("Your " + app.session.current_block_length +  " Day Average Zone Minute Bonus", 0, 10);
     ctx.restore();
 },
 
@@ -456,7 +461,9 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
 
             if(session_player_period.period_number<app.session.current_period)
             {
-                dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
+                dataSet.push({x:session_player_period.period_number, 
+                              y:session_player_period.average_pay_block_zone_minutes,
+                              pay_block_number: session_player_period.pay_block_number});
             }
         }
 
@@ -487,7 +494,9 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
                 if(session_player_period.period_number<app.session.current_period || 
                    (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
-                        dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
+                        dataSet.push({x:session_player_period.period_number, 
+                                      y:session_player_period.average_pay_block_zone_minutes,
+                                      pay_block_number: session_player_period.pay_block_number});
                     }
                 
             }
@@ -513,7 +522,9 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
                 if(session_player_period.period_number<app.session.current_period || 
                   (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
-                        dataSet.push({x:session_player_period.period_number, y:session_player_period.average_pay_block_zone_minutes});
+                        dataSet.push({x:session_player_period.period_number, 
+                                      y:session_player_period.average_pay_block_zone_minutes,
+                                      pay_block_number: session_player_period.pay_block_number});
                     }
                 
             }
