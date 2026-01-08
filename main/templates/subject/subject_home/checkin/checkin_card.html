@@ -62,7 +62,7 @@
         </div>
         <div class="row" v-if="session.session_players.length>1">
             <div class="col text-end pe-1 text-nowrap">
-                Your partner's average zone minutes:
+                Your [[get_partner_string("lower")]]'s average zone minutes:
             </div>
             <div class="col text-start ps-1">
                 [[session_player.groups_average_zone_minutes]]

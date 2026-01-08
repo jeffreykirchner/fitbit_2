@@ -736,17 +736,17 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     if(session_player_partner)
     {
         ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
-        ctx.textAlign = "right";
+        ctx.textAlign = "center";
         // ctx.fillText(app.getColorName(app.findSessionPlayerIndex(session_player_partner.id))+"'s", marginY-20, 15);
-        ctx.fillText("Other's", marginY-20, 15);
+        ctx.fillText(app.get_partner_string("upper"), marginY/2, 15);
 
         if(current_pay_block.pay_block_type == "Earn Fitbit")
         {
-            ctx.fillText("Fitbit", marginY-30, 28);
+            ctx.fillText("Fitbit", marginY/2, 28);
         }
         else
         {
-            ctx.fillText("Pay", marginY-30, 28);
+            ctx.fillText("Pay", marginY/2, 28);
         }
     }
 

@@ -40,6 +40,8 @@ class ParameterSet(models.Model):
     consent_form = models.CharField(verbose_name='Consent Form File Name', max_length = 100, default="file_name.pdf")    #consent for file name
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
+    partner_string = models.CharField(verbose_name='Partner String', max_length = 200, default="", blank=True)             #partner string field
+
     completion_message = HTMLField(default="The study is complete, thank you for your participation.", verbose_name="End of study message", blank=True)
 
     age_warning = models.IntegerField(verbose_name='Age Warning', default=25)              #age cut that issues a warning for invalid age range
@@ -79,6 +81,7 @@ class ParameterSet(models.Model):
 
             self.consent_form = new_ps.get("consent_form")
             self.consent_form_required = True if new_ps.get("consent_form_required") == "True" else False
+            self.partner_string = new_ps.get("partner_string", "")
 
             self.completion_message = new_ps.get("completion_message")
 
@@ -217,6 +220,7 @@ class ParameterSet(models.Model):
 
         self.json_for_session_json["consent_form"] = self.consent_form
         self.json_for_session_json["consent_form_required"] = "True" if self.consent_form_required else "False"
+        self.json_for_session_json["partner_string"] = self.partner_string
 
         self.json_for_session_json["completion_message"] = self.completion_message
 
@@ -232,15 +236,15 @@ class ParameterSet(models.Model):
         '''
 
         if update_players:
-            self.json_for_session_json["parameter_set_players"] = {p.id : p.json() for p in self.parameter_set_players.all()}
+            self.json_for_session_json["parameter_set_players"] = {str(p.id) : p.json() for p in self.parameter_set_players.all()}
             self.json_for_session_json["parameter_set_players_order"] = list(self.parameter_set_players.all().values_list('id', flat=True))
 
         if update_periods:
-            self.json_for_session_json["parameter_set_periods"] = {p.id : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
+            self.json_for_session_json["parameter_set_periods"] = {str(p.id) : p.json() for p in self.parameter_set_periods.all().prefetch_related()}
             self.json_for_session_json["parameter_set_periods_order"] = list(self.parameter_set_periods.all().values_list('id', flat=True))
 
         if update_pay_blocks:
-            self.json_for_session_json["parameter_set_pay_blocks"] = {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()}
+            self.json_for_session_json["parameter_set_pay_blocks"] = {str(p.id) : p.json() for p in self.parameter_set_pay_blocks_a.all()}
             self.json_for_session_json["parameter_set_pay_blocks_order"] = list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True))
 
         self.save()
@@ -274,6 +278,7 @@ class ParameterSet(models.Model):
                 "parameter_set_pay_blocks" : {p.id : p.json() for p in self.parameter_set_pay_blocks_a.all()},
                 "parameter_set_pay_blocks_order" : list(self.parameter_set_pay_blocks_a.all().values_list('id', flat=True)),
                 "completion_message" : self.completion_message,
+                "partner_string" : self.partner_string,
                 "reconnection_limit" : self.reconnection_limit,
             }
 

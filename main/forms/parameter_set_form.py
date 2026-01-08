@@ -43,6 +43,10 @@ class ParameterSetForm(forms.ModelForm):
                                    widget=forms.TextInput(attrs={"v-model":"current_parameter_set.consent_form",
                                                           }))
 
+    partner_string = forms.CharField(label='Partner String',                                                           #how the partner is referred to in the study ie partner, counterpart
+                                     required=False,
+                                     widget=forms.TextInput(attrs={"v-model":"current_parameter_set.partner_string",
+                                                          }))
 
     show_instructions = forms.ChoiceField(label='Show Instructions',
                                        choices=((True, 'Yes'), (False,'No' )),
@@ -85,5 +89,5 @@ class ParameterSetForm(forms.ModelForm):
     class Meta:
         model=ParameterSet
         fields =['graph_y_max', 'group_size', 'color_assignment_type', 'enable_chat', 'consent_form_required',
-                 'consent_form', 'show_instructions', 'show_history', 'instruction_set', 'help_doc_subject_set',
+                 'consent_form', 'partner_string', 'show_instructions', 'show_history', 'instruction_set', 'help_doc_subject_set',
                  'test_mode' ,'completion_message', 'age_warning' ,'reconnection_limit']
