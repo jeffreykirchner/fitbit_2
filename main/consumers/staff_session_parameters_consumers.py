@@ -216,6 +216,21 @@ class StaffSessionParametersConsumer(SocketConsumerMixin, StaffSubjectUpdateMixi
         # Send message to WebSocket
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
+    async def remove_parameterset_pay_block(self, event):
+        '''
+        remove a parameterset pay block
+        '''
+
+        message_data = {}
+        message_data["status"] = await sync_to_async(take_remove_parameterset_pay_block)(event["message_text"])
+
+        message = {}
+        message["messageType"] = "update_pay_block"
+        message["messageData"] = message_data
+
+        # Send message to WebSocket
+        await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
+
     async def update_parameterset_pay_block(self, event):
         '''
         update a parameterset pay block
@@ -582,6 +597,29 @@ def take_add_parameterset_pay_block(data):
         session.parameter_set.add_new_pay_block()
     elif session.parameter_set.parameter_set_pay_blocks_a.count() > 1:
         session.parameter_set.parameter_set_pay_blocks_a.last().delete()
+
+    session.parameter_set.update_json_fk(update_pay_blocks=True)
+
+    return {"value" : "success", "parameter_set" : session.parameter_set.json()}
+
+def take_remove_parameterset_pay_block(data):
+    '''
+    remove a parameter set pay block
+    '''
+    logger = logging.getLogger(__name__) 
+    logger.info(f"Remove parameterset pay block: {data}")
+
+    session_id = data["sessionID"]
+    payblock_id = data["id"]
+
+    try:        
+        parameter_set_pay_block = ParameterSetPayBlock.objects.get(id=payblock_id)
+        session = Session.objects.get(id=session_id)
+    except ObjectDoesNotExist:
+        logger.warning(f"take_remove_parameterset_pay_block session, not found ID: {payblock_id}")
+        return
+
+    parameter_set_pay_block.delete()
 
     session.parameter_set.update_json_fk(update_pay_blocks=True)
 

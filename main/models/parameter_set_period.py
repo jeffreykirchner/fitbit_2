@@ -19,7 +19,7 @@ class ParameterSetPeriod(models.Model):
     '''
 
     parameter_set = models.ForeignKey(ParameterSet, on_delete=models.CASCADE, related_name="parameter_set_periods")
-    parameter_set_pay_block = models.ForeignKey('main.ParameterSetPayBlock', on_delete=models.CASCADE, related_name="parameter_set_periods_b", blank=True, null=True)
+    parameter_set_pay_block = models.ForeignKey('main.ParameterSetPayBlock', on_delete=models.SET_NULL, related_name="parameter_set_periods_b", blank=True, null=True)
 
     period_number = models.IntegerField(verbose_name='Period Number', default=1)                                       #period number 1 to N
 

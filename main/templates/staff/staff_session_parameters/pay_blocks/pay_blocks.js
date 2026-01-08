@@ -8,6 +8,16 @@ sendAddParameterSetPayBlock(value){
                                                    });
 },
 
+/**
+ * remove a specific pay block
+ */
+sendRemoveParameterSetPayBlock(payblock_id){
+    app.working = true;
+    app.sendMessage("remove_parameterset_pay_block", {"sessionID" : app.sessionID,
+                                                      "id" : app.current_parameter_set_pay_block.id,
+                                                   });
+},
+
 takeUpdatePayBlock(messageData){
     app.clearMainFormErrors();
 

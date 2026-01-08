@@ -26,6 +26,14 @@
                         v-bind:disabled="reconnecting || working || session.started">
                     Update <i class="fas fa-sign-in-alt"></i>
                 </button>
+
+                <button class="btn btn-outline-danger"
+                        type="button"
+                        title="Remove Block"
+                        v-bind:disabled="session.started || reconnecting || working"
+                        v-on:click="sendRemoveParameterSetPayBlock(current_parameter_set_pay_block.id)">
+                    Delete <i class="fas fa-minus"></i>
+                </button>
             </div>
         </div>
     </div>
