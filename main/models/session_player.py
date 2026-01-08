@@ -1047,6 +1047,7 @@ class SessionPlayer(models.Model):
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
+            "study_average_zone_minutes" : self.cal_current_study_average_zone_minutes(),
         }
     
     def json_for_subject(self, session_player):
@@ -1118,6 +1119,7 @@ class SessionPlayer(models.Model):
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "flagged_yesterday" : yesterdays_session_player_period.get_fitbit_min_heart_rate_zone_bpm_flag() if yesterdays_session_player_period else False,
             "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
+            "study_average_zone_minutes" : self.cal_current_study_average_zone_minutes(),
         }
 
 
