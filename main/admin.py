@@ -287,11 +287,34 @@ class SessionAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
     
+    def reset(self, request, queryset):
+
+        for i in queryset.all():
+            i.reset_experiment()
+
+        self.message_user(request, ngettext(
+                '%d session is reset.',
+                '%d sessions are reset.',
+                queryset.count(),
+        ) % queryset.count(), messages.SUCCESS)
+    
+    def refresh(self, request, queryset):
+
+        for i in queryset.all():
+            i.parameter_set.json(update_required=True)
+
+        self.message_user(request, ngettext(
+                '%d session is refreshed.',
+                '%d sessions are refreshed.',
+                queryset.count(),
+        ) % queryset.count(), messages.SUCCESS)
+    
     form = SessionFormAdmin
 
     inlines = [SessionPlayerInline, sessionPeriodInline]
     readonly_fields = ['parameter_set',]
     list_display = ['title','creator']
+    actions = ['reset', 'refresh']
 
 #instruction set page
 class InstructionPageInline(admin.TabularInline):
