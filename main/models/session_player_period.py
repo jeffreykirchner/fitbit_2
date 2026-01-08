@@ -707,6 +707,7 @@ class SessionPlayerPeriod(models.Model):
             "last_login" : self.last_login,
             "check_in" : self.check_in,
             "period_type" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_type,
+            "pay_block_number" : self.session_period.parameter_set_period.parameter_set_pay_block.pay_block_number,
             "wrist_time_met" : self.wrist_time_met(),
             "survey_complete" : self.survey_complete,           
         }
