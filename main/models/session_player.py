@@ -498,6 +498,25 @@ class SessionPlayer(models.Model):
         for i in session_player_periods:
             i.calc_and_store_payment()
 
+    def cal_current_study_average_zone_minutes(self):
+        '''
+        return the current average zone minutes from all session_player_periods up to this point in the study
+        '''
+        current_period_number = self.session.get_current_session_period().period_number-1
+
+        if current_period_number < 1:
+            return 0
+
+        zone_minutes_list = self.session_player_periods_b.filter(session_period__period_number__lt=current_period_number) \
+                                                                .filter(check_in=True) \
+                                                                .values_list('average_pay_block_zone_minutes', flat=True)
+        
+        if zone_minutes_list:
+            sum_zone_minutes_list = sum(zone_minutes_list)
+
+            return round(sum_zone_minutes_list/current_period_number,2)
+        return 0
+
     def process_fitbit_last_synced(self, r, time_zone=None):
         '''
         process result of pulling fitbit last sync time
