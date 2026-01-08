@@ -779,6 +779,7 @@ class Session(models.Model):
             "current_parameter_set_period": current_parameter_set_period,
             "current_period"  : current_session_period.period_number if current_session_period else "---",
             "current_period_day_of_week": current_session_period.get_formatted_day_of_week_full() if current_session_period else "---",
+            "current_block_length" : self.parameter_set.parameter_set_periods.filter(parameter_set_pay_block=current_session_period.parameter_set_period.parameter_set_pay_block).count() if current_session_period else 0,
 
             "enable_chat" : self.parameter_set.enable_chat,
             "show_history" : self.parameter_set.show_history,
