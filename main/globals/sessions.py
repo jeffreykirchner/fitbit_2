@@ -24,6 +24,7 @@ class PayBlockType(models.TextChoices):
     BLOCK_PAY_INDIVIDUAL = 'Block Pay Individual', _('Block Pay Individual')
     EARN_FITBIT = 'Earn Fitbit', _('Earn Fitbit')
     BLOCK_PAY_COMPETITION = 'Block Pay Competition', _('Block Pay Competition')
+    NO_PAY = 'No Pay', _('No Pay')
 
 class GroupAssignmentType(models.TextChoices):
     '''
