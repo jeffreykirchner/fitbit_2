@@ -498,6 +498,29 @@ class SessionPlayer(models.Model):
         for i in session_player_periods:
             i.calc_and_store_payment()
 
+    def cal_current_study_average_zone_minutes(self):
+        '''
+        return the current average zone minutes from all session_player_periods up to this point in the study
+        '''
+        current_period = self.session.get_current_session_period()
+        if not current_period:
+            return 0
+        
+        current_period_number = current_period.period_number-1
+
+        if current_period_number < 1:
+            return 0
+
+        zone_minutes_list = self.session_player_periods_b.filter(session_period__period_number__lt=current_period_number) \
+                                                                .filter(check_in=True) \
+                                                                .values_list('average_pay_block_zone_minutes', flat=True)
+        
+        if zone_minutes_list:
+            sum_zone_minutes_list = sum(zone_minutes_list)
+
+            return float(round(sum_zone_minutes_list/current_period_number,2))
+        return 0
+
     def process_fitbit_last_synced(self, r, time_zone=None):
         '''
         process result of pulling fitbit last sync time
@@ -1028,6 +1051,7 @@ class SessionPlayer(models.Model):
             "yesterdays_zone_minutes" :  yesterdays_session_player_period.zone_minutes if yesterdays_session_player_period else "---",
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
+            "study_average_zone_minutes" : self.cal_current_study_average_zone_minutes(),
         }
     
     def json_for_subject(self, session_player):
@@ -1099,6 +1123,7 @@ class SessionPlayer(models.Model):
             "todays_average_zone_minutes" :  todays_session_player_period.average_pay_block_zone_minutes if todays_session_player_period else "---",
             "flagged_yesterday" : yesterdays_session_player_period.get_fitbit_min_heart_rate_zone_bpm_flag() if yesterdays_session_player_period else False,
             "previous_block_average_zone_minutes" :  previous_block_average_zone_minutes if previous_block_average_zone_minutes else "---",
+            "study_average_zone_minutes" : self.cal_current_study_average_zone_minutes(),
         }
 
 

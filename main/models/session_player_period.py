@@ -210,15 +210,21 @@ class SessionPlayerPeriod(models.Model):
                 # i.calc_averages_for_block(self.get_pay_block())
                 session_player_period = i.session_player_periods_b.get(session_period=self.session_period)
 
-                if session_player_period.average_pay_block_zone_minutes > highest_avg:
-                    highest_avg = session_player_period.average_pay_block_zone_minutes
-                    if i != self.session_player:
+                average_pay_block_zone_minutes = session_player_period.average_pay_block_zone_minutes
+                
+                if average_pay_block_zone_minutes >= highest_avg:
+                    
+                    if i != self.session_player and \
+                       average_pay_block_zone_minutes > highest_avg:
                         is_highest = False
                     else:
                         is_highest = True
+                    
+                    highest_avg = average_pay_block_zone_minutes
 
             if is_highest:
-                block_payment = self.session_period.parameter_set_period.get_payment(self.average_pay_block_zone_minutes)
+                average_pay_block_zone_minutes = self.average_pay_block_zone_minutes
+                block_payment = self.session_period.parameter_set_period.get_payment(average_pay_block_zone_minutes)
 
                 if block_payment:
                     return block_payment.group_bonus
