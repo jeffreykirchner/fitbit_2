@@ -600,7 +600,7 @@ class Session(models.Model):
 
         group_size = self.parameter_set.group_size
 
-        sorted_players = sorted(self.session_players.all(), key=lambda x: x.get_pay_block_average_zone_minutes(previous_pay_block), reverse=True)
+        sorted_players = sorted(self.session_players.all(), key=lambda x: x.cal_current_study_average_zone_minutes(), reverse=True)
 
         temp_group = 1
         temp_counter = 0

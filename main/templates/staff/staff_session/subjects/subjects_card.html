@@ -108,12 +108,15 @@
                                     <span v-else>---</span>
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1 text-nowrap">
-                                    AZM<br>TDY | YTD
+                                    Zone Min<br>TDY | YTD
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Block Average AZM <br> 
                                     [[session.current_parameter_set_period ? session.current_parameter_set_period.parameter_set_pay_block.pay_block_number : '---']] | 
                                     [[session.current_parameter_set_period && session.current_parameter_set_period.parameter_set_pay_block.pay_block_number > 1 ? session.current_parameter_set_period.parameter_set_pay_block.pay_block_number - 1 : '---']]
+                                </th>
+                                <th scope="col" class = "text-center m-1 p-1 text-nowrap">
+                                    Study<br>AZM
                                 </th>
                                 <th scope="col" class = "text-center m-1 p-1 text-nowrap">
                                     Wrist Time<br>TDY
@@ -191,6 +194,9 @@
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.todays_average_zone_minutes]] | [[p.previous_block_average_zone_minutes]]
+                                </td>
+                                <td class="player_table_cell text-nowrap" >
+                                    [[p.study_average_zone_minutes]]
                                 </td>
                                 <td class="player_table_cell text-nowrap" >
                                     [[p.todays_wrist_minutes]]
