@@ -502,7 +502,11 @@ class SessionPlayer(models.Model):
         '''
         return the current average zone minutes from all session_player_periods up to this point in the study
         '''
-        current_period_number = self.session.get_current_session_period().period_number-1
+        current_period = self.session.get_current_session_period()
+        if not current_period:
+            return 0
+        
+        current_period_number = current_period.period_number-1
 
         if current_period_number < 1:
             return 0
@@ -514,7 +518,7 @@ class SessionPlayer(models.Model):
         if zone_minutes_list:
             sum_zone_minutes_list = sum(zone_minutes_list)
 
-            return round(sum_zone_minutes_list/current_period_number,2)
+            return float(round(sum_zone_minutes_list/current_period_number,2))
         return 0
 
     def process_fitbit_last_synced(self, r, time_zone=None):
