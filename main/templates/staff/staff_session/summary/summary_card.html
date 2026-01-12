@@ -27,5 +27,13 @@
                 of [[session.parameter_set.parameter_set_periods_order.length]]
             </div>
         </div>  
+        <div class="row">
+            <div class="col text-end pe-1">
+                Current Block:
+            </div>
+            <div class="col text-start ps-1">
+                <span v-if="session.current_parameter_set_period">[[session.current_parameter_set_period.parameter_set_pay_block.pay_block_number]]</span> 
+            </div>
+        </div>
     </div>                    
 </div> 

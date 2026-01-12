@@ -23,7 +23,7 @@
                     <thead>
                         <tr>
                             <th scope="col" class = "m-1 p-1">
-                                #
+                                Block
                             </th>
                             <th scope="col" class = "m-1 p-1">
                                 Range
@@ -39,7 +39,8 @@
                                 [[r.block_number]]
                             </td>
                             <td class="player_table_cell text-nowrap">
-                                [[r.range.start_day.period_date]] to [[r.range.end_day.period_date]]
+                                [[r.range.start_day.period_date]] ([[r.range.start_day.period_number]]) to 
+                                [[r.range.end_day.period_date]] ([[r.range.end_day.period_number]])
                             </td>     
                             <td class="player_table_cell text-nowrap">
                                 <button type="button"
