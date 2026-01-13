@@ -123,19 +123,36 @@ class Session(models.Model):
 
         #set last day of each pay block parameter_set_periods_b
         for i in self.parameter_set.parameter_set_pay_blocks_a.all():
-            parameter_set_period = i.parameter_set_periods_b.last()
+            parameter_set_period_last = i.parameter_set_periods_b.last()
 
-            if parameter_set_period:
-                session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
+            if parameter_set_period_last:
+                session_period = self.session_periods.get(parameter_set_period=parameter_set_period_last)
                 session_period.is_last_period_in_block = True
                 session_period.save()
+            
+            #if pay block GroupAssignmentType changed to individaual from sorted or fixed and the previous pay block was not individual, pause the first session period
+            if i.group_assignment_type == GroupAssignmentType.INDIVIDUAL:
+                previous_pay_block_number = i.pay_block_number - 1
+
+                if previous_pay_block_number >= 1:
+                    previous_pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=previous_pay_block_number)
+
+                    if previous_pay_block.group_assignment_type != GroupAssignmentType.INDIVIDUAL:
+                        parameter_set_period_first = i.parameter_set_periods_b.first()
+
+                        if parameter_set_period_first:
+                            session_period = self.session_periods.get(parameter_set_period=parameter_set_period_first)
+                            session_period.paused = True
+                            session_period.save()
+            
+            
         
         #set first session period of competitive pay blocks to paused
         for i in self.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_type=PayBlockType.BLOCK_PAY_COMPETITION):
-            parameter_set_period = i.parameter_set_periods_b.first()
+            parameter_set_period_first = i.parameter_set_periods_b.first()
 
-            if parameter_set_period:
-                session_period = self.session_periods.get(parameter_set_period=parameter_set_period)
+            if parameter_set_period_first:
+                session_period = self.session_periods.get(parameter_set_period=parameter_set_period_first)
                 session_period.paused = True
                 session_period.save()
 
@@ -561,13 +578,19 @@ class Session(models.Model):
         auto assign groups to session players based on parameter set group size.
         '''
         
-        pay_block_one = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=1)
+        # pay_block_one = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=1)
+        current_session_period = self.get_current_session_period()
+
+        if not current_session_period:
+            pay_block = self.parameter_set.parameter_set_pay_blocks_a.get(pay_block_number=1)
+        else:
+            pay_block = current_session_period.parameter_set_period.parameter_set_pay_block
 
         temp_group = 1
         temp_counter = 0
         temp_group_size = 1
 
-        if pay_block_one.group_assignment_type != GroupAssignmentType.INDIVIDUAL:
+        if pay_block.group_assignment_type != GroupAssignmentType.INDIVIDUAL:
             temp_group_size = self.parameter_set.group_size
        
         for i in self.session_players.all():
