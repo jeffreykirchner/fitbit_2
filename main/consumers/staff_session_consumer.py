@@ -1044,6 +1044,14 @@ def take_get_pay_block(session_id, data):
             session.store_current_group_numbers(current_pay_block)
             current_session_period.paused = False
             current_session_period.save()
+        elif current_pay_block.group_assignment_type == GroupAssignmentType.INDIVIDUAL and \
+             current_session_period.paused:
+            
+            session.auto_assign_groups()
+
+            session.store_current_group_numbers(current_pay_block)
+            current_session_period.paused = False
+            current_session_period.save()
 
 
     return {"value" : "success",

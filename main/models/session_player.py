@@ -424,7 +424,11 @@ class SessionPlayer(models.Model):
         session_player_periods = []
         for index, p in enumerate(self.session_player_periods_b.all()):
             p.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][index]["value"]
-            p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
+
+            try:
+                p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
+            except Exception as e:
+                p.fitbit_calories = 0
 
             p.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][index]["value"]
             p.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][index]["value"]
@@ -840,7 +844,7 @@ class SessionPlayer(models.Model):
             if i.check_in:
                 values_list.append(i.zone_minutes)
             else:
-                 values_list.append(0)
+                values_list.append(0)
 
         block_earnings = self.get_block_earnings(pay_block)
 
