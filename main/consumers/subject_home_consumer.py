@@ -412,8 +412,10 @@ def take_get_session_subject(session_player_id, data):
                 session_player.calcs_for_payblock()
         
         session_period_date = None
-        if session_player.fitbit_last_synced:
+        if session_player.fitbit_last_synced:            
             session_period_date = session_player.fitbit_last_synced.date()
+            if session_period_date < session_player.session.start_date:
+                session_period_date = session_player.session.start_date
 
         return {"session" : session_player.session.json_for_subject(session_player, session_period_date=session_period_date), 
                 "show_fitbit_connect" : show_fitbit_connect,
