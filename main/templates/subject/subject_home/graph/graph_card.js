@@ -835,6 +835,7 @@ updateGraph: function updateGraph(){
     app.drawSetup("graph_id");
 
     let parameter_set_period = app.session.current_parameter_set_period;
+    if(!parameter_set_period) return;
     let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
     let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
 
