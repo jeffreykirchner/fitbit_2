@@ -779,7 +779,6 @@ class Session(models.Model):
         if(current_parameter_set_period):
             current_parameter_set_period["notice_text"] = session_player.process_help_doc(current_parameter_set_period["notice_text"])
 
-
         parameter_set_json_for_subject = self.parameter_set.json_for_subject()
 
         #hide future pay blocks
