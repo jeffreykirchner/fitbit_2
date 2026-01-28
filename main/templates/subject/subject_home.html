@@ -113,7 +113,7 @@
             </div>
         </div>
         
-        <div class="row justify-content-center mt-3">
+        <div class="row justify-content-center mt-3" v-cloak v-show="!session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
             <div class="col-lg-5" v-cloak v-if="(session.enable_chat || session.show_history) && !session.is_after_last_period && session.started && !session.is_before_first_period && !session_player.disabled">
                 <div class="row justify-content-center mb-4" v-if="session.enable_chat">
                     <div class="col-lg mb-3 mb-lg-0">

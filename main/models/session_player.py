@@ -715,7 +715,9 @@ class SessionPlayer(models.Model):
 
         p = self.get_todays_session_player_period()
 
-        wrist_time = format_minutes(p.session_period.parameter_set_period.minimum_wrist_minutes)
+        wrist_time = "N/A"
+        if p:
+            wrist_time = format_minutes(p.session_period.parameter_set_period.minimum_wrist_minutes)
 
         text = text.replace('#Individual_Zone_Minutes#', self.individual_zone_mintutes_html())
         text = text.replace('#Group_Zone_Minutes#', self.group_zone_minutes_html())
