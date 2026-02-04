@@ -667,11 +667,11 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         
         if(i==0)
         {
-            ctx.textAlign = "left";
+            ctx.textAlign = "center";
         }
         else if(i==xTickCount)
         {
-            ctx.textAlign = "right";
+            ctx.textAlign = "center";
         }
         else
         {
@@ -749,7 +749,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         ctx.fillStyle = app.getColor(app.findSessionPlayerIndex(session_player_partner.id));
         ctx.textAlign = "center";
         // ctx.fillText(app.getColorName(app.findSessionPlayerIndex(session_player_partner.id))+"'s", marginY-20, 15);
-        ctx.fillText(app.get_partner_string("upper"), marginY/2, 15);
+        ctx.fillText(app.get_partner_string("upper"), marginY/2-7, 15);
 
         if(current_pay_block.pay_block_type == "Earn Fitbit")
         {
@@ -757,7 +757,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         }
         else
         {
-            ctx.fillText("Pay", marginY/2, 28);
+            ctx.fillText("Pay", marginY/2-7, 28);
         }
     }
 
