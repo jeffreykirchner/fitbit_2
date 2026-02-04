@@ -639,7 +639,7 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
 
     let local_session_player = null;
    
-    ctx.font="14px Georgia";
+    ctx.font="12px Georgia";
                                                            
     ctx.textAlign = "center";
 
@@ -786,7 +786,8 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
         }
         else
         {
-            ctx.fillText("Sum=$"+session_player_partner.current_block_earnings.fixed, w - 5, 18);
+            ctx.fillText("Sum=", w - 10, 18);
+            ctx.fillText("$"+session_player_partner.current_block_earnings.fixed, w - 10, 33);
         }
     }
     
@@ -799,7 +800,8 @@ drawPeriodEarnings: function drawPeriodEarnings(chartID, yMin, yMax, xMin, xMax,
     }
     else
     {
-        ctx.fillText("Sum=$"+app.session_player.current_block_earnings.fixed, w - 5, h-marginX+40);
+        ctx.fillText("Sum=", w - 10, h-marginX+25);
+        ctx.fillText("$"+app.session_player.current_block_earnings.fixed, w - 10, h-marginX+40);
     }
 },
 
