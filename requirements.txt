@@ -26,6 +26,7 @@ pyasn1==0.6.1
 pyasn1-modules==0.4.2
 pycparser==2.22
 pyOpenSSL==25.1.0
+pyotp==2.9.0
 pytz==2025.2
 requests==2.32.4
 service-identity==24.2.0
