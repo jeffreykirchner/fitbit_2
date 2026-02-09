@@ -145,10 +145,9 @@ class Session(models.Model):
                             session_period.paused = True
                             session_period.save()
             
-            
-        
         #set first session period of competitive pay blocks to paused
-        for i in self.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_type=PayBlockType.BLOCK_PAY_COMPETITION):
+        for i in self.parameter_set.parameter_set_pay_blocks_a.filter(pay_block_type=PayBlockType.BLOCK_PAY_COMPETITION)\
+                                                              .exclude(pay_block_number=1):
             parameter_set_period_first = i.parameter_set_periods_b.first()
 
             if parameter_set_period_first:
