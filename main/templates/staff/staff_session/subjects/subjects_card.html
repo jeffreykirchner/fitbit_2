@@ -36,7 +36,7 @@
 
             <button type="button" 
                     class="btn btn-outline-primary me-2" 
-                    title="Upload Email List" 
+                    title="Copy Player List" 
                     v-on:click="get_playerlist_csv()" 
                     v-bind:disabled="working"
                     v-show="session.started && !session.finished">
@@ -45,7 +45,7 @@
 
             <button type="button" 
                     class="btn btn-outline-primary me-2" 
-                    title="Upload Email List" 
+                    title="Copy No Check-Ins" 
                     v-on:click="send_get_no_checkins()" 
                     v-bind:disabled="working"
                     v-show="session.started && !session.finished">
@@ -54,7 +54,7 @@
 
             <button type="button" 
                     class="btn btn-outline-primary" 
-                    title="Upload Email List" 
+                    title="Import Connections" 
                     v-on:click="showImportSession()" 
                     v-bind:disabled="working"
                     v-show="session.started && !session.finished">
