@@ -630,8 +630,8 @@ def take_check_in(session_id, session_player_id, data):
 
         session = Session.objects.get(id=session_id)
         session_player = session.session_players.get(id=session_player_id)
-        # session_player_period = session_player.get_todays_session_player_period()
-        session_player_period = session_player.get_fitbit_last_synced_session_player_period()
+        session_player_period = session_player.get_todays_session_player_period()
+        #session_player_period = session_player.get_fitbit_last_synced_session_player_period()
 
         software_version = data["software_version"]
         client_current_period = data["current_period"]
