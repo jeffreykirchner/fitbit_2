@@ -504,7 +504,7 @@ class SessionPlayer(models.Model):
 
     def cal_current_study_average_zone_minutes(self):
         '''
-        return the current average zone minutes from all session_player_periods up to this point in the study
+        return the current average zone minutes from all session_player_periods up to this point in the study but not including today
         '''
         current_period = self.session.get_current_session_period()
         if not current_period:
@@ -515,7 +515,7 @@ class SessionPlayer(models.Model):
         if current_period_number < 1:
             return 0
 
-        zone_minutes_list = self.session_player_periods_b.filter(session_period__period_number__lt=current_period_number) \
+        zone_minutes_list = self.session_player_periods_b.filter(session_period__period_number__lte=current_period_number) \
                                                                 .filter(check_in=True) \
                                                                 .values_list('zone_minutes', flat=True)
         
