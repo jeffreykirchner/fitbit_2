@@ -44,8 +44,8 @@ class ParameterSet(models.Model):
 
     completion_message = HTMLField(default="The study is complete, thank you for your participation.", verbose_name="End of study message", blank=True)
 
-    age_warning = models.IntegerField(verbose_name='Age Warning', default=25)              #age cut that issues a warning for invalid age range
-    reconnection_limit = models.IntegerField(verbose_name='Age Warning', default=25)       #age cut that issues a warning for invalid age range
+    age_warning = models.IntegerField(verbose_name='Age Warning', default=25)                     #age cut off that issues a warning for invalid age range
+    reconnection_limit = models.IntegerField(verbose_name='Reconnection Limit', default=10)       #number of times a subject can reconnect before they are blocked from reconnecting again
 
     json_for_session_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set 
     json_for_subject_json = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)                   #json model of parameter set for subject

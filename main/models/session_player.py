@@ -517,10 +517,10 @@ class SessionPlayer(models.Model):
 
         zone_minutes_list = self.session_player_periods_b.filter(session_period__period_number__lt=current_period_number) \
                                                                 .filter(check_in=True) \
-                                                                .values_list('average_pay_block_zone_minutes', flat=True)
+                                                                .values_list('zone_minutes', flat=True)
         
         if zone_minutes_list:
-            sum_zone_minutes_list = sum(zone_minutes_list)
+            sum_zone_minutes_list = sum(list(zone_minutes_list))
 
             return float(round(sum_zone_minutes_list/current_period_number,2))
         return 0
