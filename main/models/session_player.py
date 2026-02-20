@@ -231,8 +231,12 @@ class SessionPlayer(models.Model):
         return the average zone minutes for the pay block
         '''
 
+        # last_session_period_in_block = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
+        #                                                            .filter(check_in=True) \
+        #                                                            .order_by('session_period__period_number') \
+        #                                                            .last()
+
         last_session_period_in_block = self.session_player_periods_b.filter(session_period__parameter_set_period__parameter_set_pay_block=pay_block) \
-                                                                   .filter(check_in=True) \
                                                                    .order_by('session_period__period_number') \
                                                                    .last()
         
