@@ -727,6 +727,7 @@ class SessionPlayerPeriod(models.Model):
             "id" : self.id,    
             
             "period_number" : self.session_period.period_number,
+            "current_group_number" : self.current_group_number,
             "fitbit_formatted_date" : self.session_period.get_formatted_date(),
 
             "earnings_fixed" : round(self.earnings_fixed,2),
