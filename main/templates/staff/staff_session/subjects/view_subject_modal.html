@@ -17,6 +17,9 @@
                                 Period
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
+                                Group
+                            </th>
+                            <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Type
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
@@ -68,6 +71,9 @@
                         <tr v-for="(p, index) in session.session_players[current_subject].session_player_periods" v-bind:key="p.id">
                             <td class="player_table_cell text-nowrap w-auto">
                             [[p.period_number]]
+                            </td>
+                             <td class="player_table_cell text-center text-nowrap w-auto">
+                                [[p.current_group_number]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.period_type]]
