@@ -2,7 +2,7 @@
  * take update player groups
  * @param messageData {json} session day in json format
  */
-  takeUpdateConnectionStatus(messageData){
+  takeUpdateConnectionStatus: function takeUpdateConnectionStatus(messageData){
             
     if(messageData.status.value == "success")
     {
@@ -21,7 +21,7 @@
 /** take name and student id
 * @param messageData {json} session day in json format
 */
-takeUpdateName(messageData){
+takeUpdateName: function takeUpdateName(messageData){
            
     if(messageData.status.value == "success")
     {
@@ -40,7 +40,7 @@ takeUpdateName(messageData){
 /** take name and student id
 * @param messageData {json} session day in json format
 */
-takeNextInstruction(messageData){
+takeNextInstruction: function takeNextInstruction(messageData){
            
     if(messageData.status.value == "success")
     {
@@ -59,7 +59,7 @@ takeNextInstruction(messageData){
  /** take name and student id
 * @param messageData {json} session day in json format
 */
-takeFinishedInstructions(messageData){
+takeFinishedInstructions: function takeFinishedInstructions(messageData){
            
     if(messageData.status.value == "success")
     {
@@ -79,7 +79,7 @@ takeFinishedInstructions(messageData){
   * update subject earnings
   *  @param messageData {json} session day in json format
   */
- takeUpdateEarnings(messageData){
+ takeUpdateEarnings: function takeUpdateEarnings(messageData){
 
     if(messageData.status.value == "success")
     {
@@ -101,7 +101,7 @@ takeFinishedInstructions(messageData){
  /**
   * return session player that has specified id
   */
- findSessionPlayer(id){
+ findSessionPlayer: function findSessionPlayer(id){
 
     let session_players = this.session.session_players;
     for(let i=0; i<session_players.length; i++)
@@ -118,7 +118,7 @@ takeFinishedInstructions(messageData){
 /**
  * return session player index that has specified id
  */
-findSessionPlayerIndex(id){
+findSessionPlayerIndex: function findSessionPlayerIndex(id){
 
     let session_players = app.session.session_players;
     for(let i=0; i<session_players.length; i++)
@@ -134,7 +134,7 @@ findSessionPlayerIndex(id){
 
 /** send session update form   
 */
-sendEmailList(){
+sendEmailList: function sendEmailList(){
     this.cancelModal = false;
     this.working = true;
 
@@ -145,7 +145,7 @@ sendEmailList(){
 /** take update subject response
  * @param messageData {json} result of update, either sucess or fail with errors
 */
-takeUpdateEmailList(messageData){
+takeUpdateEmailList: function takeUpdateEmailList(messageData){
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -161,7 +161,7 @@ takeUpdateEmailList(messageData){
 
 /** show edit subject modal
 */
-showSendEmailList(){
+showSendEmailList: function showSendEmailList(){
     app.clearMainFormErrors();
     this.cancelModal=true;
 
@@ -172,7 +172,7 @@ showSendEmailList(){
 
 /** hide edit subject modal
 */
-hideSendEmailList(){
+hideSendEmailList: function hideSendEmailList(){
     this.csv_email_list = "";
 
     if(this.cancelModal)
@@ -183,7 +183,7 @@ hideSendEmailList(){
 
 /** send subject update form   
 */
-sendUpdateSubject(){
+sendUpdateSubject: function sendUpdateSubject(){
     this.cancelModal = false;
     this.working = true;
     app.sendMessage("update_subject",
@@ -193,7 +193,7 @@ sendUpdateSubject(){
 /** take update subject response
  * @param messageData {json} result of update, either sucess or fail with errors
 */
-takeUpdateSubject(messageData){
+takeUpdateSubject: function takeUpdateSubject(messageData){
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -217,13 +217,13 @@ takeUpdateSubject(messageData){
 
 /** send session update form   
 */
-sendLoadFullSubject(id){
+sendLoadFullSubject: function sendLoadFullSubject(id){
     this.working = true;
     app.sendMessage("load_full_subject",
                    {"subject_id" : id});
 },
 
-takeLoadFullSubject(messageData)
+takeLoadFullSubject: function takeLoadFullSubject(messageData)
 {
     for(i=0;i<app.session.session_players.length;i++)
     {
@@ -238,7 +238,7 @@ takeLoadFullSubject(messageData)
 
 /** show edit subject modal
 */
-showEditSubject:function(id){
+showEditSubject:function showEditSubject(id){
 
     if(!app.session.started) return;
 
@@ -262,7 +262,7 @@ showEditSubject:function(id){
 
 /** hide edit subject modal
 */
-hideEditSubject:function(){
+hideEditSubject:function hideEditSubject(){
     if(this.cancelModal)
     {
        
@@ -272,7 +272,7 @@ hideEditSubject:function(){
 
 /** show view subject modal
 */
-showViewSubject:function(id, subject_id){
+showViewSubject:function showViewSubject(id, subject_id){
     
     app.sendLoadFullSubject(subject_id);
 
@@ -287,7 +287,7 @@ showViewSubject:function(id, subject_id){
 
 /** show view subject modal
 */
-showViewSubjectChat:function(id, subject_id){
+showViewSubjectChat:function showViewSubjectChat(id, subject_id){
 
     app.sendLoadFullSubject(subject_id);
     
@@ -303,20 +303,20 @@ showViewSubjectChat:function(id, subject_id){
 /**
  * update chat
  */
-updateChatDisplay(){            
+updateChatDisplay: function updateChatDisplay(){            
     this.chat_list_to_display=this.session.session_players[app.current_subject].chat;
 },
 
 /** hide view subject modal
 */
-hideViewSubject:function(){
+hideViewSubject:function hideViewSubject(){
     
 },
 
 /** send session update form   
 */
-sendForceCheckIn(id){
-    if (!confirm('Force check in?')) {
+sendForceCheckIn: async function sendForceCheckIn(id){
+    if (!await show_confirm_dialog('Force check in?')) {
         return;
     }
     
@@ -328,7 +328,7 @@ sendForceCheckIn(id){
 /** take update subject response
  * @param messageData {json} result of update, either sucess or fail with errors
 */
-takeForceCheckIn(messageData){
+takeForceCheckIn: function takeForceCheckIn(messageData){
    
     this.working = false;
 
@@ -356,7 +356,7 @@ takeForceCheckIn(messageData){
 /** take update consent form status
  * @param messageData {json} result of update, either sucess or fail with errors
 */
-takeUpdateConsentForm(messageData){
+takeUpdateConsentForm: function takeUpdateConsentForm(messageData){
 
     if(messageData.status.value == "success")
     {             
@@ -377,7 +377,7 @@ takeUpdateConsentForm(messageData){
 /**
  * get pay block the server
  */
-get_playerlist_csv(){
+get_playerlist_csv: function get_playerlist_csv(){
     this.working = true;
     this.player_list_copied = false;
     app.sendMessage("get_playerlist_csv", {});
@@ -387,7 +387,7 @@ get_playerlist_csv(){
 /**
  * get pay block the server
  */
-take_playerlist_csv(messageData){    
+take_playerlist_csv: function take_playerlist_csv(messageData){    
 
     this.player_list_copied = true;
 
@@ -403,7 +403,7 @@ take_playerlist_csv(messageData){
 
 /** show edit subject modal
 */
-showImportSession(){
+showImportSession:function showImportSession(){
     app.clearMainFormErrors();
     this.cancelModal=true;
     
@@ -412,7 +412,7 @@ showImportSession(){
 
 /** hide edit subject modal
 */
-hideImportSession(){
+hideImportSession:function hideImportSession(){
     
 
     if(this.cancelModal)
@@ -424,7 +424,7 @@ hideImportSession(){
 /**
  * get pay block the server
  */
-import_session(){
+import_session: function import_session(){
     this.working = true;
     this.session_imported = false;
     app.sendMessage("import_session", {session_id:app.session_import});
@@ -434,7 +434,7 @@ import_session(){
 /**
  * get pay block the server
  */
-take_import_session(messageData){    
+take_import_session: function take_import_session(messageData){    
 
     this.session_imported = true;
 
@@ -451,9 +451,9 @@ take_import_session(messageData){
 
  /** send anonymize data request to server
 */
-send_anonymize_data(){
+send_anonymize_data: async function send_anonymize_data(){
     
-    if (!confirm('Anonymize data? Identifying information will be permanent removed.')) {
+    if (!await show_confirm_dialog('Anonymize data? Identifying information will be permanent removed.')) {
         return;
     }
 
@@ -464,7 +464,7 @@ send_anonymize_data(){
 /** take anonymize data result for server
  * @param message_data {json} result of update, either sucess or fail with errors
 */
-take_anonymize_data(messageData){
+take_anonymize_data: function take_anonymize_data(messageData){
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -490,7 +490,7 @@ take_anonymize_data(messageData){
 
  /** send anonymize data request to server
 */
-send_get_no_checkins(){
+send_get_no_checkins: function send_get_no_checkins(){
     
     app.working = true;
     app.sendMessage("get_no_checkins",{});
@@ -499,7 +499,7 @@ send_get_no_checkins(){
 /** take anonymize data result for server
  * @param message_data {json} result of update, either sucess or fail with errors
 */
-take_get_no_checkins(messageData){
+take_get_no_checkins: function take_get_no_checkins(messageData){
     this.no_checkins_copied = true;
 
     if(messageData.status.value == "success")
