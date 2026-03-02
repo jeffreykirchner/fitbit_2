@@ -1,6 +1,6 @@
 /**start the experiment
 */
-start_experiment(){
+start_experiment: function start_experiment(){
     app.working = true;
     app.control_working = true;
     app.sendMessage("start_experiment", {});
@@ -9,7 +9,7 @@ start_experiment(){
 /** take start experiment response
  * @param messageData {json}
 */
-takeStartExperiment(messageData){
+takeStartExperiment: function takeStartExperiment(messageData){
     app.control_working = false;
     app.takeGetSession(messageData.session);
 },
@@ -17,7 +17,7 @@ takeStartExperiment(messageData){
 /** update start status
 *    @param messageData {json} session day in json format
 */
-takeUpdateStartExperiment(messageData){
+takeUpdateStartExperiment: function takeUpdateStartExperiment(messageData){
     app.control_working = false;
     app.takeGetSession(messageData.session);
 },
@@ -25,15 +25,15 @@ takeUpdateStartExperiment(messageData){
 /** update start status
 *    @param messageData {json} session day in json format
 */
-takeUpdateResetExperiment(messageData){
+takeUpdateResetExperiment: function takeUpdateResetExperiment(messageData){
     app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
 /**reset experiment, remove all bids, asks and trades
 */
-reset_experiment(){
-    if (!confirm('Reset session? All activity will be removed.')) {
+reset_experiment: async function reset_experiment(){
+    if (!await show_confirm_dialog('Reset session? All activity will be removed.')) {
         return;
     }
 
@@ -45,14 +45,14 @@ reset_experiment(){
 /** take reset experiment response
  * @param messageData {json}
 */
-takeResetExperiment(messageData){
+takeResetExperiment: function takeResetExperiment(messageData){
     app.control_working = false;
     app.chat_list_to_display=[];
     app.takeGetSession(messageData.session);
 },
 
-resetConnections(){
-    if (!confirm('Reset connection status?.')) {
+resetConnections: async function resetConnections(){
+    if (!await show_confirm_dialog('Reset connection status?.')) {
         return;
     }
 
@@ -64,7 +64,7 @@ resetConnections(){
 /** update start status
 *    @param messageData {json} session day in json format
 */
-takeUpdateResetConnections(messageData){
+takeUpdateResetConnections: function takeUpdateResetConnections(messageData){
     app.control_working = false;
     app.takeGetSession(messageData.session);
 },
@@ -72,16 +72,16 @@ takeUpdateResetConnections(messageData){
 /** take reset experiment response
  * @param messageData {json}
 */
-takeResetConnections(messageData){
+takeResetConnections: function takeResetConnections(messageData){
     app.control_working = false;
     app.takeGetSession(messageData.session);
 },
 
 /**advance to next phase
 */
-next_experiment_phase(){
+next_experiment_phase: async function next_experiment_phase(){
    
-    if (!confirm('Continue to the next phase of the experiment?')) {
+    if (!await show_confirm_dialog('Continue to the next phase of the experiment?')) {
         return;
     }    
 
@@ -93,7 +93,7 @@ next_experiment_phase(){
 /** take next period response
  * @param messageData {json}
 */
-takeNextPhase(messageData){
+takeNextPhase: function takeNextPhase(messageData){
 
     app.control_working = false;
     
@@ -113,7 +113,7 @@ takeNextPhase(messageData){
 /** take next period response
  * @param messageData {json}
 */
-takeUpdateNextPhase(messageData){
+takeUpdateNextPhase: function takeUpdateNextPhase(messageData){
 
     app.control_working = false;
     
@@ -132,8 +132,8 @@ takeUpdateNextPhase(messageData){
 
 /**reset experiment, remove all bids, asks and trades
 */
-endEarly(){
-    if (!confirm('End the experiment after this period completes?')) {
+endEarly: async function endEarly(){
+    if (!await show_confirm_dialog('End the experiment after this period completes?')) {
         return;
     }
 
@@ -145,14 +145,14 @@ endEarly(){
 /** take reset experiment response
  * @param messageData {json}
 */
-takeEndEarly(messageData){
+takeEndEarly: function takeEndEarly(messageData){
     app.control_working = false;
     this.session = messageData.status.session;
 },
 
 /** send invitations
 */
-sendSendInvitations(){
+sendSendInvitations: function sendSendInvitations(){
 
     this.sendMessageModalForm.text = tinymce.get("id_invitation_subject").getContent();
 
@@ -173,7 +173,7 @@ sendSendInvitations(){
 /** take update subject response
  * @param messageData {json} result of update, either sucess or fail with errors
 */
-takeSendInvitations(messageData){
+takeSendInvitations: function takeSendInvitations(messageData){
     app.clearMainFormErrors();
 
     if(messageData.status.value == "success")
@@ -191,7 +191,7 @@ takeSendInvitations(messageData){
 
 /** show edit subject modal
 */
-showSendInvitations(){
+showSendInvitations: function showSendInvitations(){
 
     app.cancelModal=true;
 
@@ -205,14 +205,14 @@ showSendInvitations(){
 
 /** hide edit subject modal
 */
-hideSendInvitations(){
+hideSendInvitations: function hideSendInvitations(){
     this.emailResult = "";
 },
 
 /**
  * fill invitation with default values
  */
-fillDefaultInvitation(){
+fillDefaultInvitation: function fillDefaultInvitation(){
     this.sendMessageModalForm.subject = this.emailDefaultSubject;
     
     tinymce.get("id_invitation_subject").setContent(this.emailDefaultText);
@@ -221,7 +221,7 @@ fillDefaultInvitation(){
 /**
  * fill with test data
  */
-fillWithTestData(){
+fillWithTestData: function fillWithTestData(){
     this.cancelModal = false;
     this.working = true;
     app.control_working = true;
@@ -233,7 +233,7 @@ fillWithTestData(){
 /**
  * fill with test data
  */
- takeFillWithTestData(){
+ takeFillWithTestData: function takeFillWithTestData(messageData){
     app.control_working = false;
     if(messageData.status.value == "success")
     {         
@@ -250,8 +250,8 @@ fillWithTestData(){
     });
 },
 
-send_refresh_screens(messageData){
-    if (!confirm('Refresh the parameterset?')) {
+send_refresh_screens: async function send_refresh_screens(messageData){
+    if (!await show_confirm_dialog('Refresh the parameterset?')) {
         return;
     }
 
@@ -259,7 +259,7 @@ send_refresh_screens(messageData){
     app.sendMessage("refresh_screens", {});
 },
 
-take_refresh_screens(messageData){
+take_refresh_screens: function take_refresh_screens(messageData){
     if(messageData.value == "success")
     {           
         result = messageData.result

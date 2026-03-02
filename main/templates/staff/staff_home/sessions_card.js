@@ -1,7 +1,7 @@
 /**
  * send request to create new session
  */
-sendCreateSession(){
+sendCreateSession: function sendCreateSession(){
     this.working = true;
     this.createSessionButtonText ='<i class="fas fa-spinner fa-spin"></i>';
     app.sendMessage("create_session",{});
@@ -10,7 +10,7 @@ sendCreateSession(){
 /**
  * take crate a new session
  */
-takeCreateSession(messageData){    
+takeCreateSession: function takeCreateSession(messageData){    
     this.createSessionButtonText ='Create Session <i class="fas fa-plus"></i>';
     app.takeGetSessions(messageData);
 },
@@ -19,8 +19,8 @@ takeCreateSession(messageData){
  * send request to delete session
  * @param id : int
  */
-sendDeleteSession(id){
-    if (!confirm('Delete session?  All data will be removed.')) {
+sendDeleteSession: async function sendDeleteSession(id){
+    if (!await show_confirm_dialog('Delete session?  All data will be removed.')) {
         return;
     }
     this.working = true;
@@ -31,7 +31,7 @@ sendDeleteSession(id){
 /**
  * sort sessions by title
  */
-sortByTitle:function(){
+sortByTitle: function sortByTitle(){
 
     app.working = true;
 
@@ -47,7 +47,7 @@ sortByTitle:function(){
 /**
  * sort sessions by date
  */
-sortByDate:function(){
+sortByDate: function sortByDate(){
 
     app.working = true;
 
