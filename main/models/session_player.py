@@ -63,6 +63,8 @@ class SessionPlayer(models.Model):
 
     consent_form_required = models.BooleanField(default=False, verbose_name = 'Consent Form Required')                   #consent form required
 
+    current_y_scale_max = models.IntegerField(verbose_name='Current Y Scale Max', default=50)           #current max height of subject graph, can be adjusted by subject during experiment
+
     disabled = models.BooleanField(default=False, verbose_name = 'Disabled')                #if true disable subject's screen
     soft_delete = models.BooleanField(default=False, verbose_name = 'Soft Delete')          #if true remove fron session 
 
@@ -93,6 +95,7 @@ class SessionPlayer(models.Model):
         self.consent_form_required = False
         self.disabled = False        
         self.fitbit_last_synced = None
+        self.current_y_scale_max = 50
 
         self.save()
     
@@ -985,6 +988,7 @@ class SessionPlayer(models.Model):
             "survey_link" : self.get_current_survey_link(),
 
             "earnings_history" : self.get_earnings_history() if self.session.parameter_set.show_history else [],
+            "current_y_scale_max" : self.current_y_scale_max,
         }
     
     def json_for_staff(self):
@@ -1086,6 +1090,7 @@ class SessionPlayer(models.Model):
             "fitbit_last_synced" : self.get_fitbit_last_sync_str(),
             "fitbit_synced_last_30_min" : self.fitbit_synced_last_30_min(),
             "wrist_time_met_for_checkin" : todays_session_player_period.wrist_time_met() if todays_session_player_period else False,
+            "current_y_scale_max" : self.current_y_scale_max   
         }
 
     def json_min(self):
