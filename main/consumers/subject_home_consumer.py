@@ -212,6 +212,15 @@ class SubjectHomeConsumer(SocketConsumerMixin, StaffSubjectUpdateMixin):
         # Send reply to sending channel
         await self.send(text_data=json.dumps({'message': message}, cls=DjangoJSONEncoder))
     
+    async def update_y_scale_max(self, event):
+        '''
+        update y scale max
+        '''
+        session_player = await SessionPlayer.objects.aget(id=self.session_player_id)
+        session_player.current_y_scale_max = event["message_text"]["y_scale_max"]
+
+        await session_player.asave()
+
     async def consent_form(self, event):
         '''
         agree to consent form

@@ -32,9 +32,10 @@
                 <input type="range" 
                        class="form-range" 
                        id="id_y_scale_max" 
+                       step="10"
                        :min="session.parameter_set.graph_y_max" 
                        :max="session.parameter_set.graph_y_max_slider" 
-                       step="10" 
+                       @change="update_scale_max_slider"
                        v-model="y_scale_max">                
             </div>
         </div>
