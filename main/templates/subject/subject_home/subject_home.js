@@ -42,6 +42,8 @@ var app = Vue.createApp({
 
                     consentModal : null,
 
+                    y_scale_max : 75,
+
                 }},
     methods: {
 
@@ -159,6 +161,7 @@ var app = Vue.createApp({
             app.session_player = messageData.status.session_player;
             app.show_fitbit_connect = messageData.status.show_fitbit_connect;
             app.fitbit_error_message =  messageData.status.fitbit_error_message;
+            app.y_scale_max = app.session_player.current_y_scale_max;
 
             if(app.session.started)
             {

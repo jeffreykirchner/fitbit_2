@@ -20,6 +20,12 @@ class ParameterSetForm(forms.ModelForm):
                                       widget=forms.NumberInput(attrs={"v-model":"current_parameter_set.graph_y_max",
                                                                       "step":"1",
                                                                       "min":"1"}))
+
+    graph_y_max_slider = forms.IntegerField(label='Graph: Max Y Slider Value',
+                                      min_value=1,
+                                      widget=forms.NumberInput(attrs={"v-model":"current_parameter_set.graph_y_max_slider",
+                                                                      "step":"1",
+                                                                      "min":"1"}))
     
     group_size = forms.IntegerField(label='Group Size',
                                     min_value=1,
@@ -88,6 +94,6 @@ class ParameterSetForm(forms.ModelForm):
 
     class Meta:
         model=ParameterSet
-        fields =['graph_y_max', 'group_size', 'color_assignment_type', 'enable_chat', 'consent_form_required',
+        fields =['graph_y_max', 'graph_y_max_slider', 'group_size', 'color_assignment_type', 'enable_chat', 'consent_form_required',
                  'consent_form', 'partner_string', 'show_instructions', 'show_history', 'instruction_set', 'help_doc_subject_set',
                  'test_mode' ,'completion_message', 'age_warning' ,'reconnection_limit']

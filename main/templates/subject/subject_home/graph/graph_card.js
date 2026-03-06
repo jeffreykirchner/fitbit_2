@@ -357,7 +357,7 @@ drawZoneMinuteAxis: function drawZoneMinuteAxis(chartID, yMin, yMax, xMin, xMax)
         let label = current_pay_block.parameter_set_pay_block_payments[index].label;
 
         let current_zone_minutes = Math.min(zone_minutes + 1, 
-                                            app.session.parameter_set.graph_y_max);
+                                            app.y_scale_max);
 
         let y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
 
@@ -410,7 +410,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
         let index = current_pay_block.parameter_set_pay_block_payments_order[i];
         let pay_block_payment = current_pay_block.parameter_set_pay_block_payments[index];
 
-        let current_zone_minutes = Math.min(pay_block_payment.zone_minutes + 1, app.session.parameter_set.graph_y_max);
+        let current_zone_minutes = Math.min(pay_block_payment.zone_minutes + 1, app.y_scale_max);
                                             
         y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
         
@@ -462,7 +462,7 @@ drawEarnings: function drawEarnings(chartID, yMin, yMax, xMin, xMax)
             if(session_player_period.period_number<app.session.current_period)
             {
                 dataSet.push({x:session_player_period.period_number, 
-                              y:session_player_period.average_pay_block_zone_minutes,
+                              y:parseFloat(session_player_period.average_pay_block_zone_minutes),
                               pay_block_number: session_player_period.pay_block_number});
             }
         }
@@ -495,7 +495,7 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
                    (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
                         dataSet.push({x:session_player_period.period_number, 
-                                      y:session_player_period.average_pay_block_zone_minutes,
+                                      y:parseFloat(session_player_period.average_pay_block_zone_minutes),
                                       pay_block_number: session_player_period.pay_block_number});
                     }
                 
@@ -523,7 +523,7 @@ drawZoneMinuteLines2: function drawZoneMinuteLines2(chartID, yMin, yMax, xMin, x
                   (session_player_period.period_number==app.session.current_period && session_player_period.check_in))
                     {
                         dataSet.push({x:session_player_period.period_number, 
-                                      y:session_player_period.average_pay_block_zone_minutes,
+                                      y:parseFloat(session_player_period.average_pay_block_zone_minutes),
                                       pay_block_number: session_player_period.pay_block_number});
                     }
                 
@@ -841,35 +841,50 @@ updateGraph: function updateGraph(){
     let current_pay_block_id = app.session.current_parameter_set_period.parameter_set_pay_block.id;
     let current_pay_block = app.session.parameter_set.parameter_set_pay_blocks[current_pay_block_id];
 
+    // let graph_y_max = app.session.parameter_set.graph_y_max;
+    let graph_y_max = app.y_scale_max;
+
     app.drawAxis("graph_id", 
-                 0, app.session.parameter_set.graph_y_max, 1,
+                 0, graph_y_max, 1,
                  parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
                  (parameter_set_period.graph_2_end_period_number-parameter_set_period.graph_2_start_period_number),
                  "Daily Zone Minutes", "", parameter_set_period.period_number);
     
-    app.drawZoneMinuteAxis("graph_id", 0, app.session.parameter_set.graph_y_max,
+    app.drawZoneMinuteAxis("graph_id", 0, graph_y_max,
                            parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
     if(current_pay_block.pay_block_type == "Block Pay Group" || 
        current_pay_block.pay_block_type == "Block Pay Individual" ||
        current_pay_block.pay_block_type == "Block Pay Competition")
     {
-        app.drawEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
+        app.drawEarnings("graph_id", 0, graph_y_max,
                         parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
     }
     
     if(parameter_set_period.show_graph_1)
-        app.drawZoneMinuteLines1("graph_id", 0, app.session.parameter_set.graph_y_max,
+        app.drawZoneMinuteLines1("graph_id", 0, graph_y_max,
                                  parameter_set_period.graph_1_start_period_number, parameter_set_period.graph_1_end_period_number);
 
-    app.drawZoneMinuteLines2("graph_id", 0, app.session.parameter_set.graph_y_max,
+    app.drawZoneMinuteLines2("graph_id", 0, graph_y_max,
                             parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
     
-    app.drawZoneMinutes("graph_id", 0, app.session.parameter_set.graph_y_max,
+    app.drawZoneMinutes("graph_id", 0, graph_y_max,
                               parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number);
 
-    app.drawPeriodEarnings("graph_id", 0, app.session.parameter_set.graph_y_max,
+    app.drawPeriodEarnings("graph_id", 0, graph_y_max,
                             parameter_set_period.graph_2_start_period_number, parameter_set_period.graph_2_end_period_number,
                             (parameter_set_period.graph_2_end_period_number-parameter_set_period.graph_2_start_period_number));
     
+},
+
+/**
+ * when scale max slider is updated, update graph and send value to server
+ */
+update_scale_max_slider: function update_scale_max_slider()
+{
+    app.updateGraph();
+
+    //send to server
+    app.sendMessage("update_y_scale_max", {"software_version" : app.software_version, 
+                                           "y_scale_max" : app.y_scale_max});
 },
