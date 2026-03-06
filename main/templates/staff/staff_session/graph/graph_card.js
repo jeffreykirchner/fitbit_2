@@ -326,7 +326,7 @@ drawLine: function drawLine(chartID, yMin, yMax, xMin, xMax, dataSet, markerWidt
         let label = current_pay_block.parameter_set_pay_block_payments[index].label;
 
         let current_zone_minutes = Math.min(zone_minutes + 1, 
-                                            app.session.parameter_set.graph_y_max);
+                                            app.y_scale_max);
 
         let y = app.convertToY((current_zone_minutes + previous_zone_minutes)/2, yMax, yMin, h-marginX-margin2, ctx.lineWidth);
 

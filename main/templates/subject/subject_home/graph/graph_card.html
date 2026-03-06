@@ -21,6 +21,24 @@
             <div class="col">
                 <canvas class="graph" id="graph_id"></canvas>
             </div>
-        </div>       
+        </div> 
+        
+        <!-- y_scale_max slider  -->
+        <div class="row mt-3 justify-content-center" v-if="first_load_done">
+            <div class="col-2 text-end">
+                Zone Minute Scale: 
+            </div>
+            <div class="col-3">
+                <input type="range" 
+                       class="form-range" 
+                       id="id_y_scale_max" 
+                       step="10"
+                       :min="session.parameter_set.graph_y_max" 
+                       :max="session.parameter_set.graph_y_max_slider" 
+                       @change="update_scale_max_slider"
+                       v-model="y_scale_max">                
+            </div>
+        </div>
+
     </div>                    
 </div> 
