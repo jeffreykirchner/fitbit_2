@@ -41,7 +41,7 @@
                                 No Pay %
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
-                                Daily ZM
+                                Daily ZM | Expected
                             </th>
                             <th scope="col" class = "text-center m-1 p-1 w-auto">
                                 Average ZM
@@ -96,8 +96,8 @@
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.earnings_no_pay_percent]]%
                             </td>
-                            <td class="player_table_cell text-center text-nowrap w-auto">
-                                [[p.zone_minutes]]
+                            <td class="player_table_cell text-center text-nowrap w-auto" v-bind:style="p.fitbit_min_heart_rate_zone_bpm_flag ? 'color:red' : 'color:black'">
+                                [[p.zone_minutes]] | [[p.zone_minutes_from_heart_rate]]
                             </td>
                             <td class="player_table_cell text-center text-nowrap w-auto">
                                 [[p.average_pay_block_zone_minutes]]

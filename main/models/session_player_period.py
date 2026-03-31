@@ -175,6 +175,11 @@ class SessionPlayerPeriod(models.Model):
             if self.fitbit_min_heart_rate_zone_bpm != fitbit_min_heart_rate_zone_bpm_expected:
                 v = True
         
+        #if zone minutes is more than 5 away from zone_minutes_from_heart_rate
+        if self.zone_minutes_from_heart_rate>0:
+            if abs(self.zone_minutes - self.zone_minutes_from_heart_rate) > 10:
+                v = True
+
         return v
 
     def get_pay_block(self):
