@@ -177,17 +177,32 @@ class SessionPlayerPeriod(models.Model):
         
         #if zone minutes is more than 5 away from zone_minutes_from_heart_rate
         if self.zone_minutes_from_heart_rate>0:
-            if abs(self.zone_minutes - self.zone_minutes_from_heart_rate) > 10:
+            if self.zone_minutes-self.zone_minutes_from_heart_rate > 10:
                 v = True
 
         return v
 
+    def check_fitbit_age(self):
+        '''
+        if fitbit age is zero, copy age from the previous SessionPlayerPeriod with a non zero fitbit age for this player, if it exists
+        '''
+
+        if self.fitbit_age != 0:
+            return
+        
+        previous_periods = self.session_player.session_player_periods_b.filter(fitbit_age__gt=0).order_by('-session_period__period_number')
+
+        if previous_periods.count() > 0:
+            self.fitbit_age = previous_periods.first().fitbit_age
+            self.save()
+    
     def get_pay_block(self):
         '''
         return parameter set pay block for this period
         '''
 
         return self.session_period.parameter_set_period.parameter_set_pay_block
+
         
     def get_individual_bonus_payment(self):
         '''
