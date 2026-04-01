@@ -177,7 +177,7 @@ class SessionPlayerPeriod(models.Model):
         
         #if zone minutes is more than 5 away from zone_minutes_from_heart_rate
         if self.zone_minutes_from_heart_rate>0:
-            if self.zone_minutes-self.zone_minutes_from_heart_rate > 10:
+            if self.zone_minutes_from_heart_rate-self.zone_minutes > 10:
                 v = True
 
         return v
@@ -620,7 +620,7 @@ class SessionPlayerPeriod(models.Model):
         take csv writer and add row
         '''
         # ["Session ID", "Period", "Player", "Group", 
-        #                  "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
+        #                  "Zone Minutes", "Zone Minutes From Heart Rate", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
         #                  "Checked In", "Checked In Forced", "fixed pay", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])                    "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
 
         earnings_individual = 0
@@ -648,6 +648,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.group_number if not self.current_group_number else self.current_group_number,
                          self.session_player.fitbit_device,
                          self.zone_minutes,
+                         self.zone_minutes_from_heart_rate,
                          self.average_pay_block_zone_minutes,
                          #self.sleep_minutes,
                          self.fitbit_minutes_heart_peak,
