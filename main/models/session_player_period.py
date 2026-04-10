@@ -175,9 +175,8 @@ class SessionPlayerPeriod(models.Model):
             if self.fitbit_min_heart_rate_zone_bpm != fitbit_min_heart_rate_zone_bpm_expected:
                 v = True
         
-        #if zone minutes is more than 5 away from zone_minutes_from_heart_rate
-        if self.zone_minutes_from_heart_rate>0:
-            if self.zone_minutes_from_heart_rate-self.zone_minutes > 10:
+        #if zone minutes is more than 10 away from zone_minutes_from_heart_rate
+        if abs(self.zone_minutes_from_heart_rate-self.zone_minutes) > 10:
                 v = True
 
         return v
@@ -194,6 +193,20 @@ class SessionPlayerPeriod(models.Model):
 
         if previous_periods.count() > 0:
             self.fitbit_age = previous_periods.first().fitbit_age
+            self.save()
+    
+    def check_resting_heart_rate(self):
+        '''
+        if fitbit resting heart rate is zero, copy resting heart rate from the previous SessionPlayerPeriod with a non zero fitbit resting heart rate for this player, if it exists
+        '''
+
+        if self.fitbit_resting_heart_rate != 0:
+            return
+        
+        previous_periods = self.session_player.session_player_periods_b.filter(fitbit_resting_heart_rate__gt=0).order_by('-session_period__period_number')
+
+        if previous_periods.count() > 0:
+            self.fitbit_resting_heart_rate = previous_periods.first().fitbit_resting_heart_rate
             self.save()
     
     def get_pay_block(self):
