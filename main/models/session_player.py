@@ -394,6 +394,7 @@ class SessionPlayer(models.Model):
 
             #check if zone minutes reported from fitbit are different from observed heart rate time series.
             p.check_fitbit_age()
+            p.check_resting_heart_rate()
             p.calc_zone_minutes_from_heart_rate_time_series()
             p.save()
 
