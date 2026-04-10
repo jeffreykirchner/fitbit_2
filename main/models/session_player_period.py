@@ -189,10 +189,10 @@ class SessionPlayerPeriod(models.Model):
         if self.fitbit_age != 0:
             return
         
-        previous_periods = self.session_player.session_player_periods_b.filter(fitbit_age__gt=0).order_by('-session_period__period_number')
+        previous_period = self.session_player.session_player_periods_b.filter(fitbit_age__gt=0, session_period__period_number__lt=self.session_period.period_number).order_by('-session_period__period_number').first()
 
-        if previous_periods.count() > 0:
-            self.fitbit_age = previous_periods.first().fitbit_age
+        if previous_period:
+            self.fitbit_age = previous_period.fitbit_age
             self.save()
     
     def check_resting_heart_rate(self):
@@ -203,10 +203,10 @@ class SessionPlayerPeriod(models.Model):
         if self.fitbit_resting_heart_rate != 0:
             return
         
-        previous_periods = self.session_player.session_player_periods_b.filter(fitbit_resting_heart_rate__gt=0).order_by('-session_period__period_number')
+        previous_period = self.session_player.session_player_periods_b.filter(fitbit_resting_heart_rate__gt=0, session_period__period_number__lt=self.session_period.period_number).order_by('-session_period__period_number').first()
 
-        if previous_periods.count() > 0:
-            self.fitbit_resting_heart_rate = previous_periods.first().fitbit_resting_heart_rate
+        if previous_period:
+            self.fitbit_resting_heart_rate = previous_period.fitbit_resting_heart_rate
             self.save()
     
     def get_pay_block(self):
