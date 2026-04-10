@@ -391,8 +391,14 @@ class SessionPlayer(models.Model):
             p.process_metrics(save_pull_time=False,
                               result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
                                       "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+
+            #check if zone minutes reported from fitbit are different from observed heart rate time series.
+            p.check_fitbit_age()
+            p.check_resting_heart_rate()
+            p.calc_zone_minutes_from_heart_rate_time_series()
             p.save()
 
+            #if check in was already true from before, then recalc averages for block since zone minutes may have changed from back pull
             if p.check_in:
                 p.take_check_in(False)
         

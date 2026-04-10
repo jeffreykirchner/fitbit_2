@@ -41,7 +41,8 @@ class SessionPlayerPeriod(models.Model):
     earnings_individual = models.DecimalField(verbose_name='Individual Earnings', decimal_places=2, default=0, max_digits=5)     #earnings from individual activity this period
     earnings_group = models.DecimalField(verbose_name='Group Earnings', decimal_places=2, default=0, max_digits=5)               #earnings from group bonus this period
     
-    zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)        #todays heart active zone minutes
+    zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)                           #todays heart active zone minutes
+    zone_minutes_from_heart_rate =  models.IntegerField(verbose_name='Zone Minutes Observed', default=0) #zone minutes calculated from heart rate time series, used to check accuracy of fitbit active zone minute calculation
     #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
     average_pay_block_zone_minutes = models.DecimalField(verbose_name='Average Zone Minutes', decimal_places=2, default=0, max_digits=6)
 
@@ -127,7 +128,7 @@ class SessionPlayerPeriod(models.Model):
 
     def get_expected_fitbit_min_heart_rate_zone_bpm(self):
         '''
-        return the expect fitbit_min_heart_rate_zone_bpm based on age and resting HR
+        return the expect fitbit_min_heart_rate_zone_bpm based on age and resting HR (Fat burn)
         '''
 
         #return 12
@@ -142,7 +143,23 @@ class SessionPlayerPeriod(models.Model):
         heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
 
         return math.floor(self.fitbit_resting_heart_rate + 0.4 * heart_rate_reserve)
+    
+    def get_heart_rate_zone(self, reserve_used):
+        '''
+        return the heart rate based on the percent of reserve used
+        '''
 
+        if self.fitbit_age == 0:
+            return None
+    
+        if self.fitbit_resting_heart_rate == 0:
+            return None
+
+        max_heart_rate = 220 - self.fitbit_age
+        heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
+
+        return math.floor(self.fitbit_resting_heart_rate + reserve_used * heart_rate_reserve)
+    
     def get_fitbit_min_heart_rate_zone_bpm_flag(self):
         '''
         return true if incorrect AZM calc
@@ -158,14 +175,47 @@ class SessionPlayerPeriod(models.Model):
             if self.fitbit_min_heart_rate_zone_bpm != fitbit_min_heart_rate_zone_bpm_expected:
                 v = True
         
+        #if zone minutes is more than 10 away from zone_minutes_from_heart_rate
+        if abs(self.zone_minutes_from_heart_rate-self.zone_minutes) > 10:
+                v = True
+
         return v
 
+    def check_fitbit_age(self):
+        '''
+        if fitbit age is zero, copy age from the previous SessionPlayerPeriod with a non zero fitbit age for this player, if it exists
+        '''
+
+        if self.fitbit_age != 0:
+            return
+        
+        previous_period = self.session_player.session_player_periods_b.filter(fitbit_age__gt=0, session_period__period_number__lt=self.session_period.period_number).order_by('-session_period__period_number').first()
+
+        if previous_period:
+            self.fitbit_age = previous_period.fitbit_age
+            self.save()
+    
+    def check_resting_heart_rate(self):
+        '''
+        if fitbit resting heart rate is zero, copy resting heart rate from the previous SessionPlayerPeriod with a non zero fitbit resting heart rate for this player, if it exists
+        '''
+
+        if self.fitbit_resting_heart_rate != 0:
+            return
+        
+        previous_period = self.session_player.session_player_periods_b.filter(fitbit_resting_heart_rate__gt=0, session_period__period_number__lt=self.session_period.period_number).order_by('-session_period__period_number').first()
+
+        if previous_period:
+            self.fitbit_resting_heart_rate = previous_period.fitbit_resting_heart_rate
+            self.save()
+    
     def get_pay_block(self):
         '''
         return parameter set pay block for this period
         '''
 
         return self.session_period.parameter_set_period.parameter_set_pay_block
+
         
     def get_individual_bonus_payment(self):
         '''
@@ -411,6 +461,33 @@ class SessionPlayerPeriod(models.Model):
 
         self.save()
 
+    def calc_zone_minutes_from_heart_rate_time_series(self):
+        '''
+        calculate zone minutes from heart rate time series, used to check accuracy of fitbit active zone minute calculation
+        '''
+
+        self.zone_minutes_from_heart_rate = 0
+        if not self.fitbit_heart_time_series:
+            return 0
+        
+        data_set = self.fitbit_heart_time_series.get("activities-heart-intraday", {}).get("dataset", [])
+
+        fat_burn = self.get_heart_rate_zone(0.4)
+        cardio = self.get_heart_rate_zone(0.6)
+
+        if not fat_burn or not cardio:
+            return 0
+
+        for i in data_set:
+            heart_rate = i.get("value", 0)
+
+            if heart_rate >= cardio:
+                self.zone_minutes_from_heart_rate += 2
+            elif heart_rate >= fat_burn:
+                self.zone_minutes_from_heart_rate += 1
+        
+        self.save()
+        
     def take_heart_rate_from_date_range(self, heart_rate_dict):
         '''
         take and store heart rate from date range dict.
@@ -556,7 +633,7 @@ class SessionPlayerPeriod(models.Model):
         take csv writer and add row
         '''
         # ["Session ID", "Period", "Player", "Group", 
-        #                  "Zone Minutes", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
+        #                  "Zone Minutes", "Zone Minutes From Heart Rate", "Sleep Minutes", "Peak Minutes", "Cardio Minutes", "Fat Burn Minutes", "Out of Range Minutes", "Zone Minutes HR BPM", "Resting HR", "Age", "Wrist Time", 
         #                  "Checked In", "Checked In Forced", "fixed pay", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"])                    "Checked In", "Checked In Forced", "Individual Earnings", "Group Earnings", "Total Earnings", "Last Visit Time"]
 
         earnings_individual = 0
@@ -584,6 +661,7 @@ class SessionPlayerPeriod(models.Model):
                          self.session_player.group_number if not self.current_group_number else self.current_group_number,
                          self.session_player.fitbit_device,
                          self.zone_minutes,
+                         self.zone_minutes_from_heart_rate,
                          self.average_pay_block_zone_minutes,
                          #self.sleep_minutes,
                          self.fitbit_minutes_heart_peak,
@@ -737,6 +815,7 @@ class SessionPlayerPeriod(models.Model):
             "earnings_no_pay_percent" : self.earnings_no_pay_percent,
             
             "zone_minutes" : self.zone_minutes,
+            "zone_minutes_from_heart_rate" : self.zone_minutes_from_heart_rate,
             "average_pay_block_zone_minutes" : self.average_pay_block_zone_minutes,
             "fitbit_on_wrist_minutes" : self.get_formated_wrist_minutes(),
             "fitbit_min_heart_rate_zone_bpm" : self.fitbit_min_heart_rate_zone_bpm,
