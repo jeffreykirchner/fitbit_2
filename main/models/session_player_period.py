@@ -176,7 +176,7 @@ class SessionPlayerPeriod(models.Model):
                 v = True
         
         #if zone minutes is more than 10 away from zone_minutes_from_heart_rate
-        if abs(self.zone_minutes_from_heart_rate-self.zone_minutes) > 10:
+        if abs(self.zone_minutes_from_heart_rate-self.zone_minutes) > 10 and self.back_pull:
                 v = True
 
         return v
