@@ -331,7 +331,9 @@ class SessionPlayer(models.Model):
         session_player_periods_bp = []
 
         if not todays_session_player_period:
-            todays_session_player_period = self.get_todays_session_player_period()    
+            todays_session_player_period = self.get_todays_session_player_period()
+
+        end_point_url = "https://health.googleapis.com/v4"    
 
         #if during session
         if todays_session_player_period:
@@ -341,22 +343,22 @@ class SessionPlayer(models.Model):
             #test date
             # temp_date = "2025-03-08"
 
-            data["devices"] = 'https://api.fitbit.com/1/user/-/devices.json'
-            data["fitbit_profile"] = f'https://api.fitbit.com/1/user/-/profile.json'
+            data["devices"] = f'{end_point_url}/users/me/pairedDevices'
+            data["fitbit_profile"] = f'{end_point_url}/users/me/profile'
 
-            data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
-            data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
+            # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+            # data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
 
 
-            session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
-                                                                     .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
-                                                                     .order_by("-session_period__period_number")[:5]
+            # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
+            #                                                          .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
+            #                                                          .order_by("-session_period__period_number")[:5]
             
-            for p in session_player_periods_bp:
-                temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
+            # for p in session_player_periods_bp:
+            #     temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
 
-                data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
-                data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
+            #     data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+            #     data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
 
             r = get_fitbit_metrics(self.fitbit_user_id, data)
 
