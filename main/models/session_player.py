@@ -333,6 +333,7 @@ class SessionPlayer(models.Model):
         if not todays_session_player_period:
             todays_session_player_period = self.get_todays_session_player_period()
 
+        #pull data from google health api v4
         end_point_url = "https://health.googleapis.com/v4"    
 
         #if during session
@@ -343,12 +344,12 @@ class SessionPlayer(models.Model):
             #test date
             # temp_date = "2025-03-08"
 
-            data["devices"] = f'{end_point_url}/users/me/pairedDevices'
-            data["fitbit_profile"] = f'{end_point_url}/users/me/profile'
+            #data["devices"] = f'{end_point_url}/users/me/pairedDevices'
+            #data["fitbit_profile"] = f'{end_point_url}/users/me/profile'
 
             # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
-            # data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
-
+            #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
+            data["fitbit_heart_time_series_td"] = f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints?pageSize=10000&filter=heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"'
 
             # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
             #                                                          .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
