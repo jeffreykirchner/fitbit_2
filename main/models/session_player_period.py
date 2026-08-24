@@ -414,34 +414,60 @@ class SessionPlayerPeriod(models.Model):
             return {"status" : "fail", 
                     "message" : r['message']}
     
-    def process_fitbit_heart_time_series(self, d):
+    def process_fitbit_heart_time_series(self, data):
         '''
         process fitbit heartrate time series d
         '''
 
-        self.fitbit_heart_time_series = d         
-        self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
+        # self.fitbit_heart_time_series = d         
+        # self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
 
-        heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
+        # heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
 
-        #store heart rate ranges
-        for i in range(4):
+        # #store heart rate ranges
+        # for i in range(4):
         
-            minutes = heart_summary[i].get("minutes",0)
-            name =  heart_summary[i].get("name","not found")
+        #     minutes = heart_summary[i].get("minutes",0)
+        #     name =  heart_summary[i].get("name","not found")
 
-            #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
+        #     #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
 
-            if name == 'Out of Range':
-                self.fitbit_minutes_heart_out_of_range = minutes
-            elif name == 'Fat Burn':
-                self.fitbit_minutes_heart_fat_burn = minutes
-                self.fitbit_min_heart_rate_zone_bpm =  heart_summary[i].get("min",0)
-            elif name == 'Cardio':
-                self.fitbit_minutes_heart_cardio = minutes
-            elif name == 'Peak':
-                self.fitbit_minutes_heart_peak = minutes
-        
+        #     if name == 'Out of Range':
+        #         self.fitbit_minutes_heart_out_of_range = minutes
+        #     elif name == 'Fat Burn':
+        #         self.fitbit_minutes_heart_fat_burn = minutes
+        #         self.fitbit_min_heart_rate_zone_bpm =  heart_summary[i].get("min",0)
+        #     elif name == 'Cardio':
+        #         self.fitbit_minutes_heart_cardio = minutes
+        #     elif name == 'Peak':
+        #         self.fitbit_minutes_heart_peak = minutes
+
+
+        'convert google heatlth heart-rate api to fitbit format for the day'
+        output = {                
+                "activities-heart-intraday": {
+                    "dataset": {},
+                    "datasetInterval": 1,
+                    "datasetType": "minute"
+                }
+            }
+
+        data_set = output["activities-heart-intraday"]["dataset"]
+        for d in data:
+            d_time = d["heartRate"].get("sampleTime", {}).get("civilTime", None)  
+
+            temp_key = f'{d_time["time"].get("hours", 0)}:{d_time["time"].get("minutes", 0)}:00'
+
+            if temp_key not in data_set:
+                data_set[temp_key] = [d["heartRate"].get("bpm", 0)]
+            else:
+                data_set[temp_key].append(d["heartRate"].get("bpm", 0))
+            
+
+        'average the heart rate for each minute, round to one decimal place'
+        for key, values in data_set.items():
+            data_set[key] = round(sum(values) / len(values), 1)
+
         v = self.fitbit_heart_time_series.get("activities-heart-intraday",-1)
 
         if v == -1:
@@ -532,14 +558,14 @@ class SessionPlayerPeriod(models.Model):
         temp_s = self.session_period.period_date.strftime("%Y-%m-%d")
 
         try: 
-            if save_pull_time:    
-                self.fitbit_profile = result["fitbit_profile"]["result"]
-                process_fitbit_last_synced_result = self.session_player.process_fitbit_last_synced(result["devices"]["result"], self.fitbit_profile['user']['timezone'])
+            # if save_pull_time:    
+            #     self.fitbit_profile = result["fitbit_profile"]["result"]
+            #     process_fitbit_last_synced_result = self.session_player.process_fitbit_last_synced(result["devices"]["result"], self.fitbit_profile['user']['timezone'])
                 
-                if process_fitbit_last_synced_result['status'] == 'fail':
-                    return {"status" : "fail", "message" : process_fitbit_last_synced_result['message']}
+            #     if process_fitbit_last_synced_result['status'] == 'fail':
+            #         return {"status" : "fail", "message" : process_fitbit_last_synced_result['message']}
                 
-                self.fitbit_age = self.fitbit_profile['user']['age']
+            #     self.fitbit_age = self.fitbit_profile['user']['age']
 
             self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)

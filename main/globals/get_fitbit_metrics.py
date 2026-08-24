@@ -23,7 +23,7 @@ def get_fitbit_metrics(fitbit_user, metrics_dict):
 
     logger = logging.getLogger(__name__)
     
-    logger.info(f"get_fitbit_metrics: user: {fitbit_user}, {metrics_dict}")
+    # logger.info(f"get_fitbit_metrics: user: {fitbit_user}, {metrics_dict}")
 
     #return test data during unit test
     if hasattr(sys, '_called_from_test'):        
@@ -87,4 +87,4 @@ def get_fitbit_metrics_test():
     data["result"]["devices"]["result"][0]["lastSyncTime"] =  datetime.now(tmz).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
     return data
-
+       
