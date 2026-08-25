@@ -406,67 +406,91 @@ class SessionPlayerPeriod(models.Model):
         r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
         if  r['status'] == 'success':
-            self.process_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'])
+            self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'])
+            self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
             
             return {"status" : r['result']['fitbit_heart_time_series']['status'], 
                     "message" : r['result']['fitbit_heart_time_series']['message']}
         else:
             return {"status" : "fail", 
                     "message" : r['message']}
-    
-    def process_fitbit_heart_time_series(self, data):
+
+    def build_fitbit_heart_time_series(self, heart_rate_data):
         '''
-        process fitbit heartrate time series d
+        build fitbit heart rate time series from google health heart rate time series
         '''
-
-        # self.fitbit_heart_time_series = d         
-        # self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
-
-        # heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
-
-        # #store heart rate ranges
-        # for i in range(4):
-        
-        #     minutes = heart_summary[i].get("minutes",0)
-        #     name =  heart_summary[i].get("name","not found")
-
-        #     #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
-
-        #     if name == 'Out of Range':
-        #         self.fitbit_minutes_heart_out_of_range = minutes
-        #     elif name == 'Fat Burn':
-        #         self.fitbit_minutes_heart_fat_burn = minutes
-        #         self.fitbit_min_heart_rate_zone_bpm =  heart_summary[i].get("min",0)
-        #     elif name == 'Cardio':
-        #         self.fitbit_minutes_heart_cardio = minutes
-        #     elif name == 'Peak':
-        #         self.fitbit_minutes_heart_peak = minutes
-
 
         'convert google heatlth heart-rate api to fitbit format for the day'
-        output = {                
+        output = {   
+                "activities-heart":[
+                    {
+                        "value":{"heartRateZones":[{"max": 113, "min": 30, "name": "Out of Range", "minutes": 0, "caloriesOut": 0.0}, 
+                                                   {"max": 142, "min": 114, "name": "Fat Burn", "minutes": 0, "caloriesOut": 0.0}, 
+                                                   {"max": 179, "min": 143, "name": "Cardio", "minutes": 0, "caloriesOut": 0.0}, 
+                                                   {"max": 220, "min": 180, "name": "Peak", "minutes": 0, "caloriesOut": 0.0}], 
+                                 "restingHeartRate":0},
+                        "dateTime":"2026-02-26"
+                    }
+                ],             
                 "activities-heart-intraday": {
-                    "dataset": {},
+                    "dataset": [],
                     "datasetInterval": 1,
                     "datasetType": "minute"
                 }
             }
 
-        data_set = output["activities-heart-intraday"]["dataset"]
-        for d in data:
+        data_set = {}
+        for d in heart_rate_data:
             d_time = d["heartRate"].get("sampleTime", {}).get("civilTime", None)  
 
-            temp_key = f'{d_time["time"].get("hours", 0)}:{d_time["time"].get("minutes", 0)}:00'
+            temp_key = f'{d_time["time"].get("hours", 0):02d}:{d_time["time"].get("minutes", 0):02d}:00'
 
             if temp_key not in data_set:
-                data_set[temp_key] = [d["heartRate"].get("bpm", 0)]
+                data_set[temp_key] = [int(d["heartRate"].get("beatsPerMinute", 0))]
             else:
-                data_set[temp_key].append(d["heartRate"].get("bpm", 0))
+                data_set[temp_key].append(int(d["heartRate"].get("beatsPerMinute", 0)))
             
 
         'average the heart rate for each minute, round to one decimal place'
         for key, values in data_set.items():
-            data_set[key] = round(sum(values) / len(values), 1)
+            data_set[key] = round(sum(values) / len(values))
+
+        'insert data_set into ouput["activities-heart-intraday"]["dataset"] in reverse order'
+        for key, value in reversed(data_set.items()):
+            output["activities-heart-intraday"]["dataset"].append({"time": key, "value": value})
+
+        self.fitbit_heart_time_series = output
+        self.save()
+
+        return output
+    
+    def process_fitbit_heart_time_series(self, d):
+        '''
+        process fitbit heartrate time series data
+        '''
+
+        self.fitbit_heart_time_series = d         
+        self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
+
+        heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
+
+        #store heart rate ranges
+        for i in range(4):
+        
+            minutes = heart_summary[i].get("minutes",0)
+            name =  heart_summary[i].get("name","not found")
+
+            #logger.info(f'pullFibitBitHeartRate {name} {minutes}')
+
+            if name == 'Out of Range':
+                self.fitbit_minutes_heart_out_of_range = minutes
+            elif name == 'Fat Burn':
+                self.fitbit_minutes_heart_fat_burn = minutes
+                self.fitbit_min_heart_rate_zone_bpm =  heart_summary[i].get("min",0)
+            elif name == 'Cardio':
+                self.fitbit_minutes_heart_cardio = minutes
+            elif name == 'Peak':
+                self.fitbit_minutes_heart_peak = minutes
 
         v = self.fitbit_heart_time_series.get("activities-heart-intraday",-1)
 
@@ -567,16 +591,16 @@ class SessionPlayerPeriod(models.Model):
                 
             #     self.fitbit_age = self.fitbit_profile['user']['age']
 
-            self.fitbit_heart_time_series = result["fitbit_heart_time_series"]["result"]
+            self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"])
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
 
             #only store activities for this day
-            fitbit_activities_raw = result["fitbit_activities"]["result"]
+            # fitbit_activities_raw = result["fitbit_activities"]["result"]
             
-            self.fitbit_activities = {"activities" : []}
-            for i in fitbit_activities_raw["activities"]:
-                if temp_s in i["startTime"]:
-                    self.fitbit_activities["activities"].append(i)           
+            # self.fitbit_activities = {"activities" : []}
+            # for i in fitbit_activities_raw["activities"]:
+            #     if temp_s in i["startTime"]:
+            #         self.fitbit_activities["activities"].append(i)           
 
             #store pull time           
             if save_pull_time:
