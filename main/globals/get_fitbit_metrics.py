@@ -47,7 +47,7 @@ def get_fitbit_metrics(fitbit_user, metrics_dict):
         logger.error(f"get_fitbit_metrics connection error: {data}")
         return {"status":"fail","message":"timeout", "result":{}} 
    
-    logger.info(f"get_fitbit_metrics response: {request_result.json()}")
+    # logger.info(f"get_fitbit_metrics response: {request_result.json()}")
 
     return request_result.json()
 

@@ -340,6 +340,7 @@ class SessionPlayer(models.Model):
         if todays_session_player_period:
 
             temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
+            temp_date_tomorrow = (todays_session_player_period.session_period.period_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
             #test date
             # temp_date = "2025-03-08"
@@ -350,7 +351,7 @@ class SessionPlayer(models.Model):
             # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
             #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
             
-            data["fitbit_daily_resting_heart_rate"] = f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints?filter=daily_resting_heart_rate.date= "{temp_date}"'
+            data["fitbit_daily_resting_heart_rate"] = f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints?filter=daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'
             data["fitbit_heart_time_series_td"] = f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints?pageSize=10000&filter=heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"'
             
             # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
