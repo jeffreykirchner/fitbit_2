@@ -388,34 +388,35 @@ class SessionPlayerPeriod(models.Model):
         '''
         return format_minutes(self.fitbit_on_wrist_minutes)
 
-    def pull_fitbit_heart_time_series(self):
-        '''
-        pull heart rate time series from fitbit
-        '''
+    # def pull_fitbit_heart_time_series(self):
+    #     '''
+    #     pull heart rate time series from fitbit
+    #     '''
 
-        if self.session_player.fitbit_user_id == "":
-            return {"status" : "fail", "message" : "no fitbit user id"}
+    #     if self.session_player.fitbit_user_id == "":
+    #         return {"status" : "fail", "message" : "no fitbit user id"}
 
-        temp_s = self.session_period.get_fitbit_formatted_date()
-        #temp_s = "today"
-        #temp_s="2020-11-20"
-        # 
+    #     temp_s = self.session_period.get_fitbit_formatted_date()
+    #     #temp_s = "today"
+    #     #temp_s="2020-11-20"
+    #     # 
         
-        data = {'fitbit_heart_time_series' : f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'}
+    #     data = {'fitbit_heart_time_series' : f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_s}/1d.json'}
 
-        r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
+    #     r = get_fitbit_metrics(self.session_player.fitbit_user_id, data)
 
-        if  r['status'] == 'success':
-            self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'])
-            self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
+    #     if  r['status'] == 'success':
+    #         self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(r['result']['fitbit_heart_time_series']['result'],
+    #                                                                             )
+    #         self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
             
-            return {"status" : r['result']['fitbit_heart_time_series']['status'], 
-                    "message" : r['result']['fitbit_heart_time_series']['message']}
-        else:
-            return {"status" : "fail", 
-                    "message" : r['message']}
+    #         return {"status" : r['result']['fitbit_heart_time_series']['status'], 
+    #                 "message" : r['result']['fitbit_heart_time_series']['message']}
+    #     else:
+    #         return {"status" : "fail", 
+    #                 "message" : r['message']}
 
-    def build_fitbit_heart_time_series(self, heart_rate_data):
+    def build_fitbit_heart_time_series(self, heart_rate_data, resting_heart_rate, heart_rate_zones):
         '''
         build fitbit heart rate time series from google health heart rate time series
         '''
@@ -424,11 +425,11 @@ class SessionPlayerPeriod(models.Model):
         output = {   
                 "activities-heart":[
                     {
-                        "value":{"heartRateZones":[{"max": 113, "min": 30, "name": "Out of Range", "minutes": 0, "caloriesOut": 0.0}, 
-                                                   {"max": 142, "min": 114, "name": "Fat Burn", "minutes": 0, "caloriesOut": 0.0}, 
-                                                   {"max": 179, "min": 143, "name": "Cardio", "minutes": 0, "caloriesOut": 0.0}, 
-                                                   {"max": 220, "min": 180, "name": "Peak", "minutes": 0, "caloriesOut": 0.0}], 
-                                 "restingHeartRate":0},
+                        "value":{"heartRateZones":[{"max": 113, "min": 30, "name": "Out of Range", "minutes": 0}, 
+                                                   {"max": 142, "min": 114, "name": "Fat Burn", "minutes": 0}, 
+                                                   {"max": 179, "min": 143, "name": "Cardio", "minutes": 0}, 
+                                                   {"max": 220, "min": 180, "name": "Peak", "minutes": 0}], 
+                                 "restingHeartRate":resting_heart_rate.get("beatsPerMinute", 0)},
                         "dateTime":"2026-02-26"
                     }
                 ],             
@@ -439,8 +440,12 @@ class SessionPlayerPeriod(models.Model):
                 }
             }
 
+        'if no heart rate data, return empty fitbit format'
+        if not heart_rate_data:
+            return output
+
         data_set = {}
-        for d in heart_rate_data:
+        for d in heart_rate_data["dataPoints"]:
             d_time = d["heartRate"].get("sampleTime", {}).get("civilTime", None)  
 
             temp_key = f'{d_time["time"].get("hours", 0):02d}:{d_time["time"].get("minutes", 0):02d}:00'
@@ -591,7 +596,9 @@ class SessionPlayerPeriod(models.Model):
                 
             #     self.fitbit_age = self.fitbit_profile['user']['age']
 
-            self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"])
+            self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"],
+                                                                                result["fitbit_daily_resting_heart_rate"]["result"],
+                                                                                result["fitbit_daily_heart_rate_zones"]["result"])
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
 
             #only store activities for this day

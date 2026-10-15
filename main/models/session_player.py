@@ -343,7 +343,7 @@ class SessionPlayer(models.Model):
             temp_date_tomorrow = (todays_session_player_period.session_period.period_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
             #test date
-            # temp_date = "2025-03-08"
+            #temp_date = "2026-10-14"
 
             data["devices"] = f'{end_point_url}/users/me/pairedDevices'
             data["fitbit_profile"] = f'{end_point_url}/users/me/profile'
@@ -352,6 +352,9 @@ class SessionPlayer(models.Model):
             #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
             
             data["fitbit_daily_resting_heart_rate"] = f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints?filter=daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'
+            data["fitbit_daily_heart_rate_zones"] = f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints?filter=daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'
+            data["fitbit_time_in_heart_rate_zone"] = f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints?filter=time_in_heart_rate_zone.interval.civil_start_time >= "{temp_date}" AND time_in_heart_rate_zone.interval.civil_start_time < "{temp_date_tomorrow}"'
+            data["fitbit_exercise"] = f'{end_point_url}/users/me/dataTypes/exercise/dataPoints?filter=exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'
             data["fitbit_heart_time_series_td"] = f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints?pageSize=10000&filter=heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"'
             
             # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
@@ -381,6 +384,9 @@ class SessionPlayer(models.Model):
             todays_session_player_period_result = todays_session_player_period.process_metrics(save_pull_time=True,
                                                                                                result={"devices" : result["devices"],
                                                                                                        "fitbit_profile" : result["fitbit_profile"],
+                                                                                                       "fitbit_daily_resting_heart_rate" : result["fitbit_daily_resting_heart_rate"],
+                                                                                                       "fitbit_daily_heart_rate_zones" : result["fitbit_daily_heart_rate_zones"],
+                                                                                                       "fitbit_exercise" : result["fitbit_exercise"],
                                                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
                                                                                                        "fitbit_activities" : []})
             if todays_session_player_period_result['status'] == 'fail':
@@ -390,22 +396,22 @@ class SessionPlayer(models.Model):
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
 
-        for p in session_player_periods_bp:
-            p.back_pull=True
+        # for p in session_player_periods_bp:
+        #     p.back_pull=True
 
-            p.process_metrics(save_pull_time=False,
-                              result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
-                                      "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+        #     p.process_metrics(save_pull_time=False,
+        #                       result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
+        #                               "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
 
-            #check if zone minutes reported from fitbit are different from observed heart rate time series.
-            p.check_fitbit_age()
-            p.check_resting_heart_rate()
-            p.calc_zone_minutes_from_heart_rate_time_series()
-            p.save()
+        #     #check if zone minutes reported from fitbit are different from observed heart rate time series.
+        #     p.check_fitbit_age()
+        #     p.check_resting_heart_rate()
+        #     p.calc_zone_minutes_from_heart_rate_time_series()
+        #     p.save()
 
-            #if check in was already true from before, then recalc averages for block since zone minutes may have changed from back pull
-            if p.check_in:
-                p.take_check_in(False)
+        #     #if check in was already true from before, then recalc averages for block since zone minutes may have changed from back pull
+        #     if p.check_in:
+        #         p.take_check_in(False)
         
         if todays_session_player_period:
             self.calc_averages_for_block(todays_session_player_period.get_pay_block())
