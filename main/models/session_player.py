@@ -345,17 +345,44 @@ class SessionPlayer(models.Model):
             #test date
             #temp_date = "2026-10-14"
 
-            data["devices"] = f'{end_point_url}/users/me/pairedDevices'
-            data["fitbit_profile"] = f'{end_point_url}/users/me/profile'
+            data["devices"] = {"url": f'{end_point_url}/users/me/pairedDevices', 
+                               "method": "GET", 
+                               "payload": None}
+            
+            data["fitbit_profile"] = {"url": f'{end_point_url}/users/me/profile', 
+                                      "method": "GET", 
+                                      "payload": None}
 
             # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
             #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
             
-            data["fitbit_daily_resting_heart_rate"] = f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints?filter=daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'
-            data["fitbit_daily_heart_rate_zones"] = f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints?filter=daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'
-            data["fitbit_time_in_heart_rate_zone"] = f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints?filter=time_in_heart_rate_zone.interval.civil_start_time >= "{temp_date}" AND time_in_heart_rate_zone.interval.civil_start_time < "{temp_date_tomorrow}"'
-            data["fitbit_exercise"] = f'{end_point_url}/users/me/dataTypes/exercise/dataPoints?filter=exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'
-            data["fitbit_heart_time_series_td"] = f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints?pageSize=10000&filter=heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"'
+            data["fitbit_daily_resting_heart_rate"] = {"url": f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints', 
+                                                       "method": "GET", 
+                                                       "payload": {"filter": f'daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'}}
+            
+            data["fitbit_daily_heart_rate_zones"] = {"url": f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints', 
+                                                     "method": "GET", 
+                                                     "payload": {"filter": f'daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'}}
+            
+            # data["fitbit_time_in_heart_rate_zone"] = {"url": f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints', 
+            #                                           "method": "POST", 
+            #                                           "payload": {"range": {"start": {"year": 2026, "month": 10, "day": 14},
+            #                                                                 "end": {"year": 2026, "month": 10, "day": 15}},
+            #                                                       "windowSizeDays": 1,
+            #                                                       "dataSourceFamily": "users/me/dataSourceFamilies/google-wearables",}}
+            
+            data["fitbit_exercise"] = {"url": f'{end_point_url}/users/me/dataTypes/exercise/dataPoints', 
+                                       "method": "GET", 
+                                       "payload":{"filter": f'exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
+            
+            data["fitbit_heart_time_series_td"] = {"url": f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints', 
+                                                   "method": "GET", 
+                                                   "payload": {"filter": f'heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"',
+                                                               "pageSize": 10000}}
+
+            data["active_zone_minutes"] = {"url": f'{end_point_url}/users/me/dataTypes/active-zone-minutes/dataPoints',
+                                           "method": "GET", 
+                                           "payload":{"filter": f'active_zone_minutes.interval.civil_start_time >= "{temp_date}T00:00:00" AND active_zone_minutes.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
             
             # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
             #                                                          .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
@@ -387,7 +414,9 @@ class SessionPlayer(models.Model):
                                                                                                        "fitbit_daily_resting_heart_rate" : result["fitbit_daily_resting_heart_rate"],
                                                                                                        "fitbit_daily_heart_rate_zones" : result["fitbit_daily_heart_rate_zones"],
                                                                                                        "fitbit_exercise" : result["fitbit_exercise"],
+                                                                                                    #    "fitbit_time_in_heart_rate_zone" : result["fitbit_time_in_heart_rate_zone"],
                                                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
+                                                                                                       "active_zone_minutes" : result["active_zone_minutes"],
                                                                                                        "fitbit_activities" : []})
             if todays_session_player_period_result['status'] == 'fail':
                 return {"status" : "fail", "message" : todays_session_player_period_result["message"]}

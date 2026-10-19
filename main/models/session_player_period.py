@@ -43,6 +43,7 @@ class SessionPlayerPeriod(models.Model):
     
     zone_minutes = models.IntegerField(verbose_name='Zone Minutes', default=0)                           #todays heart active zone minutes
     zone_minutes_from_heart_rate =  models.IntegerField(verbose_name='Zone Minutes Observed', default=0) #zone minutes calculated from heart rate time series, used to check accuracy of fitbit active zone minute calculation
+    zone_minutes_time_series = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)        #zone minutes time series pulled from google health, used to check accuracy of fitbit active zone minute calculation
     #sleep_minutes = models.IntegerField(verbose_name='Sleep Minutes', default=0)      #todays minutes asleep
     average_pay_block_zone_minutes = models.DecimalField(verbose_name='Average Zone Minutes', decimal_places=2, default=0, max_digits=6)
 
@@ -357,6 +358,8 @@ class SessionPlayerPeriod(models.Model):
         '''
         return true if all group members have checked in
         '''
+        if not self.session_period:
+            return False
 
         no_checkin_count = self.session_period.session_player_periods_a.filter(session_player__group_number=self.session_player.group_number,
                                                                                check_in=False).count()
@@ -421,15 +424,20 @@ class SessionPlayerPeriod(models.Model):
         build fitbit heart rate time series from google health heart rate time series
         '''
 
-        'convert google heatlth heart-rate api to fitbit format for the day'
+        # get resting heart rate from resting_heart_rate data
+        resting_heart_rate_value = 0
+
+        if 'dataPoints' in resting_heart_rate and len(resting_heart_rate['dataPoints']) > 0:
+            resting_heart_rate_value = resting_heart_rate['dataPoints'][0]['dailyRestingHeartRate'].get('beatsPerMinute', 0)
+ 
         output = {   
                 "activities-heart":[
                     {
-                        "value":{"heartRateZones":[{"max": 113, "min": 30, "name": "Out of Range", "minutes": 0}, 
-                                                   {"max": 142, "min": 114, "name": "Fat Burn", "minutes": 0}, 
-                                                   {"max": 179, "min": 143, "name": "Cardio", "minutes": 0}, 
-                                                   {"max": 220, "min": 180, "name": "Peak", "minutes": 0}], 
-                                 "restingHeartRate":resting_heart_rate.get("beatsPerMinute", 0)},
+                        "value":{"heartRateZones":[{"max": 0, "min": 0, "name": "Out of Range", "minutes": 0}, 
+                                                   {"max": 0, "min": 0, "name": "Fat Burn", "minutes": 0}, 
+                                                   {"max": 0, "min": 0, "name": "Cardio", "minutes": 0}, 
+                                                   {"max": 0, "min": 0, "name": "Peak", "minutes": 0}], 
+                                 "restingHeartRate":resting_heart_rate_value},
                         "dateTime":"2026-02-26"
                     }
                 ],             
@@ -440,7 +448,21 @@ class SessionPlayerPeriod(models.Model):
                 }
             }
 
-        'if no heart rate data, return empty fitbit format'
+        #loop through heart rate zones and update
+        if 'dataPoints' in heart_rate_zones and len(heart_rate_zones['dataPoints']) > 0:
+            daily_heart_rate_zones = heart_rate_zones['dataPoints'][0]['dailyHeartRateZones']
+
+            activity_heart = output["activities-heart"][0]
+
+            activity_heart["dateTime"] = daily_heart_rate_zones["date"]
+
+            for counter, heart_rate_zone in enumerate(daily_heart_rate_zones["heartRateZones"]):
+                activity_heart["value"]["heartRateZones"][counter]["max"] = heart_rate_zone.get("maxBeatsPerMinute", 0)
+                activity_heart["value"]["heartRateZones"][counter]["min"] = heart_rate_zone.get("minBeatsPerMinute", 0)
+                activity_heart["value"]["heartRateZones"][counter]["name_gh"] = heart_rate_zone.get("heartRateZoneType", "")
+                
+
+        #if no heart rate data, return empty fitbit format
         if not heart_rate_data:
             return output
 
@@ -466,6 +488,13 @@ class SessionPlayerPeriod(models.Model):
 
         self.fitbit_heart_time_series = output
         self.save()
+
+        #loop through the data_set and count the number of minutes in each heart rate zone in activity_heart["value"]["heartRateZones"]
+        for key, value in data_set.items():
+            for heart_rate_zone in output["activities-heart"][0]["value"]["heartRateZones"]:
+                if value >= int(heart_rate_zone["min"]) and value <= int(heart_rate_zone["max"]):
+                    heart_rate_zone["minutes"] += 1
+                    break
 
         return output
     
@@ -510,9 +539,10 @@ class SessionPlayerPeriod(models.Model):
             self.fitbit_on_wrist_minutes = len(v)
 
             #active zone minutes, new calculation                
-            self.zone_minutes = self.fitbit_minutes_heart_cardio * 2 + \
-                                self.fitbit_minutes_heart_peak * 2 + \
-                                self.fitbit_minutes_heart_fat_burn
+            # self.zone_minutes = self.fitbit_minutes_heart_cardio * 2 + \
+            #                     self.fitbit_minutes_heart_peak * 2 + \
+            #                     self.fitbit_minutes_heart_fat_burn
+            
 
         self.save()
 
@@ -595,6 +625,14 @@ class SessionPlayerPeriod(models.Model):
             #         return {"status" : "fail", "message" : process_fitbit_last_synced_result['message']}
                 
             #     self.fitbit_age = self.fitbit_profile['user']['age']
+
+            self.zone_minutes_time_series = result["active_zone_minutes"]["result"]
+
+            self.zone_minutes = 0
+            if self.zone_minutes_time_series and "dataPoints" in self.zone_minutes_time_series:
+                for dp in self.zone_minutes_time_series["dataPoints"]:
+                    activeZoneMinutes = dp.get("activeZoneMinutes", 0)
+                    self.zone_minutes += int(activeZoneMinutes["activeZoneMinutes"])
 
             self.fitbit_heart_time_series = self.build_fitbit_heart_time_series(result["fitbit_heart_time_series"]["result"],
                                                                                 result["fitbit_daily_resting_heart_rate"]["result"],
