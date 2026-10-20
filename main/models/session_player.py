@@ -4,6 +4,7 @@ session player model
 
 #import logging
 from decimal import Decimal
+from typing import Any
 from datetime import datetime, timedelta
 
 import uuid
@@ -353,6 +354,10 @@ class SessionPlayer(models.Model):
                                       "method": "GET", 
                                       "payload": None}
 
+            data["fitbit_settings"] = {"url": f'{end_point_url}/users/me/settings', 
+                                                  "method": "GET", 
+                                                  "payload": None}
+
             # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
             #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
             
@@ -411,6 +416,7 @@ class SessionPlayer(models.Model):
             todays_session_player_period_result = todays_session_player_period.process_metrics(save_pull_time=True,
                                                                                                result={"devices" : result["devices"],
                                                                                                        "fitbit_profile" : result["fitbit_profile"],
+                                                                                                       "fitbit_settings" : result["fitbit_settings"],
                                                                                                        "fitbit_daily_resting_heart_rate" : result["fitbit_daily_resting_heart_rate"],
                                                                                                        "fitbit_daily_heart_rate_zones" : result["fitbit_daily_heart_rate_zones"],
                                                                                                        "fitbit_exercise" : result["fitbit_exercise"],
@@ -578,14 +584,16 @@ class SessionPlayer(models.Model):
             return float(round(sum_zone_minutes_list/current_period_number,2))
         return 0
 
-    def process_fitbit_last_synced(self, r, time_zone=None):
+    def process_fitbit_last_synced(self, r: dict[str, Any], 
+                                   time_zone: str | None = None, 
+                                   utc_offset: int | None = None) -> dict[str, str]:
         '''
         process result of pulling fitbit last sync time
         '''
 
         logger = logging.getLogger(__name__) 
 
-        devices = r
+        devices = r["pairedDevices"]
 
         if not time_zone or time_zone=="Etc/UTC":
             prm = main.models.Parameters.objects.first()
@@ -596,7 +604,11 @@ class SessionPlayer(models.Model):
         v = -1
             
         try:
-            v = devices[0].get("lastSyncTime",-1)                
+            for i in devices:
+                if i["deviceVersion"] != "MobileTrack":
+                    v = i.get("lastSyncTime")
+                    break
+
         except Exception  as e: 
             logger.info(e)
             return {"status" : "fail", "message" : "no devices found"}
@@ -609,11 +621,15 @@ class SessionPlayer(models.Model):
             
             for i in devices:
 
-                if i.get("type","") != "TRACKER":
+                if i["deviceVersion"] == "MobileTrack":
                     continue
+
                 tracker_count = tracker_count + 1
 
-                v = datetime.strptime(i.get("lastSyncTime"),'%Y-%m-%dT%H:%M:%S.%f')
+                v = datetime.fromisoformat(i.get("lastSyncTime"))  # with or without fractional seconds
+
+                if utc_offset is not None:
+                    v = v + timedelta(seconds=utc_offset)
 
                 #test synced today
                 #v = v-timedelta(days=1)
