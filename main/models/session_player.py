@@ -401,7 +401,10 @@ class SessionPlayer(models.Model):
 
             r = get_fitbit_metrics(self.fitbit_user_id, data)
         else:
-            data['devices'] = 'https://api.fitbit.com/1/user/-/devices.json'
+            data["devices"] = {"url": f'{end_point_url}/users/me/pairedDevices', 
+                                           "method": "GET", 
+                                           "payload": None}
+             
             r = get_fitbit_metrics(self.fitbit_user_id, data)
             if r["status"] != "fail":
                 process_fitbit_last_synced_result = self.process_fitbit_last_synced(r["result"]["devices"]["result"])
