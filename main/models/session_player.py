@@ -422,11 +422,10 @@ class SessionPlayer(models.Model):
                                                                                                        "fitbit_settings" : result["fitbit_settings"],
                                                                                                        "fitbit_daily_resting_heart_rate" : result["fitbit_daily_resting_heart_rate"],
                                                                                                        "fitbit_daily_heart_rate_zones" : result["fitbit_daily_heart_rate_zones"],
-                                                                                                       "fitbit_exercise" : result["fitbit_exercise"],
                                                                                                     #    "fitbit_time_in_heart_rate_zone" : result["fitbit_time_in_heart_rate_zone"],
                                                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
                                                                                                        "active_zone_minutes" : result["active_zone_minutes"],
-                                                                                                       "fitbit_activities" : []})
+                                                                                                       "fitbit_activities" :  result["fitbit_exercise"]})
             if todays_session_player_period_result['status'] == 'fail':
                 return {"status" : "fail", "message" : todays_session_player_period_result["message"]}
             

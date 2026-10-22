@@ -642,12 +642,26 @@ class SessionPlayerPeriod(models.Model):
             self.process_fitbit_heart_time_series(self.fitbit_heart_time_series)
 
             #only store activities for this day
-            # fitbit_activities_raw = result["fitbit_activities"]["result"]
+            fitbit_activities_raw = result["fitbit_activities"]["result"]
             
-            # self.fitbit_activities = {"activities" : []}
-            # for i in fitbit_activities_raw["activities"]:
-            #     if temp_s in i["startTime"]:
-            #         self.fitbit_activities["activities"].append(i)           
+            self.fitbit_activities = {"activities" : []}
+            for i in fitbit_activities_raw["dataPoints"]:
+                if "dataSource" not in i or "exercise" not in i:
+                    continue
+
+                data_source = i["dataSource"]
+                exercise = i["exercise"]
+                
+                output = {"activeZoneMinutes":{}}
+                output["activityName"] = exercise.get("exerciseType", "")
+                output["activeZoneMinutes"]["totalMinutes"] = exercise["metricsSummary"].get("activeZoneMinutes", "")
+                output["startTime"] = datetime.fromisoformat(exercise["interval"].get("startTime", ""))
+                output["duration"] = int(exercise.get("activeDuration", '0').replace("s","")) * 1000
+                output["logType"] = data_source.get("recordingMethod", "") + " " + data_source.get("platform", "")
+
+                output["rawData"] = i
+
+                self.fitbit_activities["activities"].append(output)           
 
             #store pull time           
             if save_pull_time:
