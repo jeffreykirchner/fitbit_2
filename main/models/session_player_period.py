@@ -645,23 +645,24 @@ class SessionPlayerPeriod(models.Model):
             fitbit_activities_raw = result["fitbit_activities"]["result"]
             
             self.fitbit_activities = {"activities" : []}
-            for i in fitbit_activities_raw["dataPoints"]:
-                if "dataSource" not in i or "exercise" not in i:
-                    continue
+            if "dataPoints" in fitbit_activities_raw:
+                for i in fitbit_activities_raw["dataPoints"]:
+                    if "dataSource" not in i or "exercise" not in i:
+                        continue
 
-                data_source = i["dataSource"]
-                exercise = i["exercise"]
-                
-                output = {"activeZoneMinutes":{}}
-                output["activityName"] = exercise.get("exerciseType", "")
-                output["activeZoneMinutes"]["totalMinutes"] = exercise["metricsSummary"].get("activeZoneMinutes", "")
-                output["startTime"] = datetime.fromisoformat(exercise["interval"].get("startTime", ""))
-                output["duration"] = int(exercise.get("activeDuration", '0').replace("s","")) * 1000
-                output["logType"] = data_source.get("recordingMethod", "") + " " + data_source.get("platform", "")
+                    data_source = i["dataSource"]
+                    exercise = i["exercise"]
+                    
+                    output = {"activeZoneMinutes":{}}
+                    output["activityName"] = exercise.get("exerciseType", "")
+                    output["activeZoneMinutes"]["totalMinutes"] = exercise["metricsSummary"].get("activeZoneMinutes", "")
+                    output["startTime"] = datetime.fromisoformat(exercise["interval"].get("startTime", ""))
+                    output["duration"] = int(exercise.get("activeDuration", '0').replace("s","")) * 1000
+                    output["logType"] = data_source.get("recordingMethod", "") + " " + data_source.get("platform", "")
 
-                output["rawData"] = i
+                    output["rawData"] = i
 
-                self.fitbit_activities["activities"].append(output)           
+                    self.fitbit_activities["activities"].append(output)           
 
             #store pull time           
             if save_pull_time:
@@ -670,7 +671,7 @@ class SessionPlayerPeriod(models.Model):
             self.save()
             
         except KeyError as e:
-            logger.error(f"pull_secondary_metrics error: {e}")
+            logger.error(f"process_metrics error: {e}")
             
         return {"status" : "success", "message" :""}
 
