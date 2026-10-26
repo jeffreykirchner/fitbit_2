@@ -29,6 +29,9 @@ from main.globals import get_color_by_group
 
 import main
 
+#pull data from google health api v4
+end_point_url = "https://health.googleapis.com/v4"  
+
 class SessionPlayer(models.Model):
     '''
     session player model
@@ -334,14 +337,10 @@ class SessionPlayer(models.Model):
         if not todays_session_player_period:
             todays_session_player_period = self.get_todays_session_player_period()
 
-        #pull data from google health api v4
-        end_point_url = "https://health.googleapis.com/v4"    
-
         #if during session
         if todays_session_player_period:
 
-            temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
-            temp_date_tomorrow = (todays_session_player_period.session_period.period_date + timedelta(days=1)).strftime("%Y-%m-%d")
+            
 
             #test date
             #temp_date = "2026-10-14"
@@ -358,46 +357,23 @@ class SessionPlayer(models.Model):
                                                   "method": "GET", 
                                                   "payload": None}
 
-            # data["fitbit_activities_td"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
-            #data["fitbit_heart_time_series_td"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
-            
-            data["fitbit_daily_resting_heart_rate_td"] = {"url": f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints', 
-                                                       "method": "GET", 
-                                                       "payload": {"filter": f'daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'}}
-            
-            data["fitbit_daily_heart_rate_zones_td"] = {"url": f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints', 
-                                                     "method": "GET", 
-                                                     "payload": {"filter": f'daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'}}
-            
-            # data["fitbit_time_in_heart_rate_zone"] = {"url": f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints', 
-            #                                           "method": "POST", 
-            #                                           "payload": {"range": {"start": {"year": 2026, "month": 10, "day": 14},
-            #                                                                 "end": {"year": 2026, "month": 10, "day": 15}},
-            #                                                       "windowSizeDays": 1,
-            #                                                       "dataSourceFamily": "users/me/dataSourceFamilies/google-wearables",}}
-            
-            data["fitbit_exercise_td"] = {"url": f'{end_point_url}/users/me/dataTypes/exercise/dataPoints', 
-                                       "method": "GET", 
-                                       "payload":{"filter": f'exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
-            
-            data["fitbit_heart_time_series_td"] = {"url": f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints', 
-                                                   "method": "GET", 
-                                                   "payload": {"filter": f'heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"',
-                                                               "pageSize": 10000}}
+            temp_date = todays_session_player_period.session_period.period_date.strftime("%Y-%m-%d")
+            temp_date_tomorrow = (todays_session_player_period.session_period.period_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
-            data["active_zone_minutes_td"] = {"url": f'{end_point_url}/users/me/dataTypes/active-zone-minutes/dataPoints',
-                                           "method": "GET", 
-                                           "payload":{"filter": f'active_zone_minutes.interval.civil_start_time >= "{temp_date}T00:00:00" AND active_zone_minutes.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
+            self.add_primary_time_series(data, temp_date, temp_date_tomorrow, "td")
             
-            # session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
-            #                                                          .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
-            #                                                          .order_by("-session_period__period_number")[:5]
+            session_player_periods_bp = self.session_player_periods_b.filter(back_pull=False) \
+                                                                     .filter(session_period__period_number__lt=todays_session_player_period.session_period.period_number)\
+                                                                     .order_by("-session_period__period_number")[:5]
             
-            # for p in session_player_periods_bp:
-            #     temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
+            for p in session_player_periods_bp:
+                temp_date = p.session_period.period_date.strftime("%Y-%m-%d")
+                temp_date_tomorrow = (p.session_period.period_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
-            #     data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
-            #     data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
+                self.add_primary_time_series(data, temp_date, temp_date_tomorrow, str(p.id))
+
+                # data[f"fitbit_activities_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/list.json?afterDate={temp_date}&sort=asc&offset=0&limit=100'
+                # data[f"fitbit_heart_time_series_{p.id}"] = f'https://api.fitbit.com/1/user/-/activities/heart/date/{temp_date}/1d/1min.json'
 
             r = get_fitbit_metrics(self.fitbit_user_id, data)
         else:
@@ -433,27 +409,61 @@ class SessionPlayer(models.Model):
         if not self.fitbit_synced_today():
             return {"status" : "fail", "message" : "Not synced today"}
 
-        # for p in session_player_periods_bp:
-        #     p.back_pull=True
+        
+        for p in reversed(session_player_periods_bp):
+            p.back_pull=True
 
-        #     p.process_metrics(save_pull_time=False,
-        #                       result={"fitbit_heart_time_series" : result[f"fitbit_heart_time_series_{p.id}"],
-        #                               "fitbit_activities" : result[f"fitbit_activities_{p.id}"]})
+            p.process_metrics(save_pull_time=False,
+                              result={"fitbit_daily_resting_heart_rate" : result["fitbit_daily_resting_heart_rate_" + str(p.id)],
+                                      "fitbit_daily_heart_rate_zones" : result["fitbit_daily_heart_rate_zones_" + str(p.id)],
+                                 #    "fitbit_time_in_heart_rate_zone" : result["fitbit_time_in_heart_rate_zone"],
+                                      "fitbit_heart_time_series" : result["fitbit_heart_time_series_" + str(p.id)],
+                                      "active_zone_minutes" : result["active_zone_minutes_" + str(p.id)],
+                                      "fitbit_activities" :  result["fitbit_exercise_" + str(p.id)]})
 
-        #     #check if zone minutes reported from fitbit are different from observed heart rate time series.
-        #     p.check_fitbit_age()
-        #     p.check_resting_heart_rate()
-        #     p.calc_zone_minutes_from_heart_rate_time_series()
-        #     p.save()
+            #check if zone minutes reported from fitbit are different from observed heart rate time series.
+            p.check_fitbit_age()
+            p.check_resting_heart_rate()
+            p.calc_zone_minutes_from_heart_rate_time_series()
+            p.save()
 
-        #     #if check in was already true from before, then recalc averages for block since zone minutes may have changed from back pull
-        #     if p.check_in:
-        #         p.take_check_in(False)
+            #if check in was already true from before, then recalc averages for block since zone minutes may have changed from back pull
+            if p.check_in:
+                p.take_check_in(False)
         
         if todays_session_player_period:
             self.calc_averages_for_block(todays_session_player_period.get_pay_block())
                 
         return {"status" : "success", "message" : ""}
+
+    def add_primary_time_series(self, data, temp_date, temp_date_tomorrow, suffix):
+        data["fitbit_daily_resting_heart_rate_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints', 
+                                                               "method": "GET", 
+                                                               "payload": {"filter": f'daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'}}
+                    
+        data["fitbit_daily_heart_rate_zones_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints', 
+                                                    "method": "GET", 
+                                                    "payload": {"filter": f'daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'}}
+        
+        # data["fitbit_time_in_heart_rate_zone"] = {"url": f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints', 
+        #                                           "method": "POST", 
+        #                                           "payload": {"range": {"start": {"year": 2026, "month": 10, "day": 14},
+        #                                                                 "end": {"year": 2026, "month": 10, "day": 15}},
+        #                                                       "windowSizeDays": 1,
+        #                                                       "dataSourceFamily": "users/me/dataSourceFamilies/google-wearables",}}
+        
+        data["fitbit_exercise_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/exercise/dataPoints', 
+                                        "method": "GET", 
+                                        "payload":{"filter": f'exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
+        
+        data["fitbit_heart_time_series_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints', 
+                                                "method": "GET", 
+                                                "payload": {"filter": f'heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"',
+                                                            "pageSize": 10000}}
+
+        data["active_zone_minutes_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/active-zone-minutes/dataPoints',
+                                        "method": "GET", 
+                                        "payload":{"filter": f'active_zone_minutes.interval.civil_start_time >= "{temp_date}T00:00:00" AND active_zone_minutes.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
     
     def pull_secondary_time_series(self):
         '''

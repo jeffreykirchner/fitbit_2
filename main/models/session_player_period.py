@@ -157,7 +157,7 @@ class SessionPlayerPeriod(models.Model):
             return None
 
         max_heart_rate = 220 - self.fitbit_age
-        heart_rate_reserve = max_heart_rate - self.fitbit_resting_heart_rate
+        heart_rate_reserve = max_heart_rate - int(self.fitbit_resting_heart_rate)
 
         return math.floor(self.fitbit_resting_heart_rate + reserve_used * heart_rate_reserve)
     
@@ -504,13 +504,13 @@ class SessionPlayerPeriod(models.Model):
         '''
 
         self.fitbit_heart_time_series = d         
-        self.fitbit_resting_heart_rate = self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0)
+        self.fitbit_resting_heart_rate = int(self.fitbit_heart_time_series['activities-heart'][0]['value'].get('restingHeartRate', 0))
 
         heart_summary = self.fitbit_heart_time_series['activities-heart'][0]['value']['heartRateZones']
 
         #store heart rate ranges
         for i in range(4):
-        
+            max_heart_rate = int(heart_summary[i].get("max",0))
             minutes = heart_summary[i].get("minutes",0)
             name =  heart_summary[i].get("name","not found")
 
