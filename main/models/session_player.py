@@ -445,7 +445,7 @@ class SessionPlayer(models.Model):
                                                     "method": "GET", 
                                                     "payload": {"filter": f'daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'}}
         
-        # data["fitbit_time_in_heart_rate_zone"] = {"url": f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone:dailyRollup/dataPoints', 
+        # data["fitbit_time_in_heart_rate_zone"] = {"url": f'{end_point_url}/users/me/dataTypes/time-in-heart-rate-zone/dataPoints:dailyRollup', 
         #                                           "method": "POST", 
         #                                           "payload": {"range": {"start": {"year": 2026, "month": 10, "day": 14},
         #                                                                 "end": {"year": 2026, "month": 10, "day": 15}},
@@ -476,13 +476,87 @@ class SessionPlayer(models.Model):
 
         data = {}
 
-        data["fitbit_steps"] = f'https://api.fitbit.com/1/user/-/activities/tracker/steps/date/{first_period_date}/{last_period_date}.json'
-        data["fitbit_calories"] = f'https://api.fitbit.com/1/user/-/activities/tracker/calories/date/{first_period_date}/{last_period_date}.json'
+        # data["fitbit_steps"] =  {"url": f'{end_point_url}/users/me/dataTypes/steps/dataPoints', 
+        #                          "method": "GET", 
+        #                          "payload":{"filter": f'steps.interval.civil_start_time >= "{first_period_date}T00:00:00" AND steps.interval.civil_start_time < "{last_period_date}T23:59:59"'}}
 
-        data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{first_period_date}/{last_period_date}.json'
-        data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{first_period_date}/{last_period_date}.json'
-        data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{first_period_date}/{last_period_date}.json'
-        data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{first_period_date}/{last_period_date}.json'
+        data["fitbit_steps"] =  {"url": f'{end_point_url}/users/me/dataTypes/steps/dataPoints:dailyRollUp', 
+                                 "method": "POST", 
+                                 "payload":{"range": {
+                                                "start": {
+                                                    "date": {
+                                                        "year": first_period_date.split("-")[0],
+                                                        "month": first_period_date.split("-")[1],
+                                                        "day": first_period_date.split("-")[2]
+                                                    },
+                                                    "time": {
+                                                        "hours": 0,
+                                                        "minutes": 0,
+                                                        "seconds": 0,
+                                                        "nanos": 0
+                                                    }
+                                                    },
+                                                "end": {
+                                                    "date": {
+                                                        "year": last_period_date.split("-")[0],
+                                                        "month": last_period_date.split("-")[1],
+                                                        "day": last_period_date.split("-")[2]
+                                                    },
+                                                    "time": {
+                                                        "hours": 23,
+                                                        "minutes": 59,
+                                                        "seconds": 59,
+                                                        "nanos": 0
+                                                    }
+                                                }
+                                        },
+                                        "windowSizeDays": 1}}
+
+        temp_start_range = 0
+        temp_end_range = 14
+        temp_index = 1
+
+        while temp_start_range < self.session.session_periods.count():
+            #chunk into a range of 14 days
+            temp_first_period_date = (self.session.session_periods.first().period_date+timedelta(days=temp_start_range)).strftime("%Y-%m-%d")
+
+            #add 14 days to temp_first period data
+            temp_last_period_date = (self.session.session_periods.first().period_date+timedelta(days=temp_end_range)).strftime("%Y-%m-%d")
+
+            data["fitbit_calories_" + str(temp_index)] = {"url": f'{end_point_url}/users/me/dataTypes/total-calories/dataPoints:dailyRollUp', 
+                                                            "method": "POST", 
+                                                            "payload":{"range": {
+                                                                        "start": {
+                                                                            "date": {
+                                                                                "year": temp_first_period_date.split("-")[0],
+                                                                                "month": temp_first_period_date.split("-")[1],
+                                                                                "day": temp_first_period_date.split("-")[2]
+                                                                            },
+                                                                            "time": {
+                                                                                "hours": 0,"minutes": 0,"seconds": 0,"nanos": 0
+                                                                            }
+                                                                            },
+                                                                        "end": {
+                                                                            "date": {
+                                                                                "year": temp_last_period_date.split("-")[0],
+                                                                                "month": temp_last_period_date.split("-")[1],
+                                                                                "day": temp_last_period_date.split("-")[2]
+                                                                            },
+                                                                            "time": {
+                                                                                "hours": 23,"minutes": 59,"seconds": 59,"nanos": 0
+                                                                            }
+                                                                        }
+                                                                },
+                                                                "windowSizeDays": 1}}
+
+            temp_start_range += 14
+            temp_end_range += 14
+            temp_index += 1
+
+        # data["fitbit_minutes_sedentary"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesSedentary/date/{first_period_date}/{last_period_date}.json'
+        # data["fitbit_minutes_lightly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesLightlyActive/date/{first_period_date}/{last_period_date}.json'
+        # data["fitbit_minutes_fairly_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesFairlyActive/date/{first_period_date}/{last_period_date}.json'
+        # data["fitbit_minutes_very_active"] = f'https://api.fitbit.com/1/user/-/activities/tracker/minutesVeryActive/date/{first_period_date}/{last_period_date}.json'
 
         r = get_fitbit_metrics(self.fitbit_user_id, data)
 
@@ -494,17 +568,34 @@ class SessionPlayer(models.Model):
         
         session_player_periods = []
         for index, p in enumerate(self.session_player_periods_b.all()):
-            p.fitbit_steps = result["fitbit_steps"]["result"]["activities-tracker-steps"][index]["value"]
 
-            try:
-                p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
-            except Exception as e:
-                p.fitbit_calories = 0
+            period_date = p.session_period.period_date.strftime("%Y-%m-%d")
+            temp_year = period_date.split("-")[0]
+            temp_month = period_date.split("-")[1]
+            temp_day = period_date.split("-")[2]
 
-            p.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][index]["value"]
-            p.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][index]["value"]
-            p.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][index]["value"]
-            p.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][index]["value"]        
+            #process seteps
+            p.fitbit_steps = 0
+            for i in result["fitbit_steps"]["result"]["rollupDataPoints"]:
+                
+                civil_start_date = i["civilStartTime"]["date"]
+
+                if civil_start_date["year"] == int(temp_year) and \
+                   civil_start_date["month"] == int(temp_month) and \
+                   civil_start_date["day"] == int(temp_day):
+
+                    p.fitbit_steps = int(i["steps"]["countSum"])
+                    break
+
+            # try:
+            #     p.fitbit_calories = result["fitbit_calories"]["result"]["activities-tracker-calories"][index]["value"]
+            # except Exception as e:
+            #     p.fitbit_calories = 0
+
+            # p.fitbit_minutes_sedentary = result["fitbit_minutes_sedentary"]["result"]["activities-tracker-minutesSedentary"][index]["value"]
+            # p.fitbit_minutes_lightly_active = result["fitbit_minutes_lightly_active"]["result"]["activities-tracker-minutesLightlyActive"][index]["value"]
+            # p.fitbit_minutes_fairly_active = result["fitbit_minutes_fairly_active"]["result"]["activities-tracker-minutesFairlyActive"][index]["value"]
+            # p.fitbit_minutes_very_active = result["fitbit_minutes_very_active"]["result"]["activities-tracker-minutesVeryActive"][index]["value"]        
 
             session_player_periods.append(p)
         
