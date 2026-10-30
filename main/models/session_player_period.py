@@ -664,6 +664,25 @@ class SessionPlayerPeriod(models.Model):
 
                     self.fitbit_activities["activities"].append(output)           
 
+            #process activity level
+            self.activity_level = result["activity_level"]["result"]
+            self.fitbit_minutes_sedentary = 0
+            self.fitbit_minutes_lightly_active = 0
+            self.fitbit_minutes_fairly_active = 0
+            self.fitbit_minutes_very_active = 0
+
+            for i in self.activity_level.get("dataPoints", []):
+                activity_level = i["activityLevel"].get("activityLevelType", "")
+                
+                if activity_level == "SEDENTARY":
+                    self.fitbit_minutes_sedentary += 1
+                elif activity_level == "LIGHTLY_ACTIVE":
+                    self.fitbit_minutes_lightly_active += 1
+                elif activity_level == "MODERATELY_ACTIVE":
+                    self.fitbit_minutes_fairly_active += 1
+                elif activity_level == "VERY_ACTIVE":
+                    self.fitbit_minutes_very_active += 1
+
             #store pull time           
             if save_pull_time:
                 self.last_login = datetime.now()

@@ -401,7 +401,8 @@ class SessionPlayer(models.Model):
                                                                                                     #    "fitbit_time_in_heart_rate_zone" : result["fitbit_time_in_heart_rate_zone"],
                                                                                                        "fitbit_heart_time_series" : result["fitbit_heart_time_series_td"],
                                                                                                        "active_zone_minutes" : result["active_zone_minutes_td"],
-                                                                                                       "fitbit_activities" :  result["fitbit_exercise_td"]})
+                                                                                                       "fitbit_activities" :  result["fitbit_exercise_td"],
+                                                                                                       "activity_level" : result["activity_level_td"]})
             if todays_session_player_period_result['status'] == 'fail':
                 return {"status" : "fail", "message" : todays_session_player_period_result["message"]}
             
@@ -419,7 +420,8 @@ class SessionPlayer(models.Model):
                                  #    "fitbit_time_in_heart_rate_zone" : result["fitbit_time_in_heart_rate_zone"],
                                       "fitbit_heart_time_series" : result["fitbit_heart_time_series_" + str(p.id)],
                                       "active_zone_minutes" : result["active_zone_minutes_" + str(p.id)],
-                                      "fitbit_activities" :  result["fitbit_exercise_" + str(p.id)]})
+                                      "fitbit_activities" :  result["fitbit_exercise_" + str(p.id)],
+                                      "activity_level" : result["activity_level_" + str(p.id)]})
 
             #check if zone minutes reported from fitbit are different from observed heart rate time series.
             p.check_fitbit_age()
@@ -437,11 +439,11 @@ class SessionPlayer(models.Model):
         return {"status" : "success", "message" : ""}
 
     def add_primary_time_series(self, data, temp_date, temp_date_tomorrow, suffix):
-        data["fitbit_daily_resting_heart_rate_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints', 
+        data["fitbit_daily_resting_heart_rate_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-resting-heart-rate/dataPoints:reconcile', 
                                                                "method": "GET", 
                                                                "payload": {"filter": f'daily_resting_heart_rate.date >= "{temp_date}" AND daily_resting_heart_rate.date < "{temp_date_tomorrow}"'}}
                     
-        data["fitbit_daily_heart_rate_zones_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints', 
+        data["fitbit_daily_heart_rate_zones_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/daily-heart-rate-zones/dataPoints:reconcile', 
                                                     "method": "GET", 
                                                     "payload": {"filter": f'daily_heart_rate_zones.date >= "{temp_date}" AND daily_heart_rate_zones.date < "{temp_date_tomorrow}"'}}
         
@@ -452,18 +454,22 @@ class SessionPlayer(models.Model):
         #                                                       "windowSizeDays": 1,
         #                                                       "dataSourceFamily": "users/me/dataSourceFamilies/google-wearables",}}
         
-        data["fitbit_exercise_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/exercise/dataPoints', 
+        data["fitbit_exercise_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/exercise/dataPoints:reconcile', 
                                         "method": "GET", 
                                         "payload":{"filter": f'exercise.interval.civil_start_time >= "{temp_date}T00:00:00" AND exercise.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
         
-        data["fitbit_heart_time_series_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints', 
+        data["fitbit_heart_time_series_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/heart-rate/dataPoints:reconcile', 
                                                 "method": "GET", 
                                                 "payload": {"filter": f'heart_rate.sample_time.physical_time >= "{temp_date}T00:00:00Z" AND heart_rate.sample_time.physical_time < "{temp_date}T23:59:59Z"',
                                                             "pageSize": 10000}}
 
-        data["active_zone_minutes_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/active-zone-minutes/dataPoints',
+        data["active_zone_minutes_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/active-zone-minutes/dataPoints:reconcile',
                                         "method": "GET", 
                                         "payload":{"filter": f'active_zone_minutes.interval.civil_start_time >= "{temp_date}T00:00:00" AND active_zone_minutes.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
+
+        data["activity_level_" + suffix] = {"url": f'{end_point_url}/users/me/dataTypes/activity-level/dataPoints:reconcile',
+                                                "method": "GET", 
+                                                "payload":{"filter": f'activity_level.interval.civil_start_time >= "{temp_date}T00:00:00" AND activity_level.interval.civil_start_time < "{temp_date_tomorrow}T00:00:00"'}}
     
     def pull_secondary_time_series(self):
         '''
@@ -563,8 +569,15 @@ class SessionPlayer(models.Model):
         if r['status'] == 'fail':
             logger.error(f'pull_secondary_time_series error: {r["message"]}')            
             return {"status" : r['status'], "message" : r["message"]}
-        
+
         result = r['result']
+
+        #merge calories results into one list
+        result["fitbit_calories"] = []
+
+        for i in range(1, temp_index):
+            if "rollupDataPoints" in result[f"fitbit_calories_{i}"]["result"]:
+                result["fitbit_calories"].extend(result[f"fitbit_calories_{i}"]["result"]["rollupDataPoints"])
         
         session_player_periods = []
         for index, p in enumerate(self.session_player_periods_b.all()):
@@ -585,6 +598,18 @@ class SessionPlayer(models.Model):
                    civil_start_date["day"] == int(temp_day):
 
                     p.fitbit_steps = int(i["steps"]["countSum"])
+                    break
+
+            #process calories
+            p.fitbit_calories = 0
+            for i in result["fitbit_calories"]:
+                
+                civil_start_date = i["civilStartTime"]["date"]
+
+                if civil_start_date["year"] == int(temp_year) and \
+                   civil_start_date["month"] == int(temp_month) and \
+                   civil_start_date["day"] == int(temp_day):
+                    p.fitbit_calories = round(i["totalCalories"]["kcalSum"])
                     break
 
             # try:
