@@ -83971,6 +83971,13 @@ def get_fitbit_metrics_test():
                 }
             ]
             }
+        },
+        "activity_level_td": {
+            "status": "success",
+            "message": "",
+            "result": {
+            "dataPoints": []
+            }
         }
 }
 
